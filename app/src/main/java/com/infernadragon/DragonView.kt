@@ -7,15 +7,22 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RadialGradient
 import android.graphics.Shader
-import android.view.View
 import android.os.SystemClock
-import kotlin.math.sin
+import android.view.View
 import kotlin.math.min
+import kotlin.math.sin
 
+/**
+ * Opaque, connected crimson dragon drawn with vector paths.
+ * Only the ambient glow and embers use transparency.
+ */
 class DragonView(context: Context) : View(context) {
-    private val body = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeCap = Paint.Cap.ROUND; strokeJoin = Paint.Join.ROUND }
     private val fill = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
-    private val detail = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeCap = Paint.Cap.ROUND }
+    private val stroke = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeCap = Paint.Cap.ROUND
+        strokeJoin = Paint.Join.ROUND
+    }
     private val started = SystemClock.uptimeMillis()
     private var biteAt = 0L
     private var biteX = 0f
@@ -24,88 +31,221 @@ class DragonView(context: Context) : View(context) {
     init { setLayerType(View.LAYER_TYPE_SOFTWARE, null) }
 
     fun triggerBiteAtCenter() {
-        biteX = width / 2f
-        biteY = height / 2f
+        biteX = width * .52f
+        biteY = height * .48f
         biteAt = SystemClock.uptimeMillis()
         invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        val w = width.toFloat(); val h = height.toFloat()
-        if (w <= 0 || h <= 0) return
-        val t = (SystemClock.uptimeMillis() - started) / 1000f
-        val scale = min(w, h) / 390f
+        val w = width.toFloat()
+        val h = height.toFloat()
+        if (w <= 0f || h <= 0f) return
+        val now = SystemClock.uptimeMillis()
+        val t = (now - started) / 1000f
+        val s = min(w, h) / 390f
+
+        // Atmospheric edge glow: effects only, never a translucent dragon body.
         val glow = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
-        for (side in 0..1) {
-            val x = if (side == 0) 0f else w
-            glow.shader = RadialGradient(x, h * (0.28f + 0.44f * (0.5f + 0.5f * sin(t * 0.8f + side))), w * 0.24f,
-                intArrayOf(Color.argb(65, 255, 42, 0), Color.argb(22, 255, 22, 0), Color.TRANSPARENT), null, Shader.TileMode.CLAMP)
-            canvas.drawRect(if (side == 0) 0f else w * .72f, 0f, if (side == 0) w * .28f else w, h, glow)
-            glow.shader = null
+        glow.shader = RadialGradient(w * .82f, h * .45f, min(w, h) * .42f,
+            intArrayOf(Color.argb(46, 255, 28, 8), Color.argb(15, 160, 0, 0), Color.TRANSPARENT),
+            null, Shader.TileMode.CLAMP)
+        canvas.drawRect(0f, 0f, w, h, glow)
+        glow.shader = null
+
+        val biteElapsed = now - biteAt
+        val biting = biteElapsed in 0..620
+        val p = (biteElapsed / 620f).coerceIn(0f, 1f)
+        val lunge = if (biting) sin(p * Math.PI).toFloat() else 0f
+        val baseX = w * (.70f + .035f * sin(t * .42f))
+        val baseY = h * (.43f + .055f * sin(t * .72f))
+        val hx = baseX + (if (biting) (biteX - baseX) * .34f * lunge else 0f)
+        val hy = baseY + (if (biting) (biteY - baseY) * .28f * lunge else 0f) +
+            sin(t * 1.1f) * 5f * s
+
+        canvas.save()
+        // Scale the complete creature as one connected composition.
+        canvas.translate(hx, hy)
+        canvas.scale(s, s)
+
+        // Tail and body form one continuous S-curve into the neck.
+        val bodyPath = Path().apply {
+            moveTo(-330f, 86f + sin(t * 1.2f) * 9f)
+            cubicTo(-286f, 46f, -262f, 6f + sin(t) * 7f, -226f, 28f)
+            cubicTo(-192f, 49f, -198f, 105f + sin(t * .9f) * 8f, -154f, 103f)
+            cubicTo(-105f, 101f, -113f, 53f + sin(t * 1.1f) * 6f, -79f, 48f)
+            cubicTo(-54f, 44f, -51f, 22f, -27f, 14f)
         }
-        val path = Path()
-        val cx = w * (0.5f + 0.22f * sin(t * 0.47f))
-        val cy = h * (0.48f + 0.25f * sin(t * 0.31f + 1f))
-        val length = min(w, h) * 0.72f
-        for (i in 0..90) {
-            val u = i / 90f
-            val x = cx + (u - .5f) * length + sin(t * 1.2f + u * 9f) * w * .07f
-            val y = cy + sin(t * 1.1f + u * 9f) * h * .13f + (u - .5f) * h * .10f
-            if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
+        stroke.color = Color.rgb(22, 5, 10)
+        stroke.strokeWidth = 35f
+        canvas.drawPath(bodyPath, stroke)
+        stroke.color = Color.rgb(104, 8, 22)
+        stroke.strokeWidth = 27f
+        canvas.drawPath(bodyPath, stroke)
+        stroke.color = Color.rgb(183, 24, 31)
+        stroke.strokeWidth = 17f
+        canvas.drawPath(bodyPath, stroke)
+        stroke.color = Color.rgb(255, 81, 27)
+        stroke.strokeWidth = 2.5f
+        canvas.drawPath(bodyPath, stroke)
+
+        // Distinct pointed tail tip.
+        val tail = Path().apply {
+            moveTo(-305f, 72f); lineTo(-357f, 94f + sin(t * 1.2f) * 9f)
+            lineTo(-325f, 55f); close()
         }
-        body.strokeWidth = 20f * scale
-        body.color = Color.rgb(55, 8, 15)
-        canvas.drawPath(path, body)
-        body.strokeWidth = 13f * scale
-        body.color = Color.rgb(126, 15, 25)
-        canvas.drawPath(path, body)
-        body.strokeWidth = 3.5f * scale
-        body.color = Color.rgb(255, 83, 27)
-        canvas.drawPath(path, body)
-        for (i in 0..25) {
-            val u = i / 25f
-            val x = cx + (u - .5f) * length + sin(t * 1.2f + u * 9f) * w * .07f
-            val y = cy + sin(t * 1.1f + u * 9f) * h * .13f + (u - .5f) * h * .10f
-            fill.color = if (i % 3 == 0) Color.rgb(255, 92, 24) else Color.rgb(203, 34, 31)
-            canvas.drawCircle(x, y - 5f * scale, (2.4f + (i % 2)) * scale, fill)
+        fill.color = Color.rgb(65, 5, 17)
+        canvas.drawPath(tail, fill)
+        stroke.color = Color.rgb(211, 37, 30); stroke.strokeWidth = 2f
+        canvas.drawPath(tail, stroke)
+
+        // Two visible bat-like wings, attached to the back.
+        val wingShift = sin(t * 2.0f) * 7f
+        val wing = Path().apply {
+            moveTo(-190f, 45f)
+            lineTo(-222f, -38f + wingShift)
+            lineTo(-205f, -21f + wingShift)
+            lineTo(-181f, -73f + wingShift)
+            lineTo(-176f, -28f + wingShift)
+            lineTo(-143f, -48f + wingShift)
+            lineTo(-153f, 3f)
+            lineTo(-124f, 42f)
+            close()
         }
-        var hx = cx + sin(t * 1.2f) * w * .07f + length * .50f
-        var hy = cy + sin(t * 1.1f + 4.5f) * h * .13f + h * .05f
-        val biting = SystemClock.uptimeMillis() - biteAt < 500
-        if (biting) {
-            val p = ((SystemClock.uptimeMillis() - biteAt) / 500f).coerceIn(0f, 1f)
-            hx += (biteX - hx) * (if (p < .45f) p / .45f else (1f - p) / .55f)
-            hy += (biteY - hy) * (if (p < .45f) p / .45f else (1f - p) / .55f)
+        fill.color = Color.rgb(39, 5, 15)
+        canvas.drawPath(wing, fill)
+        stroke.color = Color.rgb(157, 19, 29); stroke.strokeWidth = 3f
+        canvas.drawPath(wing, stroke)
+        stroke.color = Color.rgb(113, 14, 25); stroke.strokeWidth = 2f
+        canvas.drawLine(-222f, -38f + wingShift, -153f, 3f, stroke)
+        canvas.drawLine(-181f, -73f + wingShift, -153f, 3f, stroke)
+        canvas.drawLine(-176f, -28f + wingShift, -153f, 3f, stroke)
+
+        // Back spines make the silhouette unmistakably dragon-like.
+        for (i in 0..8) {
+            val x = -235f + i * 22f
+            val y = if (i < 3) 20f else 46f
+            val spine = Path().apply {
+                moveTo(x - 7f, y + 1f); lineTo(x, y - 17f); lineTo(x + 8f, y + 1f); close()
+            }
+            fill.color = Color.rgb(31, 4, 11)
+            canvas.drawPath(spine, fill)
+            stroke.color = Color.rgb(237, 47, 28); stroke.strokeWidth = 1.5f
+            canvas.drawPath(spine, stroke)
         }
-        canvas.save(); canvas.translate(hx, hy); canvas.rotate(sin(t * 1.1f) * 25f)
-        val horn = Path().apply { moveTo(-8f*scale, -7f*scale); quadTo(-24f*scale, -35f*scale, -29f*scale, -39f*scale); quadTo(-22f*scale, -16f*scale, -2f*scale, 0f) }
-        fill.color = Color.rgb(24, 8, 12); canvas.drawPath(horn, fill)
-        canvas.save(); canvas.scale(1f, -1f); canvas.drawPath(horn, fill); canvas.restore()
-        fill.color = Color.rgb(74, 8, 17)
-        val head = Path().apply { moveTo(-20f*scale, -15f*scale); cubicTo(-9f*scale, -30f*scale, 14f*scale, -24f*scale, 24f*scale, -8f*scale); lineTo(38f*scale, 0f); lineTo(20f*scale, 9f*scale); cubicTo(7f*scale, 23f*scale, -13f*scale, 17f*scale, -20f*scale, 5f*scale); close() }
-        canvas.drawPath(head, fill)
-        detail.color = Color.rgb(255, 91, 25); detail.strokeWidth = 2f*scale
-        canvas.drawLine(-4f*scale, -10f*scale, 9f*scale, -7f*scale, detail)
-        fill.color = Color.rgb(255, 183, 39); canvas.drawCircle(6f*scale, -7f*scale, 3.2f*scale, fill)
-        fill.color = Color.BLACK; canvas.drawCircle(7f*scale, -7f*scale, 1.3f*scale, fill)
-        val teeth = Path().apply { moveTo(14f*scale, 7f*scale); lineTo(19f*scale, 14f*scale); lineTo(21f*scale, 7f*scale); lineTo(28f*scale, 5f*scale); lineTo(30f*scale, 1f*scale); close() }
-        fill.color = Color.rgb(255, 226, 181); canvas.drawPath(teeth, fill)
-        detail.color = Color.rgb(255, 95, 36); detail.strokeWidth = 1.4f*scale
-        canvas.drawLine(13f*scale, 4f*scale, 35f*scale, 18f*scale, detail)
-        canvas.drawLine(13f*scale, -2f*scale, 37f*scale, -12f*scale, detail)
+
+        // Raised scale plates along the visible upper side of the body.
+        for (i in 0..13) {
+            val u = i / 13f
+            val x = -310f + u * 270f
+            val y = 75f - 43f * sin(u * Math.PI).toFloat() + 15f * sin(u * 2.2f * Math.PI).toFloat()
+            val plate = Path().apply {
+                moveTo(x - 6f, y + 2f); lineTo(x, y - 6f); lineTo(x + 7f, y + 2f)
+                lineTo(x, y + 5f); close()
+            }
+            fill.color = if (i % 3 == 0) Color.rgb(255, 91, 30) else Color.rgb(211, 39, 35)
+            canvas.drawPath(plate, fill)
+        }
+
+        // Neck flows directly into the skull.
+        val neck = Path().apply {
+            moveTo(-43f, 25f)
+            cubicTo(-29f, 20f, -27f, 10f, -17f, 5f)
+            lineTo(-4f, 4f)
+            lineTo(-4f, 23f)
+            cubicTo(-20f, 30f, -32f, 34f, -43f, 25f)
+            close()
+        }
+        fill.color = Color.rgb(76, 5, 17)
+        canvas.drawPath(neck, fill)
+        stroke.color = Color.rgb(190, 28, 31); stroke.strokeWidth = 2.5f
+        canvas.drawPath(neck, stroke)
+
+        // Skull, muzzle and lower jaw are separate solid shapes with a clear mouth gap.
+        val skull = Path().apply {
+            moveTo(-26f, 5f)
+            cubicTo(-30f, -13f, -19f, -30f, -2f, -31f)
+            cubicTo(13f, -32f, 24f, -23f, 28f, -13f)
+            lineTo(43f, -7f)
+            lineTo(37f, 1f)
+            lineTo(17f, 4f)
+            lineTo(7f, 13f)
+            cubicTo(-6f, 17f, -19f, 14f, -26f, 5f)
+            close()
+        }
+        fill.color = Color.rgb(86, 7, 18)
+        canvas.drawPath(skull, fill)
+        stroke.color = Color.rgb(226, 40, 32); stroke.strokeWidth = 2.5f
+        canvas.drawPath(skull, stroke)
+
+        // Horns.
+        val horns = Path().apply {
+            moveTo(-17f, -22f); cubicTo(-35f, -34f, -38f, -49f, -30f, -58f)
+            cubicTo(-29f, -42f, -19f, -35f, -7f, -29f); close()
+            moveTo(0f, -29f); cubicTo(-4f, -43f, 2f, -52f, 10f, -57f)
+            cubicTo(7f, -42f, 11f, -35f, 16f, -28f); close()
+        }
+        fill.color = Color.rgb(25, 7, 11)
+        canvas.drawPath(horns, fill)
+        stroke.color = Color.rgb(153, 25, 28); stroke.strokeWidth = 1.8f
+        canvas.drawPath(horns, stroke)
+
+        // Eye socket, glowing amber eye and slit pupil.
+        fill.color = Color.rgb(25, 1, 4)
+        canvas.drawOval(-2f, -22f, 17f, -7f, fill)
+        fill.color = Color.rgb(255, 183, 35)
+        canvas.drawOval(2f, -19f, 14f, -10f, fill)
+        fill.color = Color.BLACK
+        canvas.drawOval(7f, -19f, 10f, -10f, fill)
+        fill.color = Color.rgb(255, 244, 187)
+        canvas.drawCircle(5f, -16f, 1.8f, fill)
+
+        // Nostril and fangs on the upper muzzle.
+        fill.color = Color.rgb(18, 2, 5)
+        canvas.drawCircle(31f, -9f, 2.3f, fill)
+        val fangs = Path().apply {
+            moveTo(13f, 0f); lineTo(17f, 10f); lineTo(20f, 1f); close()
+            moveTo(27f, -2f); lineTo(30f, 6f); lineTo(33f, -3f); close()
+        }
+        fill.color = Color.rgb(255, 226, 185)
+        canvas.drawPath(fangs, fill)
+
+        // Open lower jaw; it moves down during the bite.
+        val jawDrop = if (biting) 9f * sin(p * Math.PI).toFloat() else 1.5f
+        val jaw = Path().apply {
+            moveTo(2f, 7f + jawDrop)
+            cubicTo(13f, 10f + jawDrop, 28f, 9f + jawDrop, 39f, 2f + jawDrop)
+            lineTo(32f, 18f + jawDrop)
+            cubicTo(20f, 25f + jawDrop, 8f, 20f + jawDrop, 2f, 7f + jawDrop)
+            close()
+        }
+        fill.color = Color.rgb(53, 3, 13)
+        canvas.drawPath(jaw, fill)
+        stroke.color = Color.rgb(219, 42, 31); stroke.strokeWidth = 2f
+        canvas.drawPath(jaw, stroke)
+        val lowerFangs = Path().apply {
+            moveTo(18f, 13f + jawDrop); lineTo(20f, 7f + jawDrop); lineTo(23f, 14f + jawDrop); close()
+            moveTo(29f, 9f + jawDrop); lineTo(31f, 4f + jawDrop); lineTo(33f, 10f + jawDrop); close()
+        }
+        fill.color = Color.rgb(255, 228, 191)
+        canvas.drawPath(lowerFangs, fill)
+
         canvas.restore()
+
+        // Bite flash stays separate from the solid creature.
         if (biting) {
-            val p = (SystemClock.uptimeMillis() - biteAt) / 500f
-            fill.color = Color.argb(((1f-p)*180).toInt().coerceIn(0,180), 255, 75, 0)
-            canvas.drawCircle(biteX, biteY, (12f + p*48f)*scale, fill)
+            fill.color = Color.argb(((1f - p) * 130f).toInt().coerceIn(0, 130), 255, 67, 8)
+            canvas.drawCircle(biteX, biteY, (14f + p * 36f) * s, fill)
         }
-        for (i in 0..16) {
-            val phase = t * (0.8f + i % 4 * .16f) + i * 2.13f
-            val x = (i * 73f + sin(phase) * 24f * scale) % w
-            val y = (h * ((phase * .12f + i * .173f) % 1f))
-            fill.color = Color.argb((80 + 130 * (0.5f + .5f * sin(phase))).toInt().coerceIn(0,255), 255, 75, 15)
-            canvas.drawCircle(x, y, (1f + (i % 3)) * scale, fill)
+
+        // A few small embers; no smoke veil over the dragon.
+        for (i in 0..11) {
+            val phase = t * (0.7f + (i % 4) * .17f) + i * 2.1f
+            val x = (w * .5f + sin(phase) * w * .42f + w) % w
+            val y = (h * ((phase * .09f + i * .19f) % 1f))
+            fill.color = Color.argb((75 + 110 * (.5f + .5f * sin(phase))).toInt().coerceIn(0, 185), 255, 70, 14)
+            canvas.drawCircle(x, y, (1f + (i % 2)) * s, fill)
         }
         postInvalidateOnAnimation()
     }
