@@ -55,7 +55,7 @@ class DragonView(context: Context) : View(context) {
         glow.shader = null
 
         val biteElapsed = now - biteAt
-        val biting = biteElapsed in 0..620
+        val biting = biteElapsed >= 0L && biteElapsed <= 620L
         val p = (biteElapsed / 620f).coerceIn(0f, 1f)
         val lunge = if (biting) sin(p * Math.PI).toFloat() else 0f
         val baseX = w * (.70f + .035f * sin(t * .42f))
