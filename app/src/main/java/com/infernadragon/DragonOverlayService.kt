@@ -5,11 +5,10 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.os.IBinder
-import android.webkit.JavascriptInterface
 import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
-import android.widget.FrameLayout
+import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -18,20 +17,14 @@ import android.webkit.WebViewClient
 class DragonOverlayService : Service() {
     private lateinit var windowManager: WindowManager
     private var webView: WebView? = null
-    private var fallbackDragon: DragonView? = null
+    private var overlay: View? = null
 
     override fun onCreate() {
         super.onCreate()
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
-        // Always put a native dragon on screen first. The remote 3D model is an
-        // enhancement, never a single point of failure: if WebGL/CDN/model loading
-        // fails, the user still sees the dragon rather than a blank overlay.
-        val fallback = DragonView(this).apply {
-            setBackgroundColor(Color.TRANSPARENT)
-        }
-        fallbackDragon = fallback
-
+        // The remote rigged GLB is the only dragon renderer.
+        // Never create or reveal the old hand-drawn DragonView as a fallback.
         val web = WebView(this).apply {
             setBackgroundColor(Color.TRANSPARENT)
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
@@ -43,29 +36,13 @@ class DragonOverlayService : Service() {
             settings.allowUniversalAccessFromFileURLs = true
             settings.cacheMode = WebSettings.LOAD_DEFAULT
             settings.mediaPlaybackRequiresUserGesture = true
-            addJavascriptInterface(DragonBridge { success ->
-                fallback.post {
-                    if (success) fallback.visibility = View.GONE
-                    else fallback.visibility = View.VISIBLE
-                }
-            }, "AndroidDragon")
+            addJavascriptInterface(DragonBridge(), "AndroidDragon")
             webViewClient = WebViewClient()
             webChromeClient = WebChromeClient()
             loadUrl("file:///android_asset/dragon3d.html")
         }
         webView = web
 
-        val stack = FrameLayout(this).apply {
-            setBackgroundColor(Color.TRANSPARENT)
-            addView(fallback, FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
-            ))
-            addView(web, FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
-            ))
-        }
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT,
@@ -75,24 +52,25 @@ class DragonOverlayService : Service() {
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
             PixelFormat.TRANSLUCENT
         ).apply { gravity = Gravity.TOP or Gravity.START }
-        windowManager.addView(stack, params)
-        overlay = stack
+        windowManager.addView(web, params)
+        overlay = web
     }
 
-    private var overlay: View? = null
-
-    private inner class DragonBridge(private val report: (Boolean) -> Unit) {
+    private inner class DragonBridge {
         @JavascriptInterface
-        fun modelLoaded() { report(true) }
+        fun modelLoaded() {
+            // The 3D model loaded successfully. No native substitute exists.
+        }
 
         @JavascriptInterface
-        fun modelFailed() { report(false) }
+        fun modelFailed() {
+            // Keep the HTML diagnostic visible; do not resurrect the removed dragon.
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_BITE_CENTER) {
             webView?.evaluateJavascript("window.dragonBite && window.dragonBite()", null)
-            fallbackDragon?.triggerBiteAtCenter()
         }
         return START_STICKY
     }
@@ -105,7 +83,6 @@ class DragonOverlayService : Service() {
             it.destroy()
         }
         webView = null
-        fallbackDragon = null
         overlay = null
         super.onDestroy()
     }
