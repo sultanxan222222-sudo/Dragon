@@ -10,8 +10,8 @@ android {
         applicationId = "com.infernadragon"
         minSdk = 26
         targetSdk = 28
-        versionCode = 4
-        versionName = "0.4-living-dragon"
+        versionCode = 5
+        versionName = "0.5-visible-diagnostics"
     }
 
     compileOptions {
