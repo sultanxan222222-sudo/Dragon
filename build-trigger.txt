@@ -1,0 +1,1 @@
+Trigger a fresh Inferno Dragon APK build after the previous run stalled during Android command-line tools setup.
