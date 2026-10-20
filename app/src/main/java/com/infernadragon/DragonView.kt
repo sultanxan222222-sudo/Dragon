@@ -199,6 +199,54 @@ class DragonView(context: Context) : View(context) {
         stroke.color = Color.rgb(211, 37, 30); stroke.strokeWidth = 2f
         canvas.drawPath(tail, stroke)
 
+        // Four articulated-looking legs break the silhouette out of a simple worm shape.
+        // Their slight alternating movement is most visible while the dragon crawls.
+        val crawlMotion = sin(t * 5.2f) * 5f
+        fun drawLeg(x: Float, y: Float, phase: Float) {
+            val step = crawlMotion * phase
+            val limb = Path().apply {
+                moveTo(x, y)
+                cubicTo(x - 5f, y + 12f, x - 12f + step, y + 17f, x - 9f + step, y + 26f)
+                cubicTo(x - 4f + step, y + 29f, x + 5f + step, y + 25f, x + 7f + step, y + 21f)
+            }
+            stroke.color = Color.rgb(28, 4, 10)
+            stroke.strokeWidth = 13f
+            canvas.drawPath(limb, stroke)
+            stroke.color = Color.rgb(137, 12, 25)
+            stroke.strokeWidth = 8f
+            canvas.drawPath(limb, stroke)
+            stroke.color = Color.rgb(238, 53, 35)
+            stroke.strokeWidth = 1.8f
+            canvas.drawPath(limb, stroke)
+            for (toe in 0..2) {
+                val tx = x + step + 2f + toe * 4f
+                val claw = Path().apply {
+                    moveTo(tx, y + 23f)
+                    lineTo(tx + 2f, y + 29f)
+                    lineTo(tx + 5f, y + 24f)
+                }
+                stroke.color = Color.rgb(255, 218, 174)
+                stroke.strokeWidth = 1.8f
+                canvas.drawPath(claw, stroke)
+            }
+        }
+        drawLeg(-203f, 51f, 1f)
+        drawLeg(-171f, 61f, -1f)
+        drawLeg(-125f, 73f, -1f)
+        drawLeg(-91f, 57f, 1f)
+
+        // Segmented armored belly, visually separating the torso from the tail.
+        for (i in 0..5) {
+            val x = -185f + i * 19f
+            val belly = Path().apply {
+                moveTo(x - 7f, 83f)
+                quadraticTo(x, 96f + sin(t * 2f + i) * 1.5f, x + 8f, 82f)
+            }
+            stroke.color = Color.rgb(240, 93, 53)
+            stroke.strokeWidth = 3.2f
+            canvas.drawPath(belly, stroke)
+        }
+
         // Two visible bat-like wings, attached to the back.
         val wingShift = sin(t * 2.0f) * 7f
         val wing = Path().apply {
