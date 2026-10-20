@@ -10,8 +10,8 @@ android {
         applicationId = "com.infernadragon"
         minSdk = 26
         targetSdk = 28
-        versionCode = 7
-        versionName = "0.7-3d-only"
+        versionCode = 8
+        versionName = "0.8-3d-fix"
     }
 
     compileOptions {
@@ -22,4 +22,8 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+}
+
+dependencies {
+    implementation("androidx.webkit:webkit:1.12.1")
 }
