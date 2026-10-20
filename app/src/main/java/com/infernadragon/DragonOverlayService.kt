@@ -13,6 +13,9 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import androidx.webkit.WebViewAssetLoader
 
 class DragonOverlayService : Service() {
     private lateinit var windowManager: WindowManager
@@ -23,23 +26,32 @@ class DragonOverlayService : Service() {
         super.onCreate()
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
-        // The remote rigged GLB is the only dragon renderer.
-        // Never create or reveal the old hand-drawn DragonView as a fallback.
+        // Serve bundled files from a secure HTTPS-like origin. ES modules and
+        // relative GLB/module URLs often fail when loaded directly from file://.
+        val assetLoader = WebViewAssetLoader.Builder()
+            .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
+            .build()
+
         val web = WebView(this).apply {
             setBackgroundColor(Color.TRANSPARENT)
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
-            settings.allowFileAccess = true
+            settings.allowFileAccess = false
             settings.allowContentAccess = true
-            @Suppress("DEPRECATION")
-            settings.allowUniversalAccessFromFileURLs = true
             settings.cacheMode = WebSettings.LOAD_DEFAULT
             settings.mediaPlaybackRequiresUserGesture = true
             addJavascriptInterface(DragonBridge(), "AndroidDragon")
-            webViewClient = WebViewClient()
+            webViewClient = object : WebViewClient() {
+                override fun shouldInterceptRequest(
+                    view: WebView?,
+                    request: WebResourceRequest
+                ): WebResourceResponse? {
+                    return assetLoader.shouldInterceptRequest(request.url)
+                }
+            }
             webChromeClient = WebChromeClient()
-            loadUrl("file:///android_asset/dragon3d.html")
+            loadUrl("https://appassets.androidplatform.net/assets/dragon3d.html")
         }
         webView = web
 
@@ -59,12 +71,12 @@ class DragonOverlayService : Service() {
     private inner class DragonBridge {
         @JavascriptInterface
         fun modelLoaded() {
-            // The 3D model loaded successfully. No native substitute exists.
+            // The bundled 3D model loaded successfully.
         }
 
         @JavascriptInterface
         fun modelFailed() {
-            // Keep the HTML diagnostic visible; do not resurrect the removed dragon.
+            // Keep the on-screen diagnostic; no fake dragon fallback.
         }
     }
 
