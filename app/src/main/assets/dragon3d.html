@@ -51,8 +51,10 @@ loader.load('https://afk.ai/rig/animations/dragon-animations.glb', gltf => {
   clips = gltf.animations || [];
   mixer = new THREE.AnimationMixer(dragon);
   const pick = keys => clips.find(c => keys.some(k => c.name.toLowerCase().includes(k)));
-  const idle = pick(['idle','stand']) || clips[0];
+  const idle = pick(['idle']) || clips[0];
   if(idle) playClip(idle, true);
+  // AFK.ai's public CC0 dragon GLB includes a real 100-joint rig and
+  // the named Idle, Walk, Fly Flap and Fly Glide animation clips.
   status.textContent = '';
 }, undefined, err => { status.textContent='3D dragon failed to load'; });
 
@@ -76,16 +78,19 @@ function animate(){
     const cycle=now%24;
     const flying=(cycle>5&&cycle<12)||(cycle>17&&cycle<22);
     const walk=!flying && cycle<5;
-    const desired=flying ? (clips.find(c=>/fly flap|fly|glide/i.test(c.name))) :
-      walk ? (clips.find(c=>/walk/i.test(c.name))) :
-      (clips.find(c=>/idle/i.test(c.name)) || clips[0]);
-    const nextMode=flying?'fly':walk?'walk':'idle';
+    const flap = pick(['fly flap']) || pick(['fly']);
+    const glide = pick(['fly glide','glide']);
+    const walkClip = pick(['walk']);
+    const idleClip = pick(['idle']) || clips[0];
+    const glidePhase = flying && (cycle > 8.5 && cycle < 10.5);
+    const desired = flying ? (glidePhase ? (glide || flap) : (flap || glide)) :
+      walk ? (walkClip || idleClip) : idleClip;
+    const nextMode = flying ? (glidePhase ? 'glide' : 'fly') : walk ? 'walk' : 'idle';
     if(nextMode!==lastMode && desired){playClip(desired,true);lastMode=nextMode;}
-    const progress=cycle/24;
     dragon.position.x=Math.sin(now*.36)*1.15;
-    dragon.position.y=(flying ? .45+Math.sin(now*2.4)*.13 : .0+Math.sin(now*1.7)*.025);
+    dragon.position.y=(flying ? .55+Math.sin(now*2.4)*.16 : .0+Math.sin(now*1.7)*.025);
     dragon.rotation.y=(Math.sin(now*.36)>0 ? Math.PI : 0);
-    dragon.rotation.z=flying ? Math.sin(now*1.4)*.035 : Math.sin(now*.9)*.012;
+    dragon.rotation.z=flying ? Math.sin(now*1.4)*.045 : Math.sin(now*.9)*.012;
     if(attackAt && performance.now()-attackAt<620){
       const p=(performance.now()-attackAt)/620;
       dragon.position.z=Math.sin(p*Math.PI)*.75;
