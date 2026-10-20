@@ -240,7 +240,7 @@ class DragonView(context: Context) : View(context) {
             val x = -185f + i * 19f
             val belly = Path().apply {
                 moveTo(x - 7f, 83f)
-                quadraticTo(x, 96f + sin(t * 2f + i) * 1.5f, x + 8f, 82f)
+                quadTo(x, 96f + sin(t * 2f + i) * 1.5f, x + 8f, 82f)
             }
             stroke.color = Color.rgb(240, 93, 53)
             stroke.strokeWidth = 3.2f
