@@ -19,8 +19,22 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Install Android command line tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+          mkdir -p "$HOME/android-sdk/cmdline-tools"
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O /tmp/android-tools.zip
+          mkdir -p /tmp/android-tools
+          unzip -q /tmp/android-tools.zip -d /tmp/android-tools
+          mv /tmp/android-tools/cmdline-tools "$HOME/android-sdk/cmdline-tools/latest"
+          echo "ANDROID_HOME=$HOME/android-sdk" >> "$GITHUB_ENV"
+          echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          echo "$HOME/android-sdk/platform-tools" >> "$GITHUB_PATH"
       - name: Install Android platform
-        run: yes | sdkmanager --licenses && sdkmanager --install 'platforms;android-35' 'build-tools;35.0.0'
+        run: |
+          yes | sdkmanager --sdk_root="$ANDROID_HOME" --licenses
+          sdkmanager --sdk_root="$ANDROID_HOME" --install 'platforms;android-35' 'build-tools;35.0.0'
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
