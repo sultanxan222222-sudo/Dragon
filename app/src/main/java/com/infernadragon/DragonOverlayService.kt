@@ -26,6 +26,8 @@ class DragonOverlayService : Service() {
             settings.domStorageEnabled = true
             settings.allowFileAccess = true
             settings.allowContentAccess = true
+            @Suppress("DEPRECATION")
+            settings.allowUniversalAccessFromFileURLs = true
             settings.cacheMode = WebSettings.LOAD_DEFAULT
             settings.mediaPlaybackRequiresUserGesture = true
             webViewClient = WebViewClient()
