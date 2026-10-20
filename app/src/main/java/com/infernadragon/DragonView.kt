@@ -52,9 +52,10 @@ class DragonView(context: Context) : View(context) {
             val samples = ShortArray(count)
             for (i in 0 until count) {
                 val x = i.toFloat() / count
+                val xd = x.toDouble()
                 val envelope = sin(PI * x).toFloat().coerceAtLeast(0f).let { it * it }
-                val wobble = 1f + .12f * sin(2.0 * PI * 5.0 * x).toFloat()
-                val phase = 2.0 * PI * (58.0 * x * .72 + 9.0 * x * x)
+                val wobble = 1f + .12f * sin(2.0 * PI * 5.0 * xd).toFloat()
+                val phase = 2.0 * PI * (58.0 * xd * .72 + 9.0 * xd * xd)
                 val rumble = sin(phase).toFloat() * .62f +
                     sin(phase * 1.91).toFloat() * .23f +
                     sin(phase * 3.17).toFloat() * .10f +
