@@ -45,8 +45,8 @@ loader.load('https://afk.ai/rig/animations/dragon-animations.glb', gltf => {
   const center = box.getCenter(new THREE.Vector3());
   dragon.position.sub(center);
   const longest = Math.max(size.x,size.y,size.z) || 1;
-  dragon.scale.setScalar(4.8/longest);
-  dragon.position.y -= (center.y - box.min.y) * (4.8/longest) * .15;
+  dragon.scale.setScalar(3.0/longest);
+  dragon.position.y -= (center.y - box.min.y) * (3.0/longest) * .15;
   scene.add(dragon);
   clips = gltf.animations || [];
   mixer = new THREE.AnimationMixer(dragon);
