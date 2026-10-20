@@ -34,12 +34,12 @@ scene.add(new THREE.HemisphereLight(0xffd8cb, 0x19080b, 2.0));
 const key = new THREE.DirectionalLight(0xffe2ce, 3.0); key.position.set(4,7,5); scene.add(key);
 const rim = new THREE.DirectionalLight(0xff351f, 2.2); rim.position.set(-5,2,-4); scene.add(rim);
 
-let dragon=null, mixer=null, clips=[], activeAction=null, mode='idle', attackAt=0;
+let dragon=null, mixer=null, clips=[], activeAction=null, mode='idle', attackAt=0, headBone=null, jawBone=null, headBase=null, jawBase=null;
 const clock = new THREE.Clock();
 const loader = new GLTFLoader();
 loader.load('https://afk.ai/rig/animations/dragon-animations.glb', gltf => {
   dragon = gltf.scene;
-  dragon.traverse(o => { if(o.isMesh){ o.frustumCulled=false; if(o.material){o.material.transparent=false; o.material.side=THREE.DoubleSide;} }});
+  dragon.traverse(o => {\n    if(o.isMesh){ o.frustumCulled=false; if(o.material){o.material.transparent=false; o.material.side=THREE.DoubleSide;} }\n    if(o.isBone){\n      const n=(o.name||'').toLowerCase().replace(/[^a-z]/g,'');\n      if(!headBone && (n==='head' || n.includes('headbone') || n.includes('neckhead'))) { headBone=o; headBase=o.rotation.x; }\n      if(!jawBone && (n.includes('jaw') || n.includes('mandible'))) { jawBone=o; jawBase=o.rotation.x; }\n    }\n  });
   const box = new THREE.Box3().setFromObject(dragon);
   const size = box.getSize(new THREE.Vector3());
   const center = box.getCenter(new THREE.Vector3());
