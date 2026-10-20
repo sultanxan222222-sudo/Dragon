@@ -1,132 +1,29 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 <head>
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta charset="utf-8">
-<style>
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent}
-canvas{display:block;width:100%;height:100%;background:transparent}
-#status{position:absolute;left:8px;right:8px;top:12px;z-index:10;text-align:center;color:#fff;background:rgba(35,8,8,.82);border:1px solid rgba(255,100,60,.65);border-radius:10px;padding:10px 8px;font:14px sans-serif;white-space:pre-line;pointer-events:none}
-</style>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta charset="utf-8">
+<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent}canvas{display:block;width:100%;height:100%;background:transparent}#status{position:absolute;left:8px;right:8px;top:12px;z-index:10;text-align:center;color:#fff;background:rgba(35,8,8,.82);border:1px solid rgba(255,100,60,.65);border-radius:10px;padding:10px 8px;font:14px sans-serif;white-space:pre-line;pointer-events:none}</style>
+<script type="importmap">{"imports":{"three":"./three.module.js"}}</script>
 </head>
 <body>
-<div id="status">ДРАКОН ЗАГРУЖАЕТСЯ…</div>
+<div id="status">ЗАГРУЖАЕМ ДРАКОНА…</div>
 <script>
-  // Keep a visible diagnostic if remote 3D scripts/model cannot load.
-  window.__dragonLoaded = false;
-  setTimeout(() => {
-    if (!window.__dragonLoaded) {
-      if (window.AndroidDragon) window.AndroidDragon.modelFailed();
-      const s = document.getElementById('status');
-      if (s && s.textContent.includes('ЗАГРУЖАЕТСЯ')) {
-        s.textContent = 'ДРАКОН НЕ ЗАГРУЗИЛСЯ\\nПроверь интернет и повторно включи дракона';
-      }
-    }
-  }, 20000);
-</script>
-<script type="importmap">
-{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}
+window.__dragonLoaded=false;
+setTimeout(()=>{if(!window.__dragonLoaded){if(window.AndroidDragon)window.AndroidDragon.modelFailed();const s=document.getElementById('status');if(s)s.textContent='НЕ УДАЛОСЬ ЗАГРУЗИТЬ ДРАКОНА';}},15000);
 </script>
 <script type="module">
 import * as THREE from 'three';
-import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/loaders/GLTFLoader.js';
-
-const status = document.getElementById('status');
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(34, innerWidth / innerHeight, 0.1, 100);
-camera.position.set(0, 1.0, 10);
-const renderer = new THREE.WebGLRenderer({alpha:true, antialias:true, powerPreference:'low-power'});
-renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5));
-renderer.setSize(innerWidth, innerHeight);
-renderer.setClearColor(0x000000, 0);
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.1;
-document.body.appendChild(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xffd8cb, 0x19080b, 2.0));
-const key = new THREE.DirectionalLight(0xffe2ce, 3.0); key.position.set(4,7,5); scene.add(key);
-const rim = new THREE.DirectionalLight(0xff351f, 2.2); rim.position.set(-5,2,-4); scene.add(rim);
-
-let dragon=null, mixer=null, clips=[], activeAction=null, mode='idle', attackAt=0, headBone=null, jawBone=null, headBase=null, jawBase=null;
-const clock = new THREE.Clock();
-const loader = new GLTFLoader();
-loader.load('https://afk.ai/rig/animations/dragon-animations.glb', gltf => {
-  dragon = gltf.scene;
-  dragon.traverse(o => {
-    if(o.isMesh){ o.frustumCulled=false; if(o.material){o.material.transparent=false; o.material.side=THREE.DoubleSide;} }
-    if(o.isBone){
-      const n=(o.name||'').toLowerCase().replace(/[^a-z]/g,'');
-      if(!headBone && (n==='head' || n.includes('headbone') || n.includes('neckhead'))) { headBone=o; headBase=o.rotation.x; }
-      if(!jawBone && (n.includes('jaw') || n.includes('mandible'))) { jawBone=o; jawBase=o.rotation.x; }
-    }
-  });
-  const box = new THREE.Box3().setFromObject(dragon);
-  const size = box.getSize(new THREE.Vector3());
-  const center = box.getCenter(new THREE.Vector3());
-  dragon.position.sub(center);
-  const longest = Math.max(size.x,size.y,size.z) || 1;
-  dragon.scale.setScalar(3.0/longest);
-  dragon.position.y -= (center.y - box.min.y) * (3.0/longest) * .15;
-  scene.add(dragon);
-  clips = gltf.animations || [];
-  mixer = new THREE.AnimationMixer(dragon);
-  const pick = keys => clips.find(c => keys.some(k => c.name.toLowerCase().includes(k)));
-  const idle = pick(['idle']) || clips[0];
-  if(idle) playClip(idle, true);
-  // AFK.ai's public CC0 dragon GLB includes a real 100-joint rig and
-  // the named Idle, Walk, Fly Flap and Fly Glide animation clips.
-  window.__dragonLoaded = true;
-  if (window.AndroidDragon) window.AndroidDragon.modelLoaded();
-  status.textContent = 'ДРАКОН ГОТОВ';
-  setTimeout(() => { status.style.display = 'none'; }, 1400);
-}, undefined, err => {
-  console.error('Dragon GLB load failed', err);
-  if (window.AndroidDragon) window.AndroidDragon.modelFailed();
-  status.textContent='ДРАКОН НЕ ЗАГРУЗИЛСЯ\\nПроверь интернет и повторно включи дракона';
-});
-
-function playClip(clip, loop) {
-  if(!mixer || !clip) return;
-  if(activeAction) activeAction.fadeOut(.18);
-  activeAction=mixer.clipAction(clip);
-  activeAction.reset().fadeIn(.18);
-  activeAction.setLoop(loop ? THREE.LoopRepeat : THREE.LoopOnce, loop ? Infinity : 1);
-  activeAction.clampWhenFinished=!loop;
-  activeAction.play();
-}
-window.dragonBite = () => { attackAt=performance.now(); mode='attack'; };
-window.dragonStop = () => { mode='idle'; };
-let lastMode='';
-function animate(){
-  requestAnimationFrame(animate);
-  const dt=Math.min(clock.getDelta(),.05), now=performance.now()/1000;
-  if(mixer) mixer.update(dt);
-  if(dragon){
-    const cycle=now%24;
-    const flying=(cycle>5&&cycle<12)||(cycle>17&&cycle<22);
-    const walk=!flying && cycle<5;
-    const flap = pick(['fly flap']) || pick(['fly']);
-    const glide = pick(['fly glide','glide']);
-    const walkClip = pick(['walk']);
-    const idleClip = pick(['idle']) || clips[0];
-    const glidePhase = flying && (cycle > 8.5 && cycle < 10.5);
-    const desired = flying ? (glidePhase ? (glide || flap) : (flap || glide)) :
-      walk ? (walkClip || idleClip) : idleClip;
-    const nextMode = flying ? (glidePhase ? 'glide' : 'fly') : walk ? 'walk' : 'idle';
-    if(nextMode!==lastMode && desired){playClip(desired,true);lastMode=nextMode;}
-    dragon.position.x=Math.sin(now*.36)*1.15;
-    dragon.position.y=(flying ? .55+Math.sin(now*2.4)*.16 : .0+Math.sin(now*1.7)*.025);
-    dragon.rotation.y=(Math.sin(now*.36)>0 ? Math.PI : 0);
-    dragon.rotation.z=flying ? Math.sin(now*1.4)*.045 : Math.sin(now*.9)*.012;
-    if(attackAt && performance.now()-attackAt<620){
-      const p=(performance.now()-attackAt)/620;
-      dragon.position.z=Math.sin(p*Math.PI)*.75;
-    } else { attackAt=0; }
-  }
-  renderer.render(scene,camera);
-}
-animate();
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
-</script>
-</body>
-</html>
+import { GLTFLoader } from './GLTFLoader.js';
+const status=document.getElementById('status');
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(34,innerWidth/innerHeight,.1,100);camera.position.set(0,1,10);
+const renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:'low-power'});renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.setSize(innerWidth,innerHeight);renderer.setClearColor(0,0);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;document.body.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xffd8cb,0x19080b,2));const key=new THREE.DirectionalLight(0xffe2ce,3);key.position.set(4,7,5);scene.add(key);const rim=new THREE.DirectionalLight(0xff351f,2.2);rim.position.set(-5,2,-4);scene.add(rim);
+let dragon=null,mixer=null,clips=[],activeAction=null,attackAt=0,lastMode='';const clock=new THREE.Clock();const loader=new GLTFLoader();
+function findClip(keys){return clips.find(c=>keys.some(k=>c.name.toLowerCase().includes(k)));}
+function playClip(clip,loop=true){if(!mixer||!clip)return;if(activeAction)activeAction.fadeOut(.2);activeAction=mixer.clipAction(clip);activeAction.reset().fadeIn(.2);activeAction.setLoop(loop?THREE.LoopRepeat:THREE.LoopOnce,loop?Infinity:1);activeAction.clampWhenFinished=!loop;activeAction.play();}
+loader.load('./dragon-animations.glb',gltf=>{dragon=gltf.scene;dragon.traverse(o=>{if(o.isMesh){o.frustumCulled=false;if(o.material)o.material.side=THREE.DoubleSide;}});const box=new THREE.Box3().setFromObject(dragon),size=box.getSize(new THREE.Vector3()),center=box.getCenter(new THREE.Vector3());dragon.position.sub(center);dragon.scale.setScalar(3/(Math.max(size.x,size.y,size.z)||1));scene.add(dragon);clips=gltf.animations||[];mixer=new THREE.AnimationMixer(dragon);playClip(findClip(['idle'])||clips[0]);window.__dragonLoaded=true;if(window.AndroidDragon)window.AndroidDragon.modelLoaded();status.textContent='ДРАКОН ГОТОВ';setTimeout(()=>status.style.display='none',1200);},undefined,err=>{console.error('Bundled dragon load failed',err);if(window.AndroidDragon)window.AndroidDragon.modelFailed();status.textContent='ОШИБКА ЗАГРУЗКИ 3D-МОДЕЛИ';});
+window.dragonBite=()=>{attackAt=performance.now();};window.dragonStop=()=>{};
+function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.05),now=performance.now()/1000;if(mixer)mixer.update(dt);if(dragon){const cycle=now%24,flying=(cycle>5&&cycle<12)||(cycle>17&&cycle<22),walking=!flying&&cycle<5;const desired=flying?((cycle>8.5&&cycle<10.5)?(findClip(['fly glide','glide'])||findClip(['fly flap','fly'])):(findClip(['fly flap','fly'])||findClip(['fly glide','glide']))):walking?(findClip(['walk'])||findClip(['idle'])):(findClip(['idle'])||clips[0]);const mode=flying?'fly':walking?'walk':'idle';if(mode!==lastMode&&desired){playClip(desired);lastMode=mode;}dragon.position.x=Math.sin(now*.36)*1.0;dragon.position.y=flying?.45+Math.sin(now*2.4)*.14:Math.sin(now*1.7)*.02;dragon.rotation.y=Math.sin(now*.36)>0?Math.PI:0;dragon.rotation.z=flying?Math.sin(now*1.4)*.04:Math.sin(now*.9)*.01;if(attackAt&&performance.now()-attackAt<620){const p=(performance.now()-attackAt)/620;dragon.position.z=Math.sin(p*Math.PI)*.75;}else attackAt=0;}renderer.render(scene,camera);}
+animate();addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+</script></body></html>
