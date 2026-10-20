@@ -13,7 +13,7 @@ setTimeout(()=>{if(!window.__dragonLoaded){if(window.AndroidDragon)window.Androi
 </script>
 <script type="module">
 import * as THREE from 'three';
-import { GLTFLoader } from './GLTFLoader.js';
+import { GLTFLoader } from './examples/jsm/loaders/GLTFLoader.js';
 const status=document.getElementById('status');
 const scene=new THREE.Scene();
 const camera=new THREE.PerspectiveCamera(34,innerWidth/innerHeight,.1,100);camera.position.set(0,1,10);
