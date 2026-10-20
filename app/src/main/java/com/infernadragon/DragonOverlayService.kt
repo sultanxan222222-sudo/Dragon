@@ -2,19 +2,37 @@ package com.infernadragon
 
 import android.app.Service
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.PixelFormat
 import android.os.IBinder
 import android.view.Gravity
 import android.view.WindowManager
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings
+import android.webkit.WebView
+import android.webkit.WebViewClient
 
 class DragonOverlayService : Service() {
     private lateinit var windowManager: WindowManager
-    private var dragonView: DragonView? = null
+    private var dragonView: WebView? = null
 
     override fun onCreate() {
         super.onCreate()
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
-        dragonView = DragonView(this)
+        val view = WebView(this).apply {
+            setBackgroundColor(Color.TRANSPARENT)
+            setLayerType(WebView.LAYER_TYPE_HARDWARE, null)
+            settings.javaScriptEnabled = true
+            settings.domStorageEnabled = true
+            settings.allowFileAccess = true
+            settings.allowContentAccess = true
+            settings.cacheMode = WebSettings.LOAD_DEFAULT
+            settings.mediaPlaybackRequiresUserGesture = true
+            webViewClient = WebViewClient()
+            webChromeClient = WebChromeClient()
+            loadUrl("file:///android_asset/dragon3d.html")
+        }
+        dragonView = view
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT,
@@ -24,18 +42,22 @@ class DragonOverlayService : Service() {
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
             PixelFormat.TRANSLUCENT
         ).apply { gravity = Gravity.TOP or Gravity.START }
-        windowManager.addView(dragonView, params)
+        windowManager.addView(view, params)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_BITE_CENTER) {
-            dragonView?.triggerBiteAtCenter()
+            dragonView?.evaluateJavascript("window.dragonBite && window.dragonBite()", null)
         }
         return START_STICKY
     }
 
     override fun onDestroy() {
-        dragonView?.let { if (it.isAttachedToWindow) windowManager.removeView(it) }
+        dragonView?.let {
+            if (it.isAttachedToWindow) windowManager.removeView(it)
+            it.stopLoading()
+            it.destroy()
+        }
         dragonView = null
         super.onDestroy()
     }
