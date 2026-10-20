@@ -16,6 +16,7 @@ canvas{display:block;width:100%;height:100%;background:transparent}
   window.__dragonLoaded = false;
   setTimeout(() => {
     if (!window.__dragonLoaded) {
+      if (window.AndroidDragon) window.AndroidDragon.modelFailed();
       const s = document.getElementById('status');
       if (s && s.textContent.includes('ЗАГРУЖАЕТСЯ')) {
         s.textContent = 'ДРАКОН НЕ ЗАГРУЗИЛСЯ\\nПроверь интернет и повторно включи дракона';
@@ -75,10 +76,12 @@ loader.load('https://afk.ai/rig/animations/dragon-animations.glb', gltf => {
   // AFK.ai's public CC0 dragon GLB includes a real 100-joint rig and
   // the named Idle, Walk, Fly Flap and Fly Glide animation clips.
   window.__dragonLoaded = true;
+  if (window.AndroidDragon) window.AndroidDragon.modelLoaded();
   status.textContent = 'ДРАКОН ГОТОВ';
   setTimeout(() => { status.style.display = 'none'; }, 1400);
 }, undefined, err => {
   console.error('Dragon GLB load failed', err);
+  if (window.AndroidDragon) window.AndroidDragon.modelFailed();
   status.textContent='ДРАКОН НЕ ЗАГРУЗИЛСЯ\\nПроверь интернет и повторно включи дракона';
 });
 
