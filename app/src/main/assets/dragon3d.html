@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta charset="utf-8">
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent}
+canvas{display:block;width:100%;height:100%;background:transparent}
+#status{position:absolute;left:0;right:0;top:0;text-align:center;color:#ffb09b;font:12px sans-serif;opacity:.0}
+</style>
+</head>
+<body>
+<div id="status">Loading 3D dragon…</div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js';
+import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/loaders/GLTFLoader.js';
+
+const status = document.getElementById('status');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(34, innerWidth / innerHeight, 0.1, 100);
+camera.position.set(0, 1.0, 10);
+const renderer = new THREE.WebGLRenderer({alpha:true, antialias:true, powerPreference:'low-power'});
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5));
+renderer.setSize(innerWidth, innerHeight);
+renderer.setClearColor(0x000000, 0);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+document.body.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xffd8cb, 0x19080b, 2.0));
+const key = new THREE.DirectionalLight(0xffe2ce, 3.0); key.position.set(4,7,5); scene.add(key);
+const rim = new THREE.DirectionalLight(0xff351f, 2.2); rim.position.set(-5,2,-4); scene.add(rim);
+
+let dragon=null, mixer=null, clips=[], activeAction=null, mode='idle', attackAt=0;
+const clock = new THREE.Clock();
+const loader = new GLTFLoader();
+loader.load('https://afk.ai/rig/animations/dragon-animations.glb', gltf => {
+  dragon = gltf.scene;
+  dragon.traverse(o => { if(o.isMesh){ o.frustumCulled=false; if(o.material){o.material.transparent=false; o.material.side=THREE.DoubleSide;} }});
+  const box = new THREE.Box3().setFromObject(dragon);
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  dragon.position.sub(center);
+  const longest = Math.max(size.x,size.y,size.z) || 1;
+  dragon.scale.setScalar(4.8/longest);
+  dragon.position.y -= (center.y - box.min.y) * (4.8/longest) * .15;
+  scene.add(dragon);
+  clips = gltf.animations || [];
+  mixer = new THREE.AnimationMixer(dragon);
+  const pick = keys => clips.find(c => keys.some(k => c.name.toLowerCase().includes(k)));
+  const idle = pick(['idle','stand']) || clips[0];
+  if(idle) playClip(idle, true);
+  status.textContent = '';
+}, undefined, err => { status.textContent='3D dragon failed to load'; });
+
+function playClip(clip, loop) {
+  if(!mixer || !clip) return;
+  if(activeAction) activeAction.fadeOut(.18);
+  activeAction=mixer.clipAction(clip);
+  activeAction.reset().fadeIn(.18);
+  activeAction.setLoop(loop ? THREE.LoopRepeat : THREE.LoopOnce, loop ? Infinity : 1);
+  activeAction.clampWhenFinished=!loop;
+  activeAction.play();
+}
+window.dragonBite = () => { attackAt=performance.now(); mode='attack'; };
+window.dragonStop = () => { mode='idle'; };
+let lastMode='';
+function animate(){
+  requestAnimationFrame(animate);
+  const dt=Math.min(clock.getDelta(),.05), now=performance.now()/1000;
+  if(mixer) mixer.update(dt);
+  if(dragon){
+    const cycle=now%24;
+    const flying=(cycle>5&&cycle<12)||(cycle>17&&cycle<22);
+    const walk=!flying && cycle<5;
+    const desired=flying ? (clips.find(c=>/fly flap|fly|glide/i.test(c.name))) :
+      walk ? (clips.find(c=>/walk/i.test(c.name))) :
+      (clips.find(c=>/idle/i.test(c.name)) || clips[0]);
+    const nextMode=flying?'fly':walk?'walk':'idle';
+    if(nextMode!==lastMode && desired){playClip(desired,true);lastMode=nextMode;}
+    const progress=cycle/24;
+    dragon.position.x=Math.sin(now*.36)*1.15;
+    dragon.position.y=(flying ? .45+Math.sin(now*2.4)*.13 : .0+Math.sin(now*1.7)*.025);
+    dragon.rotation.y=(Math.sin(now*.36)>0 ? Math.PI : 0);
+    dragon.rotation.z=flying ? Math.sin(now*1.4)*.035 : Math.sin(now*.9)*.012;
+    if(attackAt && performance.now()-attackAt<620){
+      const p=(performance.now()-attackAt)/620;
+      dragon.position.z=Math.sin(p*Math.PI)*.75;
+    } else { attackAt=0; }
+  }
+  renderer.render(scene,camera);
+}
+animate();
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+</script>
+</body>
+</html>
