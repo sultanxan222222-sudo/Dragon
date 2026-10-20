@@ -7,10 +7,15 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RadialGradient
 import android.graphics.Shader
+import android.media.AudioAttributes
+import android.media.AudioFormat
+import android.media.AudioTrack
 import android.os.SystemClock
 import android.view.View
+import kotlin.math.PI
 import kotlin.math.min
 import kotlin.math.sin
+import kotlin.concurrent.thread
 
 /**
  * Opaque, connected crimson dragon drawn with vector paths.
@@ -27,6 +32,8 @@ class DragonView(context: Context) : View(context) {
     private var biteAt = 0L
     private var biteX = 0f
     private var biteY = 0f
+    private var wasGrowling = false
+    private var lastGrowlStartedAt = 0L
 
     init { setLayerType(View.LAYER_TYPE_SOFTWARE, null) }
 
@@ -37,6 +44,52 @@ class DragonView(context: Context) : View(context) {
         invalidate()
     }
 
+    /** Short synthesized low growl; generated locally so no external audio asset is required. */
+    private fun playGrowl() {
+        thread(name = "dragon-growl", isDaemon = true) {
+            val sampleRate = 22050
+            val count = (sampleRate * .72f).toInt()
+            val samples = ShortArray(count)
+            for (i in 0 until count) {
+                val x = i.toFloat() / count
+                val envelope = sin(PI * x).toFloat().coerceAtLeast(0f).let { it * it }
+                val wobble = 1f + .12f * sin(2.0 * PI * 5.0 * x).toFloat()
+                val phase = 2.0 * PI * (58.0 * x * .72 + 9.0 * x * x)
+                val rumble = sin(phase).toFloat() * .62f +
+                    sin(phase * 1.91).toFloat() * .23f +
+                    sin(phase * 3.17).toFloat() * .10f +
+                    sin(i * 0.173).toFloat() * .05f
+                samples[i] = (rumble * envelope * wobble * 10500f).toInt()
+                    .coerceIn(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt()).toShort()
+            }
+            var track: AudioTrack? = null
+            try {
+                val attrs = AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_GAME)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+                val format = AudioFormat.Builder()
+                    .setSampleRate(sampleRate)
+                    .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+                    .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                    .build()
+                track = AudioTrack.Builder()
+                    .setAudioAttributes(attrs)
+                    .setAudioFormat(format)
+                    .setTransferMode(AudioTrack.MODE_STATIC)
+                    .setBufferSizeInBytes(samples.size * 2)
+                    .build()
+                track.write(samples, 0, samples.size)
+                track.play()
+                Thread.sleep(760L)
+            } catch (_: Exception) {
+                // Silent fallback if audio output is unavailable.
+            } finally {
+                track?.release()
+            }
+        }
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val w = width.toFloat()
@@ -44,7 +97,8 @@ class DragonView(context: Context) : View(context) {
         if (w <= 0f || h <= 0f) return
         val now = SystemClock.uptimeMillis()
         val t = (now - started) / 1000f
-        val s = min(w, h) / 390f
+        // Keep the full silhouette smaller than the screen so it can travel without filling the display.
+        val s = min(w, h) / 390f * .72f
 
         // Atmospheric edge glow: effects only, never a translucent dragon body.
         val glow = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
@@ -58,16 +112,60 @@ class DragonView(context: Context) : View(context) {
         val biting = biteElapsed >= 0L && biteElapsed <= 620L
         val p = (biteElapsed / 620f).coerceIn(0f, 1f)
         val lunge = if (biting) sin(p * Math.PI).toFloat() else 0f
-        val baseX = w * (.70f + .035f * sin(t * .42f))
-        val baseY = h * (.43f + .055f * sin(t * .72f))
+
+        // A repeating living-creature routine: crawl, fly across, perch, glare/growl, fly back.
+        val cycle = t % 24f
+        val growling = cycle >= 12f && cycle < 15f
+        var direction = 1f
+        val baseX: Float
+        val baseY: Float
+        when {
+            cycle < 4f -> {
+                val q = cycle / 4f
+                baseX = w * (.38f + .50f * q)
+                baseY = h * (.17f + .018f * sin(t * 4.2f))
+            }
+            cycle < 9f -> {
+                val q = (cycle - 4f) / 5f
+                direction = -1f
+                baseX = w * (.90f - .65f * q)
+                baseY = h * (.36f + .075f * sin(q * Math.PI).toFloat())
+            }
+            cycle < 12f -> {
+                baseX = w * .25f
+                baseY = h * (.17f + .012f * sin(t * 2.5f))
+            }
+            cycle < 15f -> {
+                baseX = w * .25f
+                baseY = h * (.17f + .008f * sin(t * 7f))
+            }
+            cycle < 20f -> {
+                val q = (cycle - 15f) / 5f
+                baseX = w * (.25f + .65f * q)
+                baseY = h * (.35f - .06f * sin(q * Math.PI).toFloat())
+            }
+            else -> {
+                val q = (cycle - 20f) / 4f
+                direction = -1f
+                baseX = w * (.88f - .50f * q)
+                baseY = h * (.17f + .016f * sin(t * 4f))
+            }
+        }
+        if (growling && !wasGrowling && now - lastGrowlStartedAt > 1800L) {
+            lastGrowlStartedAt = now
+            playGrowl()
+        }
+        wasGrowling = growling
+
         val hx = baseX + (if (biting) (biteX - baseX) * .34f * lunge else 0f)
+        val headShake = if (growling) sin(t * 21f) * 3.2f * s else 0f
         val hy = baseY + (if (biting) (biteY - baseY) * .28f * lunge else 0f) +
-            sin(t * 1.1f) * 5f * s
+            sin(t * 1.1f) * 3f * s + headShake
 
         canvas.save()
-        // Scale the complete creature as one connected composition.
+        // Scale and turn the complete connected creature as one composition.
         canvas.translate(hx, hy)
-        canvas.scale(s, s)
+        canvas.scale(direction * s, s)
 
         // Tail and body form one continuous S-curve into the neck.
         val bodyPath = Path().apply {
@@ -212,7 +310,7 @@ class DragonView(context: Context) : View(context) {
         canvas.drawPath(fangs, fill)
 
         // Open lower jaw; it moves down during the bite.
-        val jawDrop = if (biting) 9f * sin(p * Math.PI).toFloat() else 1.5f
+        val jawDrop = if (biting) 9f * sin(p * Math.PI).toFloat() else if (growling) 7f + 3f * sin(t * 18f) else 1.5f
         val jaw = Path().apply {
             moveTo(2f, 7f + jawDrop)
             cubicTo(13f, 10f + jawDrop, 28f, 9f + jawDrop, 39f, 2f + jawDrop)
