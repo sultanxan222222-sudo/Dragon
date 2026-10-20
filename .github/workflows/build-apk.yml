@@ -14,6 +14,17 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
+      - name: Download dragon model and 3D engine into app assets
+        run: |
+          set -euo pipefail
+          mkdir -p app/src/main/assets/examples/jsm/loaders app/src/main/assets/examples/jsm/utils
+          curl --fail --location --retry 3 'https://afk.ai/rig/animations/dragon-animations.glb' -o app/src/main/assets/dragon-animations.glb
+          curl --fail --location --retry 3 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js' -o app/src/main/assets/three.module.js
+          curl --fail --location --retry 3 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/loaders/GLTFLoader.js' -o app/src/main/assets/examples/jsm/loaders/GLTFLoader.js
+          curl --fail --location --retry 3 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/utils/BufferGeometryUtils.js' -o app/src/main/assets/examples/jsm/utils/BufferGeometryUtils.js
+          test -s app/src/main/assets/dragon-animations.glb
+          test -s app/src/main/assets/three.module.js
+          test -s app/src/main/assets/examples/jsm/loaders/GLTFLoader.js
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
@@ -22,7 +33,7 @@ jobs:
       - name: Install Android command line tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget unzip
+          sudo apt-get install -y wget unzip curl
           mkdir -p "$HOME/android-sdk/cmdline-tools"
           wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O /tmp/android-tools.zip
           mkdir -p /tmp/android-tools
@@ -49,5 +60,3 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
-
-# Manual rebuild trigger: 2026-10-20
