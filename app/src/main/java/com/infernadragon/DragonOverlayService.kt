@@ -44,7 +44,7 @@ class DragonOverlayService : Service() {
             settings.cacheMode = WebSettings.LOAD_DEFAULT
             settings.mediaPlaybackRequiresUserGesture = true
             addJavascriptInterface(DragonBridge { success ->
-                post {
+                fallback.post {
                     if (success) fallback.visibility = View.GONE
                     else fallback.visibility = View.VISIBLE
                 }
