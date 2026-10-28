@@ -8,171 +8,125 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent
 canvas{position:absolute;inset:0;display:block;width:100%;height:100%;background:transparent}
 #status{position:absolute;left:8px;right:8px;top:12px;z-index:10;text-align:center;color:#fff;background:rgba(35,8,8,.86);border:1px solid rgba(255,100,60,.7);border-radius:10px;padding:10px 8px;font:14px sans-serif;white-space:pre-line;pointer-events:none}
 </style>
-<script type="importmap">{"imports":{"three":"./three.module.js"}}</script>
 </head>
 <body>
-<div id="status">ПОДГОТОВКА GPU…</div>
+<div id="status">СОЗДАНИЕ НОВОГО INFERNO DRAGON…</div>
 <script>
-window.__dragonLoaded=false;
-window.__dragonError='';
-window.__dragonBiteAt=0;
-window.dragonBite=()=>{window.__dragonBiteAt=performance.now();};
+window.__dragonLoaded=false;window.__dragonError='';
+window.__dragonBiteAt=0;window.dragonBite=()=>{window.__dragonBiteAt=performance.now();};
 window.dragonStop=()=>{};
-setTimeout(()=>{if(!window.__dragonLoaded){const s=document.getElementById('status');if(s)s.textContent='ДРАКОН НЕ ЗАГРУЗИЛСЯ\n'+(window.__dragonError||'Проверь 3D-модель и WebGL');if(window.AndroidDragon)window.AndroidDragon.modelFailed();}},20000);
+setTimeout(()=>{if(!window.__dragonLoaded){const s=document.getElementById('status');if(s)s.textContent='НЕ УДАЛОСЬ ЗАПУСТИТЬ 3D-ДВИЖОК\n'+(window.__dragonError||'Проверь WebGL');if(window.AndroidDragon)window.AndroidDragon.modelFailed();}},15000);
 </script>
 <script type="module">
-import * as THREE from 'three';
-import { GLTFLoader } from './examples/jsm/loaders/GLTFLoader.js';
+import * as THREE from './three.module.js';
 const status=document.getElementById('status');
 const say=t=>{if(status)status.textContent=t;};
 let renderer;
-try {
-  renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:'high-performance',failIfMajorPerformanceCaveat:false});
-} catch(e) {
-  window.__dragonError='WebGL недоступен: '+(e?.message||e);
-  say('ГРАФИЧЕСКИЙ ДВИЖОК НЕ ЗАПУСТИЛСЯ\n'+window.__dragonError);
-  if(window.AndroidDragon)window.AndroidDragon.modelFailed();
-  throw e;
-}
-renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.65));
-renderer.setSize(innerWidth,innerHeight);
-renderer.setClearColor(0x000000,0);
-renderer.outputColorSpace=THREE.SRGBColorSpace;
-renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=1.15;
-renderer.shadowMap.enabled=true;
-renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+try{renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:'high-performance',failIfMajorPerformanceCaveat:false});}
+catch(e){window.__dragonError='WebGL недоступен: '+(e?.message||e);say(window.__dragonError);if(window.AndroidDragon)window.AndroidDragon.modelFailed();throw e;}
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
+renderer.setSize(innerWidth,innerHeight);renderer.setClearColor(0x000000,0);
+renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.18;
 document.body.appendChild(renderer.domElement);
 const scene=new THREE.Scene();
-const camera=new THREE.PerspectiveCamera(38,innerWidth/innerHeight,.01,1000);
-scene.add(new THREE.HemisphereLight(0xffd8cc,0x160609,2.0));
-const key=new THREE.DirectionalLight(0xffe4d1,3.0);
-key.position.set(4,7,6); key.castShadow=true; scene.add(key);
-const fill=new THREE.DirectionalLight(0xffb078,1.25);
-fill.position.set(-4,2,4); scene.add(fill);
-const rim=new THREE.DirectionalLight(0xff2d18,2.4);
-rim.position.set(-5,3,-4); scene.add(rim);
-let dragon=null,mixer=null,clips=[],activeAction=null,lastMode='';
-const clock=new THREE.Clock();
-const loader=new GLTFLoader();
-function findClip(keys){return clips.find(c=>keys.some(k=>c.name.toLowerCase().includes(k)));}
-function playClip(clip,loop=true){
-  if(!mixer||!clip)return;
-  if(activeAction)activeAction.fadeOut(.22);
-  activeAction=mixer.clipAction(clip);
-  activeAction.reset().fadeIn(.22);
-  activeAction.setLoop(loop?THREE.LoopRepeat:THREE.LoopOnce,loop?Infinity:1);
-  activeAction.clampWhenFinished=!loop;
-  activeAction.play();
+const camera=new THREE.PerspectiveCamera(40,innerWidth/innerHeight,.1,100);camera.position.set(0,0,8);camera.lookAt(0,0,0);
+scene.add(new THREE.HemisphereLight(0xffded2,0x160508,2.1));
+const key=new THREE.DirectionalLight(0xffe5d0,3.1);key.position.set(3,5,7);scene.add(key);
+const fill=new THREE.DirectionalLight(0xff6845,1.8);fill.position.set(-4,1,4);scene.add(fill);
+const rim=new THREE.DirectionalLight(0xff1d14,2.7);rim.position.set(-3,4,-4);scene.add(rim);
+const mat=(color,roughness=.62,metalness=.05,emissive=0x000000,intensity=0)=>new THREE.MeshStandardMaterial({color,roughness,metalness,emissive,emissiveIntensity:intensity,side:THREE.DoubleSide});
+const hide=mat(0x17090d,.82),scaleMat=mat(0x351017,.53,.12),red=mat(0x8c171c,.46,.12),membrane=mat(0x4a1018,.72,.03,0x260208,.3),hornMat=mat(0x20191c,.42,.08),gold=mat(0xff6a19,.28,.05,0xff2a00,2.2),ivory=mat(0xffd9a6,.32),black=mat(0x090609,.3),mouthMat=mat(0x080205,.9);
+const sphere=new THREE.SphereGeometry(1,18,12);
+function ell(parent,material,pos,scale,geo=sphere){const m=new THREE.Mesh(geo,material);m.position.set(...pos);m.scale.set(...scale);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;}
+function bone(parent,a,b,r1,r2,material){const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),d=B.clone().sub(A);const m=new THREE.Mesh(new THREE.CylinderGeometry(r2,r1,d.length(),8),material);m.position.copy(A.add(B).multiplyScalar(.5));m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());m.castShadow=true;parent.add(m);return m;}
+function spike(parent,at,tip,r,material){return bone(parent,at,tip,r,.005,material);}
+const dragon=new THREE.Group();scene.add(dragon);
+const rig=new THREE.Group();dragon.add(rig);
+// Main body and articulated neck/head.
+ell(rig,hide,[0,-.12,0],[.43,.76,.37]);
+ell(rig,scaleMat,[0,-.18,.29],[.31,.55,.12]);
+for(let i=0;i<7;i++){const y=.36-i*.19;spike(rig,[0,y,-.03],[0,y+.19,-.1],.105,i%2?red:hornMat);}
+const neck=new THREE.Group();neck.position.set(0,.42,.02);rig.add(neck);
+ell(neck,red,[0,.24,.03],[.27,.52,.27]);
+const headPivot=new THREE.Group();headPivot.position.set(0,.62,.06);neck.add(headPivot);
+ell(headPivot,hide,[0,.08,.1],[.34,.3,.32]);
+ell(headPivot,red,[0,.01,.29],[.28,.19,.22]);
+ell(headPivot,scaleMat,[0,-.08,.44],[.24,.12,.2]);
+ell(headPivot,mouthMat,[0,-.17,.42],[.205,.075,.18]);
+const jaw=new THREE.Group();jaw.position.set(0,-.12,.34);headPivot.add(jaw);
+ell(jaw,red,[0,-.075,.12],[.22,.075,.2]);
+for(const side of [-1,1]){
+ ell(headPivot,gold,[side*.205,.12,.33],[.052,.065,.035]);
+ ell(headPivot,black,[side*.205,.12,.36],[.018,.043,.012]);
+ spike(headPivot,[side*.13,.25,.02],[side*.2,.53,-.02],.085,hornMat);
+ spike(headPivot,[side*.25,.12,.02],[side*.43,.22,-.03],.065,red);
+ spike(headPivot,[side*.12,-.13,.49],[side*.14,-.22,.53],.04,ivory);
 }
-function frameModel(model){
-  const box=new THREE.Box3().setFromObject(model);
-  const size=box.getSize(new THREE.Vector3());
-  const center=box.getCenter(new THREE.Vector3());
-  model.position.sub(center);
-  const largest=Math.max(size.x,size.y,size.z)||1;
-  model.scale.setScalar(2.8/largest);
-  const scaledRadius=Math.max(size.length()*.5*model.scale.x,.6);
-  const vFov=THREE.MathUtils.degToRad(camera.fov);
-  const distance=(scaledRadius/Math.sin(vFov/2))*1.18;
-  camera.position.set(0,scaledRadius*.12,distance);
-  camera.near=Math.max(.01,distance/1000);
-  camera.far=Math.max(100,distance*10);
-  camera.lookAt(0,0,0);
-  camera.updateProjectionMatrix();
+// Wing joints: each wing is a membrane with curved-looking ribs and a separate wrist.
+const wings=[];
+function makeWing(side){
+ const shoulder=new THREE.Group();shoulder.position.set(side*.25,.2,-.03);rig.add(shoulder);
+ const shape=new THREE.Shape();shape.moveTo(0,0);shape.quadraticCurveTo(side*.45,.38,side*1.28,.48);shape.lineTo(side*1.05,.08);shape.quadraticCurveTo(side*.98,-.08,side*.83,-.28);shape.lineTo(side*.63,-.05);shape.quadraticCurveTo(side*.5,-.2,side*.39,-.47);shape.lineTo(side*.2,-.18);shape.lineTo(0,0);
+ const membraneMesh=new THREE.Mesh(new THREE.ShapeGeometry(shape,10),membrane);membraneMesh.position.z=-.015;shoulder.add(membraneMesh);
+ const wrist=new THREE.Group();wrist.position.set(side*.7,.05,.015);shoulder.add(wrist);
+ bone(shoulder,[0,0,0],[side*1.28,.48,0],.075,.025,red);
+ bone(shoulder,[0,0,0],[side*.83,-.28,0],.055,.018,red);
+ bone(shoulder,[0,0,0],[side*.39,-.47,0],.05,.014,red);
+ bone(shoulder,[side*.7,.05,0],[side*1.28,.48,0],.028,.012,hornMat);
+ spike(shoulder,[side*1.18,.43,0],[side*1.39,.61,0],.035,hornMat);
+ wings.push({shoulder,wrist,side});
 }
-loader.load('./dragon-animations.glb',gltf=>{
-  dragon=gltf.scene;
-  dragon.traverse(o=>{
-    if(o.isMesh){
-      o.frustumCulled=false;
-      o.castShadow=true;
-      o.receiveShadow=true;
-      if(o.material){
-        o.material.side=THREE.DoubleSide;
-        if('roughness' in o.material)o.material.roughness=Math.max(.34,o.material.roughness||.6);
-        // Prevent a semi-transparent skin from making the creature look like a ghost.
-        o.material.transparent=false;
-        o.material.opacity=1;
-        o.material.depthWrite=true;
-        o.material.needsUpdate=true;
-      }
-    }
-  });
-  frameModel(dragon);
-  scene.add(dragon);
-  clips=gltf.animations||[];
-  mixer=new THREE.AnimationMixer(dragon);
-  const idle=findClip(['idle','breath','stand'])||clips[0];
-  if(idle)playClip(idle);
-  window.__dragonLoaded=true;
-  if(window.AndroidDragon)window.AndroidDragon.modelLoaded();
-  say('3D-ДРАКОН ЗАГРУЖЕН • GPU АКТИВЕН');
-  setTimeout(()=>{if(status)status.style.display='none';},1800);
-},progress=>{
-  if(progress.total>0)say('ЗАГРУЗКА 3D-МОДЕЛИ… '+Math.round(progress.loaded/progress.total*100)+'%');
-},err=>{
-  console.error('Dragon GLB load failed',err);
-  window.__dragonError='Не удалось прочитать dragon-animations.glb';
-  say('ОШИБКА 3D-МОДЕЛИ\n'+window.__dragonError);
-  if(window.AndroidDragon)window.AndroidDragon.modelFailed();
-});
-// Lightweight autonomous behaviour: the dragon chooses a new destination,
- // glides across the visible overlay, banks into turns and occasionally rests.
-let targetX=0,targetY=0,nextDecision=0,flightMood='glide',heading=0;
-function chooseDestination(now){
-  const halfH=camera.position.z*Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
-  const halfW=halfH*camera.aspect;
-  // Stay inside a safe inset so the whole dragon remains visible on narrow phone overlays.
-  targetX=(Math.random()*1.05-.525)*halfW;
-  targetY=(Math.random()*.78-.39)*halfH;
-  flightMood=Math.random()<.28?'hover':(Math.random()<.5?'glide':'flap');
-  nextDecision=now+(flightMood==='hover'?2.5+Math.random()*2:4.5+Math.random()*4);
+makeWing(-1);makeWing(1);
+// Four legs with joints, toes and ivory claws.
+const legs=[];
+for(const side of [-1,1]){
+ for(const y of [-.45]){
+  const hip=new THREE.Group();hip.position.set(side*.29,y,.02);rig.add(hip);
+  ell(hip,red,[0,-.12,.02],[.18,.28,.2]);
+  bone(hip,[0,-.18,0],[side*.03,-.43,.12],.105,.065,hide);
+  const ankle=new THREE.Group();ankle.position.set(side*.03,-.43,.12);hip.add(ankle);
+  ell(ankle,scaleMat,[0,-.045,.04],[.11,.09,.14]);
+  for(let t=-1;t<=1;t++){bone(ankle,[t*.055,-.06,.09],[t*.075,-.12,.2],.035,.006,ivory);}
+  legs.push({hip,ankle,side});
+ }
 }
-function animate(){
-  requestAnimationFrame(animate);
-  const dt=Math.min(clock.getDelta(),.04);
-  const now=performance.now()/1000;
-  if(mixer)mixer.update(dt);
-  if(dragon){
-    if(now>nextDecision)chooseDestination(now);
-    const dx=targetX-dragon.position.x,dy=targetY-dragon.position.y;
-    const dist=Math.hypot(dx,dy);
-    const speed=flightMood==='hover'?.45:1.05;
-    const blend=1-Math.exp(-dt*speed);
-    dragon.position.x+=dx*blend;
-    dragon.position.y+=dy*blend+Math.sin(now*2.2)*dt*.018;
-    // Face the direction of travel and bank naturally during turns.
-    const desiredHeading=Math.atan2(dx,Math.max(.001,Math.abs(dy)+.25));
-    heading+=(desiredHeading-heading)*(1-Math.exp(-dt*2.2));
-    // Smoothly turn toward the flight path instead of snapping direction.
-    const facing=dx<0?Math.PI:0;
-    const yawDelta=Math.atan2(Math.sin(facing-dragon.rotation.y),Math.cos(facing-dragon.rotation.y));
-    dragon.rotation.y+=yawDelta*(1-Math.exp(-dt*3.0));
-    dragon.rotation.z=THREE.MathUtils.clamp(-dx*.12,-.22,.22)+Math.sin(now*1.1)*.025;
-    dragon.rotation.x=Math.sin(now*.8)*.018;
-    const flyClip=flightMood==='flap'
-      ? (findClip(['fly','flight'])||findClip(['takeoff']))
-      : (findClip(['glide'])||findClip(['fly','flight']));
-    const idle=findClip(['idle','breath','stand'])||clips[0];
-    const desired=flightMood==='hover'?idle:(flyClip||idle);
-    const mode=flightMood==='hover'?'hover':'fly';
-    if(mode!==lastMode&&desired){playClip(desired);lastMode=mode;}
-    const biteAt=window.__dragonBiteAt||0;
-    if(biteAt&&performance.now()-biteAt<650){
-      const p=(performance.now()-biteAt)/650;
-      dragon.position.z=Math.sin(p*Math.PI)*.28;
-    } else dragon.position.z=0;
-  }
-  renderer.render(scene,camera);
+// Long segmented tail with a pointed ember-red blade.
+const tail=new THREE.Group();tail.position.set(0,-.63,-.02);rig.add(tail);
+let parent=tail;
+const tailSegments=[];
+for(let i=0;i<6;i++){
+ const seg=new THREE.Group();seg.position.set(0,-.17,0);parent.add(seg);
+ ell(seg,i<3?hide:scaleMat,[0,-.12,0],[.23-i*.028,.24,.22-i*.025]);
+ if(i<4)spike(seg,[0,-.18,-.02],[0,-.31,-.04],.055,red);
+ tailSegments.push(seg);parent=seg;
+}
+const bladeShape=new THREE.Shape();bladeShape.moveTo(0,0);bladeShape.quadraticCurveTo(.2,-.08,.12,-.27);bladeShape.lineTo(0,-.42);bladeShape.lineTo(-.12,-.27);bladeShape.quadraticCurveTo(-.2,-.08,0,0);
+const blade=new THREE.Mesh(new THREE.ShapeGeometry(bladeShape),red);blade.position.set(0,-.28,.02);parent.add(blade);
+// Back and shoulder armor, visible red plates.
+for(let i=0;i<5;i++){const y=.45-i*.22;ell(rig,i%2?red:scaleMat,[0,y,-.29],[.22,.13,.075]);}
+// Tiny sparks around the mouth during the bite action.
+const sparks=[];for(let i=0;i<7;i++){const p=ell(headPivot,gold,[0,0,0],[.018,.018,.018]);p.visible=false;sparks.push(p);}
+function updateSparks(now){const active=window.__dragonBiteAt&&now-window.__dragonBiteAt<500;for(let i=0;i<sparks.length;i++){const p=sparks[i];p.visible=!!active;if(active){const t=(now-window.__dragonBiteAt)/500;p.position.set(Math.sin(i*2.4+t*5)*(.18+t*.2),-.18-Math.abs(Math.cos(i*1.8+t*7))*.16,.58+t*.18);p.scale.setScalar(.012+Math.random()*.016);}}}
+window.__dragonLoaded=true;if(window.AndroidDragon)window.AndroidDragon.modelLoaded();say('INFERNO DRAGON • НОВАЯ 3D-МОДЕЛЬ ГОТОВА');setTimeout(()=>{if(status)status.style.display='none';},2000);
+// Autonomous flight plus genuine screen-edge cling/climb behaviour.
+const clock=new THREE.Clock();let mode='fly',modeUntil=0,targetX=0,targetY=0,nextChoice=0,faceSign=1;
+function bounds(){const hh=camera.position.z*Math.tan(THREE.MathUtils.degToRad(camera.fov/2));return {x:hh*camera.aspect*.76,y:hh*.72};}
+function choose(now){const b=bounds();const roll=Math.random();if(roll<.24){mode='cling';faceSign=Math.random()<.5?-1:1;targetX=faceSign*b.x;targetY=(Math.random()*2-1)*b.y;modeUntil=now+3.5+Math.random()*3;}else{mode='fly';targetX=(Math.random()*2-1)*b.x;targetY=(Math.random()*2-1)*b.y;modeUntil=now+3+Math.random()*4;}nextChoice=modeUntil;}
+function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04),now=performance.now();if(now/1000>nextChoice)choose(now/1000);
+ const t=now/1000;const dx=targetX-dragon.position.x,dy=targetY-dragon.position.y;const speed=mode==='cling'?1.9:1.15,blend=1-Math.exp(-dt*speed);
+ dragon.position.x+=dx*blend;dragon.position.y+=dy*blend+Math.sin(t*2.2)*dt*(mode==='cling'?.025:.05);
+ if(mode==='cling'){dragon.rotation.z+=(faceSign*.20-dragon.rotation.z)*(1-Math.exp(-dt*3));dragon.rotation.y+=(faceSign*.25-dragon.rotation.y)*(1-Math.exp(-dt*3));}
+ else{dragon.rotation.z+=(-dx*.14-dragon.rotation.z)*(1-Math.exp(-dt*2.6));dragon.rotation.y+=(Math.atan2(dx,3)*.5-dragon.rotation.y)*(1-Math.exp(-dt*2));}
+ rig.rotation.y=Math.sin(t*.9)*.055;headPivot.rotation.x=Math.sin(t*1.5)*.06;headPivot.rotation.y=Math.sin(t*.7)*.08;
+ const flap=mode==='cling'?.08:Math.sin(t*8.5)*.48;
+ for(const w of wings){w.shoulder.rotation.z=w.side*(mode==='cling'?.15:flap);w.shoulder.rotation.x=Math.sin(t*4+w.side)*.08;w.wrist.rotation.z=w.side*(mode==='cling'?.04:-flap*.28);}
+ for(const l of legs){l.hip.rotation.x=mode==='cling'?.6:Math.sin(t*8+l.side)*.12;l.ankle.rotation.x=mode==='cling'?-.4:0;}
+ for(let i=0;i<tailSegments.length;i++)tailSegments[i].rotation.z=Math.sin(t*2.3-i*.52)*(.08+i*.025);
+ jaw.rotation.x=(window.__dragonBiteAt&&now-window.__dragonBiteAt<500)?-Math.sin((now-window.__dragonBiteAt)/500*Math.PI)*.75:Math.sin(t*1.8)*.025;
+ updateSparks(now);renderer.render(scene,camera);
 }
 animate();
-addEventListener('resize',()=>{
-  camera.aspect=innerWidth/innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.65));
-  renderer.setSize(innerWidth,innerHeight);
-});
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));renderer.setSize(innerWidth,innerHeight);});
 </script>
 </body>
 </html>
