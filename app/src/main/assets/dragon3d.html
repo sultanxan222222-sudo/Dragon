@@ -145,10 +145,15 @@ function animate(){
     // Face the direction of travel and bank naturally during turns.
     const desiredHeading=Math.atan2(dx,Math.max(.001,Math.abs(dy)+.25));
     heading+=(desiredHeading-heading)*(1-Math.exp(-dt*2.2));
-    dragon.rotation.y=dx<0?Math.PI:0;
+    // Smoothly turn toward the flight path instead of snapping direction.
+    const facing=dx<0?Math.PI:0;
+    const yawDelta=Math.atan2(Math.sin(facing-dragon.rotation.y),Math.cos(facing-dragon.rotation.y));
+    dragon.rotation.y+=yawDelta*(1-Math.exp(-dt*3.0));
     dragon.rotation.z=THREE.MathUtils.clamp(-dx*.12,-.22,.22)+Math.sin(now*1.1)*.025;
     dragon.rotation.x=Math.sin(now*.8)*.018;
-    const flyClip=flightMood==='flap'?(findClip(['fly flap','fly'])):(findClip(['fly glide','glide'])||findClip(['fly']));
+    const flyClip=flightMood==='flap'
+      ? (findClip(['fly','flight'])||findClip(['takeoff']))
+      : (findClip(['glide'])||findClip(['fly','flight']));
     const idle=findClip(['idle','breath','stand'])||clips[0];
     const desired=flightMood==='hover'?idle:(flyClip||idle);
     const mode=flightMood==='hover'?'hover':'fly';
