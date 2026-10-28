@@ -123,9 +123,10 @@ let targetX=0,targetY=0,nextDecision=0,flightMood='glide',heading=0;
 function chooseDestination(now){
   const halfH=camera.position.z*Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
   const halfW=halfH*camera.aspect;
-  targetX=(Math.random()*1.35-.675)*halfW;
-  targetY=(Math.random()*1.05-.525)*halfH;
-  flightMood=Math.random()<.22?'hover':(Math.random()<.5?'glide':'flap');
+  // Stay inside a safe inset so the whole dragon remains visible on narrow phone overlays.
+  targetX=(Math.random()*1.05-.525)*halfW;
+  targetY=(Math.random()*.78-.39)*halfH;
+  flightMood=Math.random()<.28?'hover':(Math.random()<.5?'glide':'flap');
   nextDecision=now+(flightMood==='hover'?2.5+Math.random()*2:4.5+Math.random()*4);
 }
 function animate(){
