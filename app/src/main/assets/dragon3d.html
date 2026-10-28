@@ -127,7 +127,7 @@ function animate(){
     const mode=flying?'fly':walking?'walk':'idle';
     if(mode!==lastMode&&desired){playClip(desired);lastMode=mode;}
     dragon.position.x=Math.sin(now*.3)*.22;
-    dragon.position.y=(flying?.12:0)+Math.sin(now*1.8)*.035;
+    dragon.position.y=(flying ? .12 : 0)+Math.sin(now*1.8)*.035;
     dragon.rotation.y=Math.sin(now*.3)>0?Math.PI:0;
     dragon.rotation.z=flying?Math.sin(now*1.2)*.035:Math.sin(now*.8)*.012;
     const biteAt=window.__dragonBiteAt||0;
@@ -144,7 +144,6 @@ addEventListener('resize',()=>{
   camera.updateProjectionMatrix();
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.65));
   renderer.setSize(innerWidth,innerHeight);
-  if(dragon)frameModel(dragon);
 });
 </script>
 </body>
