@@ -40,7 +40,7 @@ const sphere=new THREE.SphereGeometry(1,18,12);
 function ell(parent,material,pos,scale,geo=sphere){const m=new THREE.Mesh(geo,material);m.position.set(...pos);m.scale.set(...scale);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;}
 function bone(parent,a,b,r1,r2,material){const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),d=B.clone().sub(A);const m=new THREE.Mesh(new THREE.CylinderGeometry(r2,r1,d.length(),8),material);m.position.copy(A.add(B).multiplyScalar(.5));m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());m.castShadow=true;parent.add(m);return m;}
 function spike(parent,at,tip,r,material){return bone(parent,at,tip,r,.005,material);}
-const dragon=new THREE.Group();scene.add(dragon);
+const dragon=new THREE.Group();dragon.scale.setScalar(.7);scene.add(dragon);
 const rig=new THREE.Group();dragon.add(rig);
 // Main body and articulated neck/head.
 ell(rig,hide,[0,-.12,0],[.43,.76,.37]);
@@ -110,7 +110,7 @@ function updateSparks(now){const active=window.__dragonBiteAt&&now-window.__drag
 window.__dragonLoaded=true;if(window.AndroidDragon)window.AndroidDragon.modelLoaded();say('INFERNO DRAGON • НОВАЯ 3D-МОДЕЛЬ ГОТОВА');setTimeout(()=>{if(status)status.style.display='none';},2000);
 // Autonomous flight plus genuine screen-edge cling/climb behaviour.
 const clock=new THREE.Clock();let mode='fly',modeUntil=0,targetX=0,targetY=0,nextChoice=0,faceSign=1;
-function bounds(){const hh=camera.position.z*Math.tan(THREE.MathUtils.degToRad(camera.fov/2));return {x:hh*camera.aspect*.76,y:hh*.72};}
+function bounds(){const hh=camera.position.z*Math.tan(THREE.MathUtils.degToRad(camera.fov/2));return {x:hh*camera.aspect*.42,y:hh*.34};}
 function choose(now){const b=bounds();const roll=Math.random();if(roll<.24){mode='cling';faceSign=Math.random()<.5?-1:1;targetX=faceSign*b.x;targetY=(Math.random()*2-1)*b.y;modeUntil=now+3.5+Math.random()*3;}else{mode='fly';targetX=(Math.random()*2-1)*b.x;targetY=(Math.random()*2-1)*b.y;modeUntil=now+3+Math.random()*4;}nextChoice=modeUntil;}
 function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04),now=performance.now();if(now/1000>nextChoice)choose(now/1000);
  const t=now/1000;const dx=targetX-dragon.position.x,dy=targetY-dragon.position.y;const speed=mode==='cling'?1.9:1.15,blend=1-Math.exp(-dt*speed);
