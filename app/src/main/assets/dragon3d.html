@@ -90,7 +90,11 @@ loader.load('./dragon-animations.glb',gltf=>{
       o.receiveShadow=true;
       if(o.material){
         o.material.side=THREE.DoubleSide;
-        if('roughness' in o.material)o.material.roughness=Math.max(.28,o.material.roughness||.6);
+        if('roughness' in o.material)o.material.roughness=Math.max(.34,o.material.roughness||.6);
+        // Prevent a semi-transparent skin from making the creature look like a ghost.
+        o.material.transparent=false;
+        o.material.opacity=1;
+        o.material.depthWrite=true;
         o.material.needsUpdate=true;
       }
     }
@@ -113,23 +117,41 @@ loader.load('./dragon-animations.glb',gltf=>{
   say('ОШИБКА 3D-МОДЕЛИ\n'+window.__dragonError);
   if(window.AndroidDragon)window.AndroidDragon.modelFailed();
 });
+// Lightweight autonomous behaviour: the dragon chooses a new destination,
+ // glides across the visible overlay, banks into turns and occasionally rests.
+let targetX=0,targetY=0,nextDecision=0,flightMood='glide',heading=0;
+function chooseDestination(now){
+  const halfH=camera.position.z*Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
+  const halfW=halfH*camera.aspect;
+  targetX=(Math.random()*1.35-.675)*halfW;
+  targetY=(Math.random()*1.05-.525)*halfH;
+  flightMood=Math.random()<.22?'hover':(Math.random()<.5?'glide':'flap');
+  nextDecision=now+(flightMood==='hover'?2.5+Math.random()*2:4.5+Math.random()*4);
+}
 function animate(){
   requestAnimationFrame(animate);
   const dt=Math.min(clock.getDelta(),.04);
   const now=performance.now()/1000;
   if(mixer)mixer.update(dt);
   if(dragon){
-    const cycle=now%24;
-    const flying=(cycle>5&&cycle<12)||(cycle>17&&cycle<22);
-    const walking=!flying&&cycle<5;
-    const desired=flying?(findClip(['fly glide','glide'])||findClip(['fly flap','fly'])):
-      walking?(findClip(['walk'])||findClip(['idle'])):(findClip(['idle','breath','stand'])||clips[0]);
-    const mode=flying?'fly':walking?'walk':'idle';
+    if(now>nextDecision)chooseDestination(now);
+    const dx=targetX-dragon.position.x,dy=targetY-dragon.position.y;
+    const dist=Math.hypot(dx,dy);
+    const speed=flightMood==='hover'?.45:1.05;
+    const blend=1-Math.exp(-dt*speed);
+    dragon.position.x+=dx*blend;
+    dragon.position.y+=dy*blend+Math.sin(now*2.2)*dt*.018;
+    // Face the direction of travel and bank naturally during turns.
+    const desiredHeading=Math.atan2(dx,Math.max(.001,Math.abs(dy)+.25));
+    heading+=(desiredHeading-heading)*(1-Math.exp(-dt*2.2));
+    dragon.rotation.y=dx<0?Math.PI:0;
+    dragon.rotation.z=THREE.MathUtils.clamp(-dx*.12,-.22,.22)+Math.sin(now*1.1)*.025;
+    dragon.rotation.x=Math.sin(now*.8)*.018;
+    const flyClip=flightMood==='flap'?(findClip(['fly flap','fly'])):(findClip(['fly glide','glide'])||findClip(['fly']));
+    const idle=findClip(['idle','breath','stand'])||clips[0];
+    const desired=flightMood==='hover'?idle:(flyClip||idle);
+    const mode=flightMood==='hover'?'hover':'fly';
     if(mode!==lastMode&&desired){playClip(desired);lastMode=mode;}
-    dragon.position.x=Math.sin(now*.3)*.22;
-    dragon.position.y=(flying ? .12 : 0)+Math.sin(now*1.8)*.035;
-    dragon.rotation.y=Math.sin(now*.3)>0?Math.PI:0;
-    dragon.rotation.z=flying?Math.sin(now*1.2)*.035:Math.sin(now*.8)*.012;
     const biteAt=window.__dragonBiteAt||0;
     if(biteAt&&performance.now()-biteAt<650){
       const p=(performance.now()-biteAt)/650;
