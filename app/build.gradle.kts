@@ -10,8 +10,8 @@ android {
         applicationId = "com.infernadragon"
         minSdk = 26
         targetSdk = 28
-        versionCode = 8
-        versionName = "0.8-3d-fix"
+        versionCode = 9
+        versionName = "0.9-gpu-renderer"
     }
 
     compileOptions {
