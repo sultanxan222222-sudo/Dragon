@@ -3,7 +3,7 @@ name: Build Inferno Dragon APK
 on:
   workflow_dispatch:
   push:
-    branches: [main, master]
+    branches: [main, master, gpu-renderer-fix]
 
 permissions:
   contents: read
@@ -25,6 +25,7 @@ jobs:
           test -s app/src/main/assets/dragon-animations.glb
           test -s app/src/main/assets/three.module.js
           test -s app/src/main/assets/examples/jsm/loaders/GLTFLoader.js
+          test -s app/src/main/assets/examples/jsm/utils/BufferGeometryUtils.js
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
