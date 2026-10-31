@@ -407,7 +407,7 @@ arm.select_set(True)
 for o in bpy.data.objects:
     if o.type=="MESH": o.select_set(True)
 bpy.context.view_layer.objects.active=arm
-bpy.ops.export_scene.fbx(filepath=FBX, use_selection=True, object_types={'ARMATURE','MESH'}, add_leaf_bones=False, bake_anim=True, bake_anim_use_all_actions=True, path_mode='COPY')
+bpy.ops.export_scene.fbx(filepath=FBX, use_selection=True, object_types={'ARMATURE','MESH'}, add_leaf_bones=False, use_mesh_modifiers=False, bake_anim=True, bake_anim_use_all_actions=True, path_mode='COPY')
 assert os.path.getsize(FBX)>10000, "FBX export unexpectedly small"
 # Re-import FBX into clean scene to validate exported data
 bpy.ops.object.select_all(action='SELECT'); bpy.ops.object.delete(use_global=False)
