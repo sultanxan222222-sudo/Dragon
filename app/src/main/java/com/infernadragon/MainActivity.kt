@@ -25,6 +25,8 @@ class MainActivity : Activity() {
             .build()
         webView = WebView(this).apply {
             setBackgroundColor(android.graphics.Color.rgb(15, 17, 20))
+            // Keep WebView's WebGL canvas on Android's hardware-accelerated rendering path.
+            setLayerType(View.LAYER_TYPE_HARDWARE, null)
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             settings.allowFileAccess = false
