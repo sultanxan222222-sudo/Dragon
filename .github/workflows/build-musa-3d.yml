@@ -45,6 +45,14 @@ jobs:
           grep -q MUSA_3D_VALIDATION_OK artifacts/blender-validation.log
           test -s artifacts/Talking_Musa_Rigged.blend
           test -s artifacts/Talking_Musa_Rigged.fbx
+      - name: Integrate anatomical body into Musa rig and outfit
+        run: |
+          set -euo pipefail
+          /opt/blender/blender -b artifacts/Talking_Musa_Rigged.blend --python tools/musa3d/integrate_base_body.py 2>&1 | tee artifacts/body-integration.log
+          grep -q MUSA_ANATOMICAL_BODY_INTEGRATION_OK artifacts/body-integration.log
+          test -s artifacts/Talking_Musa_Rigged.glb
+          test -s artifacts/Talking_Musa_Rigged.fbx
+          test -s artifacts/Musa_Preview.png
       - name: Upload Blender project, FBX and validation log
         uses: actions/upload-artifact@v4
         with:
