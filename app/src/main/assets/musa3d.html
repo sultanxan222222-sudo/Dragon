@@ -18,6 +18,7 @@
 <div id="stage"></div><div id="status">Удерживай палец 0,5 сек., говори и отпусти — Муса повторит голос</div>
 <script type="module">
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 const host=document.getElementById('stage'),status=document.getElementById('status');
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x101416);
 const camera=new THREE.PerspectiveCamera(32,1,.1,80);camera.position.set(0,1.15,8.8);camera.lookAt(0,.85,0);
@@ -29,6 +30,18 @@ const fill=new THREE.DirectionalLight(0xb6c89b,1.0);fill.position.set(4,2,-4);sc
 const mat=(c,r=.82)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
 const skin=mat(0xb97855),skinLight=mat(0xd18d68),beard=mat(0x171717),beardMid=mat(0x242321),coat=mat(0x566344),coatLight=mat(0x68764f),seam=mat(0x38452e),capMat=mat(0x17191b),cloth=mat(0x3d4933),white=mat(0xf3eadb),iris=mat(0x39271c),pupil=mat(0x100f0e),mouthMat=mat(0x321b19),bootMat=mat(0x252a25);
 const character=new THREE.Group();scene.add(character);
+let runtimeModel=null,runtimeMixer=null,runtimeActions={};
+const gltfLoader=new GLTFLoader();
+gltfLoader.load('./Talking_Musa_Rigged.glb',gltf=>{
+  runtimeModel=gltf.scene; runtimeModel.name='Musa_Rigged_Runtime';
+  runtimeModel.position.set(0,0,0); runtimeModel.scale.setScalar(1.0);
+  scene.add(runtimeModel); character.visible=false;
+  runtimeMixer=new THREE.AnimationMixer(runtimeModel);
+  for(const clip of gltf.animations){runtimeActions[clip.name]=runtimeMixer.clipAction(clip);}
+  const idle=Object.entries(runtimeActions).find(([name])=>name.includes('Idle_Breath'));
+  if(idle){idle[1].reset().play();}
+  say('Муса готов! Коснись его для реакции');
+},undefined,err=>{console.warn('Rigged Musa GLB unavailable; using procedural fallback',err);});
 function mesh(geo,m,parent=character){const o=new THREE.Mesh(geo,m);parent.add(o);return o}
 function ellipsoid(parent,m,p,s,seg=40){const o=mesh(new THREE.SphereGeometry(1,seg,28),m,parent);o.position.set(...p);o.scale.set(...s);return o}
 function capsule(parent,m,a,b,r1,r2){const d=new THREE.Vector3(...b).sub(new THREE.Vector3(...a));const o=mesh(new THREE.CylinderGeometry(r2,r1,d.length(),24,1),m,parent);o.position.copy(new THREE.Vector3(...a).add(new THREE.Vector3(...b)).multiplyScalar(.5));o.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());ellipsoid(parent,m,a,[r1,r1,r1],20);ellipsoid(parent,m,b,[r2,r2,r2],20);return o}
@@ -99,7 +112,8 @@ const shadowMat=new THREE.MeshBasicMaterial({color:0x080a09,transparent:true,opa
 const shadow=mesh(new THREE.CircleGeometry(.92,48),shadowMat,scene);shadow.rotation.x=-Math.PI/2;shadow.position.set(0,-1.965,0);shadow.scale.set(1,.48,1);
 let mood='idle',until=0,hoodAngle=0,hoodTarget=0,blink=0,blinkAt=2.5;
 function say(text){status.textContent=text}
-function react(kind){mood=kind;until=performance.now()+1500;if(kind==='head'){hoodTarget=1;headPivot.rotation.x=-.18;say('Ой! Капюшон откинулся!');}else if(kind==='face'){say('Ой, не щекочи!');blink=1;headPivot.rotation.x=.12;}else if(kind==='legs'){say('Эй! Ноги щекотно!');body.rotation.x=.08;}else if(kind==='pet'){say('Ха… приятно!');headPivot.rotation.z=.10;}else{say('Эй! Полегче!');}}
+function react(kind){mood=kind;until=performance.now()+1500;
+  if(runtimeMixer){const key=kind==='head'?'Hood_Hit_Return':kind==='face'?'Head_Reaction':kind==='shake'?'Head_Reaction':kind==='pet'?'Wave_L':null;const action=key&&Object.entries(runtimeActions).find(([name])=>name.includes(key));if(action){for(const a of Object.values(runtimeActions))a.fadeOut(.12);action[1].reset().fadeIn(.12).play();}}if(kind==='head'){hoodTarget=1;headPivot.rotation.x=-.18;say('Ой! Капюшон откинулся!');}else if(kind==='face'){say('Ой, не щекочи!');blink=1;headPivot.rotation.x=.12;}else if(kind==='legs'){say('Эй! Ноги щекотно!');body.rotation.x=.08;}else if(kind==='pet'){say('Ха… приятно!');headPivot.rotation.z=.10;}else{say('Эй! Полегче!');}}
 const ray=new THREE.Raycaster(),pointer=new THREE.Vector2();let touchStart=null;
 // Long press records the user's voice; playback is pitch-shifted for the talking-pet effect.
 let holdTimer=null,holdRecording=false,recordingPending=false,recorder=null,voiceStream=null,voiceChunks=[];
@@ -145,11 +159,11 @@ renderer.domElement.addEventListener('pointerup',e=>{
   if(!touchStart)return;
   clearTimeout(holdTimer);
   if(holdRecording||recordingPending){endVoiceRecording();touchStart=null;return;}
-  const r=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);const hits=ray.intersectObject(character,true);if(hits.length){const hit=hits[0].point;const distance=Math.hypot(e.clientX-touchStart.x,e.clientY-touchStart.y);if(distance>42){react('shake');}else if(hit.y>1.55){react('head');}else if(hit.y>.65&&hit.z>.25){react('face');}else if(hit.y<-.95){react('legs');}else{react('pet');}}touchStart=null;
+  const r=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);const hits=ray.intersectObject(runtimeModel||character,true);if(hits.length){const hit=hits[0].point;const distance=Math.hypot(e.clientX-touchStart.x,e.clientY-touchStart.y);if(distance>42){react('shake');}else if(hit.y>1.55){react('head');}else if(hit.y>.65&&hit.z>.25){react('face');}else if(hit.y<-.95){react('legs');}else{react('pet');}}touchStart=null;
 });
 renderer.domElement.addEventListener('pointercancel',()=>{clearTimeout(holdTimer);endVoiceRecording();touchStart=null;});
 let last=performance.now();
-function animate(now){requestAnimationFrame(animate);const dt=Math.min((now-last)/1000,.05);last=now;const t=now/1000;
+function animate(now){requestAnimationFrame(animate);const dt=Math.min((now-last)/1000,.05);last=now;const t=now/1000;if(runtimeMixer)runtimeMixer.update(dt);
 body.position.y=Math.sin(t*2)*.018;body.rotation.x*=.9;body.rotation.x*=.9;
 if(mood==='shake'&&now<until){character.rotation.z=Math.sin(t*25)*.09;headPivot.rotation.z=Math.sin(t*18)*.08;}
 else{character.rotation.z*=.88;headPivot.rotation.z*=.88;headPivot.rotation.x*=.9;}
