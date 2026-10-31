@@ -381,6 +381,36 @@ action('Musa_Laugh_Loop',[(1,{'jaw':(0,0,0),'head':(0,0,0),'spine':(0,0,0)}),(5,
 # scene, camera-friendly orientation
 arm.show_in_front=True
 bpy.context.scene.frame_start=1; bpy.context.scene.frame_end=40; bpy.context.scene.frame_set(1)
+# Studio preview render for visual QA (transparent background, full-body framing).
+scene=bpy.context.scene
+scene.render.engine='BLENDER_EEVEE_NEXT'
+scene.render.resolution_x=900
+scene.render.resolution_y=900
+scene.render.resolution_percentage=100
+scene.render.image_settings.file_format='PNG'
+scene.render.film_transparent=True
+scene.world.color=(0.055,0.055,0.055)
+camera_data=bpy.data.cameras.new("Musa_Preview_Camera")
+camera=bpy.data.objects.new("Musa_Preview_Camera",camera_data)
+bpy.context.collection.objects.link(camera)
+camera.location=(3.7,1.35,7.2)
+target=Vector((0,1.05,0))
+camera.rotation_euler=(target- camera.location).to_track_quat('-Z','Y').to_euler()
+camera_data.type='ORTHO'
+camera_data.ortho_scale=3.85
+scene.camera=camera
+def area_light(name,location,power,size,color):
+    data=bpy.data.lights.new(name,'AREA'); data.energy=power; data.shape='DISK'; data.size=size; data.color=color
+    obj=bpy.data.objects.new(name,data); bpy.context.collection.objects.link(obj); obj.location=location
+    obj.rotation_euler=(Vector((0,1.25,0))-obj.location).to_track_quat('-Z','Y').to_euler()
+area_light("Musa_Key_Light",(4.0,4.5,5.0),850,4.0,(1.0,.82,.68))
+area_light("Musa_Fill_Light",(-4.0,2.5,3.5),520,3.5,(.62,.76,1.0))
+area_light("Musa_Rim_Light",(1.0,4.0,-3.5),950,3.0,(1.0,.72,.48))
+scene.render.filepath=os.path.join(OUT,"Musa_Preview.png")
+scene.view_settings.view_transform='AgX'
+bpy.ops.render.render(write_still=True)
+assert os.path.getsize(os.path.join(OUT,"Musa_Preview.png"))>10000, "Preview render missing or too small"
+
 # Select mesh + rig for export
 bpy.ops.object.select_all(action='DESELECT'); arm.select_set(True)
 for obj,_ in parts: obj.select_set(True)
