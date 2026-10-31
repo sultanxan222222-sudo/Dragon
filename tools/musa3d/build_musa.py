@@ -119,24 +119,30 @@ for obj,bone in parts:
     obj.parent=arm
     obj.select_set(False)
 
-# Animation helpers
-def action(name,keys):
+# Animation helpers: reset every pose channel, smooth curves, and add true looping cycles.
+def action(name, keys, loop=False):
     bpy.context.view_layer.objects.active=arm; arm.select_set(True)
     bpy.ops.object.mode_set(mode='POSE')
-    for pb in arm.pose.bones: pb.rotation_mode='XYZ'
-    act=bpy.data.actions.new(name)
-    arm.animation_data.action=act
+    for pb in arm.pose.bones:
+        pb.rotation_mode='XYZ'; pb.rotation_euler=(0,0,0)
+    act=bpy.data.actions.new(name); arm.animation_data.action=act
     for frame,poses in keys:
-        for bn,rot in poses.items():
-            pb=arm.pose.bones[bn]; pb.rotation_euler=rot; pb.keyframe_insert(data_path="rotation_euler",frame=frame,group=bn)
-    bpy.ops.object.mode_set(mode='OBJECT')
-    act.use_fake_user=True
+        for pb in arm.pose.bones:
+            pb.rotation_euler=poses.get(pb.name,(0,0,0))
+            pb.keyframe_insert(data_path='rotation_euler',frame=frame,group=pb.name)
+    for fc in act.fcurves:
+        for kp in fc.keyframe_points:
+            kp.interpolation='BEZIER'; kp.handle_left_type='AUTO_CLAMPED'; kp.handle_right_type='AUTO_CLAMPED'
+        if loop: fc.modifiers.new('CYCLES')
+    bpy.ops.object.mode_set(mode='OBJECT'); act.use_fake_user=True
     return act
 arm.animation_data_create()
-action("Musa_Idle_Breath",[(1,{"spine":(0,0,0),"head":(0,0,0)}),(20,{"spine":(.018,0,0),"head":(-.012,0,0)}),(40,{"spine":(0,0,0),"head":(0,0,0)})])
-action("Musa_Hood_Hit_Return",[(1,{"hood":(0,0,0)}),(5,{"hood":(-.42,0,0)}),(12,{"hood":(-.24,0,0)}),(22,{"hood":(0,0,0)})])
-action("Musa_Head_Reaction",[(1,{"head":(0,0,0)}),(6,{"head":(.18,0,.12)}),(15,{"head":(-.05,0,-.05)}),(28,{"head":(0,0,0)})])
-action("Musa_Wave_L",[(1,{"upper_arm.L":(0,0,0),"forearm.L":(0,0,0)}),(8,{"upper_arm.L":(-.3,0,-.65),"forearm.L":(-.2,0,0)}),(16,{"upper_arm.L":(-.3,0,-.65),"forearm.L":(.2,0,0)}),(24,{"upper_arm.L":(-.3,0,-.65),"forearm.L":(-.2,0,0)}),(32,{"upper_arm.L":(0,0,0),"forearm.L":(0,0,0)})])
+action('Musa_Idle_Breath_Loop',[(1,{'spine':(0,0,0),'head':(0,0,0)}),(10,{'spine':(.018,0,0),'head':(-.008,0,.008)}),(20,{'spine':(.028,0,0),'head':(-.014,0,0)}),(30,{'spine':(.012,0,0),'head':(-.006,0,-.006)}),(40,{'spine':(0,0,0),'head':(0,0,0)})],True)
+action('Musa_Hood_Hit_Return',[(1,{'hood':(0,0,0)}),(3,{'hood':(-.58,0,0)}),(6,{'hood':(-.48,0,0)}),(10,{'hood':(-.29,0,0)}),(16,{'hood':(-.12,0,0)}),(24,{'hood':(0,0,0)})])
+action('Musa_Head_Reaction',[(1,{'head':(0,0,0),'spine':(0,0,0)}),(4,{'head':(.22,0,.16),'spine':(.035,0,0)}),(9,{'head':(-.08,0,-.08),'spine':(-.015,0,0)}),(16,{'head':(.035,0,.025)}),(26,{'head':(0,0,0),'spine':(0,0,0)})])
+action('Musa_Wave_L',[(1,{'upper_arm.L':(0,0,0),'forearm.L':(0,0,0)}),(7,{'upper_arm.L':(-.35,0,-.72),'forearm.L':(-.25,0,0)}),(13,{'upper_arm.L':(-.35,0,-.72),'forearm.L':(.28,0,0)}),(19,{'upper_arm.L':(-.35,0,-.72),'forearm.L':(-.22,0,0)}),(25,{'upper_arm.L':(-.35,0,-.72),'forearm.L':(.28,0,0)}),(34,{'upper_arm.L':(0,0,0),'forearm.L':(0,0,0)})])
+action('Musa_Talking_Loop',[(1,{'head':(0,0,0)}),(4,{'head':(.025,0,.015)}),(8,{'head':(-.018,0,-.012)}),(12,{'head':(.02,0,.01)}),(16,{'head':(0,0,0)})],True)
+action('Musa_Laugh_Loop',[(1,{'head':(0,0,0),'spine':(0,0,0)}),(5,{'head':(-.06,0,.035),'spine':(.025,0,0)}),(9,{'head':(.035,0,-.025),'spine':(-.01,0,0)}),(13,{'head':(-.045,0,.025),'spine':(.02,0,0)}),(18,{'head':(0,0,0),'spine':(0,0,0)})],True)
 # scene, camera-friendly orientation
 arm.show_in_front=True
 bpy.context.scene.frame_start=1; bpy.context.scene.frame_end=40; bpy.context.scene.frame_set(1)
@@ -154,7 +160,7 @@ required={"root","spine","neck","head","hood","upper_arm.L","forearm.L","hand.L"
 assert required.issubset(set(arm.data.bones.keys())), "Missing expected rig bones"
 assert len([o for o in bpy.data.objects if o.type=="MESH"]) >= 20, "Character mesh incomplete"
 acts={a.name for a in bpy.data.actions}
-for a in ["Musa_Idle_Breath","Musa_Hood_Hit_Return","Musa_Head_Reaction","Musa_Wave_L"]:
+for a in ["Musa_Idle_Breath_Loop","Musa_Hood_Hit_Return","Musa_Head_Reaction","Musa_Wave_L","Musa_Talking_Loop","Musa_Laugh_Loop"]:
     assert a in acts, "Missing animation "+a
 # Export FBX with mesh and rig, including actions
 bpy.ops.object.select_all(action='DESELECT')
