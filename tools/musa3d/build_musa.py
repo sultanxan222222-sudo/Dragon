@@ -163,11 +163,16 @@ uv("Neck",(0,1.76,0),(.17,.20,.17),skin,"neck")
 head_surface()
 uv("Ear L",(-.39,2.10,0),(.085,.13,.075),skin,"head")
 uv("Ear R",(.39,2.10,0),(.085,.13,.075),skin,"head")
-# beard wraps jaw and cheeks
-uv("Beard main",(0,1.88,.20),(.34,.32,.23),beard,"head",40,24)
-uv("Beard chin",(0,1.68,.19),(.26,.20,.22),beard,"head")
-uv("Mustache L",(-.105,1.98,.295),(.16,.075,.075),beard,"head")
-uv("Mustache R",(.105,1.98,.295),(.16,.075,.075),beard,"head")
+# Sculpted beard shell follows cheek, jaw and chin contours with quad support loops.
+beard_profile=[
+    (1.645,.105,.105,.205),(1.675,.175,.145,.205),(1.715,.225,.165,.205),
+    (1.765,.265,.178,.205),(1.825,.292,.180,.205),(1.885,.300,.168,.205),
+    (1.935,.278,.145,.205),(1.975,.235,.112,.205),(2.005,.175,.080,.205),
+    (2.025,.105,.050,.205)
+]
+loft("Beard • sculpted jaw shell",beard_profile,beard,"head",40,2)
+uv("Mustache L",(-.105,1.99,.315),(.16,.068,.055),beard,"head")
+uv("Mustache R",(.105,1.99,.315),(.16,.068,.055),beard,"head")
 # facial features
 for side in (-1,1):
     uv("Eye white "+str(side),(side*.145,2.20,.300),(.075,.052,.035),white,"eye."+("L" if side<0 else "R"),24,16)
@@ -401,9 +406,11 @@ scene.world.color=(0.055,0.055,0.055)
 camera_data=bpy.data.cameras.new("Musa_Preview_Camera")
 camera=bpy.data.objects.new("Musa_Preview_Camera",camera_data)
 bpy.context.collection.objects.link(camera)
-camera.location=(3.7,1.35,7.2)
+# The character is authored with Y as its vertical axis; use a straight-on
+# camera with world Y as image-up so the preview is not rolled sideways.
+camera.location=(0,1.05,8.0)
+camera.rotation_euler=(0,0,0)
 target=Vector((0,1.05,0))
-camera.rotation_euler=(target- camera.location).to_track_quat('-Z','Y').to_euler()
 camera_data.type='ORTHO'
 camera_data.ortho_scale=3.85
 scene.camera=camera
