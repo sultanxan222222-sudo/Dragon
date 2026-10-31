@@ -26,8 +26,7 @@ if not rig or rig.type != "ARMATURE":
 # Keep the existing outfit, beard, hood, cap, animation actions and app-facing rig.
 # Replace only the primitive exposed skin/face pieces with the anatomical base body.
 remove_prefixes = (
-    "Head • sculpted", "Neck", "Ear L", "Ear R", "Nose", "Eye white",
-    "Iris", "Pupil", "Brow", "Mouth", "Hand ", "Finger "
+    "Head • sculpted", "Neck", "Hand ", "Finger "
 )
 removed = []
 for obj in list(bpy.data.objects):
