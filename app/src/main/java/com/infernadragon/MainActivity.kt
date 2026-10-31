@@ -10,6 +10,7 @@ import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.webkit.ConsoleMessage
 import android.widget.Toast
 import androidx.webkit.WebViewAssetLoader
 
@@ -34,10 +35,25 @@ class MainActivity : Activity() {
             settings.mediaPlaybackRequiresUserGesture = false
             addJavascriptInterface(MusaBridge(), "AndroidMusa")
             webViewClient = object : WebViewClient() {
+                override fun onReceivedError(view: WebView?, request: android.webkit.WebResourceRequest, error: android.webkit.WebResourceError) {
+                    if (request.isForMainFrame) {
+                        val detail = "Ошибка страницы: ${error.description}"
+                        android.util.Log.e("TalkingMusaWeb", detail)
+                        Toast.makeText(this@MainActivity, detail, Toast.LENGTH_LONG).show()
+                    }
+                }
                 override fun shouldInterceptRequest(view: WebView?, request: android.webkit.WebResourceRequest) =
                     assetLoader.shouldInterceptRequest(request.url)
             }
             webChromeClient = object : WebChromeClient() {
+                override fun onConsoleMessage(message: ConsoleMessage): Boolean {
+                    val line = "JS: ${message.message()} (${message.sourceId()}:${message.lineNumber()})"
+                    android.util.Log.e("TalkingMusaWeb", line)
+                    runOnUiThread {
+                        Toast.makeText(this@MainActivity, message.message().take(180), Toast.LENGTH_LONG).show()
+                    }
+                    return true
+                }
                 override fun onPermissionRequest(request: PermissionRequest) {
                     runOnUiThread {
                         val audioOnly = request.resources.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
