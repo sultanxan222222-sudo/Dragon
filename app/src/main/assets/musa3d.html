@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Говорящий Муса</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0f1215;color:#f4f1e9;font-family:Arial,sans-serif}#stage{position:absolute;inset:0 0 104px}canvas{display:block;width:100%;height:100%}#top{position:absolute;top:env(safe-area-inset-top,12px);left:0;right:0;text-align:center;pointer-events:none}#top strong{font-size:22px;letter-spacing:1px}#hint{font-size:12px;color:#b7b8b3;margin-top:6px}#controls{position:absolute;bottom:env(safe-area-inset-bottom,12px);left:12px;right:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}button{border:1px solid #65704d;border-radius:14px;padding:14px 5px;background:#252d22;color:#f3f0e8;font-weight:700;font-size:13px}button:active{background:#596641}#status{position:absolute;bottom:78px;left:0;right:0;text-align:center;color:#c4c9b9;font-size:12px;pointer-events:none}
+</style>
+<script type="importmap">{"imports":{"three":"./three.module.js"}}</script>
+</head>
+<body>
+<div id="stage"></div>
+<div id="top"><strong>ГОВОРЯЩИЙ МУСА</strong><div id="hint">Коснись персонажа — он ответит</div></div>
+<div id="status">3D-персонаж: первая тестовая модель</div>
+<div id="controls">
+<button id="pet">ПОГЛАДИТЬ</button><button id="head">ПО ГОЛОВЕ</button><button id="shake">РАЗБУДИТЬ</button>
+</div>
+<script type="module">
+import * as THREE from 'three';
+const host=document.getElementById('stage'), status=document.getElementById('status');
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x0f1215);
+const camera=new THREE.PerspectiveCamera(35,1,.1,100); camera.position.set(0,1.35,7.6); camera.lookAt(0,1.35,0);
+const renderer=new THREE.WebGLRenderer({antialias:true, powerPreference:'low-power'});
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5)); renderer.outputColorSpace=THREE.SRGBColorSpace; renderer.setSize(host.clientWidth,host.clientHeight); host.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xe9edff,0x454333,2));
+const key=new THREE.DirectionalLight(0xffe4c6,2.2);key.position.set(-3,6,5);scene.add(key);
+const rim=new THREE.DirectionalLight(0x9cae82,1.1);rim.position.set(4,3,-4);scene.add(rim);
+const mat=(color,roughness=.8)=>new THREE.MeshStandardMaterial({color,roughness});
+const skin=mat(0xb98260), beardMat=mat(0x17191a), jacket=mat(0x596448), hoodMat=mat(0x414c35), black=mat(0x17191d), white=mat(0xf1e8d8), iris=mat(0x38261c), mouthMat=mat(0x321819);
+const root=new THREE.Group();scene.add(root);
+function sphere(parent,m,pos,scale){const o=new THREE.Mesh(new THREE.SphereGeometry(1,28,20),m);o.position.set(...pos);o.scale.set(...scale);parent.add(o);return o}
+function cylinder(parent,m,a,b,r1,r2){const h=a.distanceTo(b),o=new THREE.Mesh(new THREE.CylinderGeometry(r2,r1,h,20),m);o.position.copy(a).add(b).multiplyScalar(.5);o.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),b.clone().sub(a).normalize());parent.add(o);return o}
+const torso=sphere(root,jacket,[0,.45,0],[.83,1.05,.48]);
+sphere(root,skin,[0,1.68,0],[.66,.78,.53]);
+// hood behind head, with opening facing camera
+const hood=sphere(root,hoodMat,[0,1.78,-.18],[.79,.9,.58]);hood.scale.set(.79,.9,.58);
+sphere(root,black,[0,2.43,.01],[.67,.18,.56]); // dark cap
+// ears
+sphere(root,skin,[-.65,1.72,0],[.14,.22,.13]);sphere(root,skin,[.65,1.72,0],[.14,.22,.13]);
+// beard mass and tapered chin
+sphere(root,beardMat,[0,1.26,.28],[.52,.55,.32]);
+const chin=sphere(root,beardMat,[0,.96,.27],[.34,.4,.29]);
+// moustache
+sphere(root,beardMat,[-.19,1.55,.53],[.25,.12,.12]);sphere(root,beardMat,[.19,1.55,.53],[.25,.12,.12]);
+// eyes, brows
+for(const x of [-.25,.25]){sphere(root,white,[x,1.86,.475],[.13,.105,.07]);sphere(root,iris,[x,1.86,.535],[.055,.07,.025]);sphere(root,black,[x,2.02,.49],[.19,.055,.07]);}
+const nose=sphere(root,skin,[0,1.68,.56],[.12,.16,.13]);
+const mouth=sphere(root,mouthMat,[0,1.43,.55],[.16,.035,.035]);
+// shoulders and arms
+for(const side of [-1,1]){sphere(root,jacket,[side*.78,.88,0],[.27,.3,.3]);cylinder(root,jacket,new THREE.Vector3(side*.82,.8,0),new THREE.Vector3(side*1.02,-.02,.04),.2,.14);sphere(root,skin,[side*1.02,-.08,.04],[.16,.17,.15]);}
+// legs and boots
+for(const side of [-1,1]){cylinder(root,mat(0x343b32),new THREE.Vector3(side*.34,-.35,0),new THREE.Vector3(side*.36,-1.25,0),.23,.18);sphere(root,black,[side*.36,-1.3,.12],[.25,.15,.38]);}
+const floor=new THREE.Mesh(new THREE.CircleGeometry(2.2,48),mat(0x202622));floor.rotation.x=-Math.PI/2;floor.position.y=-1.47;scene.add(floor);
+let mood='idle',moodUntil=0,hoodDrop=0,hoodTarget=0,headTap=0;
+function react(kind){mood=kind;moodUntil=performance.now()+1300;if(kind==='head'){hoodTarget=1;headTap=1;status.textContent='Ой! Капюшон слетел!';}else if(kind==='pet'){status.textContent='Мусе приятно';}else{status.textContent='Эй! Не тряси меня!';}}
+document.getElementById('pet').onclick=()=>react('pet');
+document.getElementById('head').onclick=()=>react('head');
+document.getElementById('shake').onclick=()=>react('shake');
+const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
+renderer.domElement.addEventListener('pointerup',e=>{const r=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);raycaster.setFromCamera(pointer,camera);if(raycaster.intersectObjects(root.children,true).length)react('head');});
+let last=performance.now(),blink=0;
+function animate(now){requestAnimationFrame(animate);const dt=Math.min((now-last)/1000,.05);last=now;const t=now/1000;
+root.position.y=Math.sin(t*2)*.025;root.rotation.y=Math.sin(t*.55)*.08;
+if(mood==='shake'&&now<moodUntil)root.rotation.z=Math.sin(t*28)*.11;else root.rotation.z*=.9;
+if(mood==='pet'&&now<moodUntil)root.rotation.x=Math.sin(t*5)*.035;else root.rotation.x*=.9;
+hoodDrop+=(hoodTarget-hoodDrop)*Math.min(1,dt*5);hood.position.y=1.78-hoodDrop*.66;hood.rotation.x=hoodDrop*.9;hood.rotation.z=hoodDrop*.18;
+if(headTap){root.position.y+=Math.sin(t*30)*.045;headTap*=.88;}
+mouth.scale.y=.035+(mood!=='idle'&&now<moodUntil?Math.abs(Math.sin(t*13))*.095:Math.abs(Math.sin(t*2))*.008);
+if(now>moodUntil&&mood!=='idle'){mood='idle';if(hoodDrop<.03){hoodTarget=0;status.textContent='Коснись персонажа — он ответит';}}
+renderer.render(scene,camera);}
+function resize(){camera.aspect=host.clientWidth/host.clientHeight;camera.updateProjectionMatrix();renderer.setSize(host.clientWidth,host.clientHeight);}
+addEventListener('resize',resize);requestAnimationFrame(animate);
+if(window.AndroidMusa)window.AndroidMusa.ready();
+</script>
+</body></html>
