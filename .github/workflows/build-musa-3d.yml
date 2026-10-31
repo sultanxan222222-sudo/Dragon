@@ -29,8 +29,8 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p assets
-          curl -fL --retry 3 "https://files.innerscene.com/library/human-base-mesh-with-editable-53-bone-rig-8e7c8ab1/329f39cef2f95a0f0a24/human-base-rigged.glb" -o assets/human-base-rigged.glb
-          test "$(stat -c%s assets/human-base-rigged.glb)" -gt 100000
+          curl -fL --retry 3 "https://files.innerscene.com/library/male-base-mesh-3d-person-rigged-a-pose-380e6d89/038f3a526b2fc3efd012/male-base-mesh-base_male.glb" -o assets/male-base-mesh-base_male.glb
+          test "$(stat -c%s assets/male-base-mesh-base_male.glb)" -gt 100000
       - name: Inspect base mesh topology and skeleton
         run: |
           set -euo pipefail
