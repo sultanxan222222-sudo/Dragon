@@ -1,0 +1,42 @@
+name: Build and validate Talking Musa 3D model
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [talking-musa-rebuild]
+    paths:
+      - 'tools/musa3d/**'
+      - '.github/workflows/build-musa-3d.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  blender-model:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Blender
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y wget xz-utils
+          wget -q https://download.blender.org/release/Blender4.2/blender-4.2.3-linux-x64.tar.xz -O /tmp/blender.tar.xz
+          mkdir -p /opt/blender
+          tar -xf /tmp/blender.tar.xz -C /opt/blender --strip-components=1
+          /opt/blender/blender --version
+      - name: Generate, save, export and round-trip validate Musa
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          /opt/blender/blender -b --factory-startup --python tools/musa3d/build_musa.py 2>&1 | tee artifacts/blender-validation.log
+          grep -q MUSA_3D_VALIDATION_OK artifacts/blender-validation.log
+          test -s artifacts/Talking_Musa_Rigged.blend
+          test -s artifacts/Talking_Musa_Rigged.fbx
+      - name: Upload Blender project, FBX and validation log
+        uses: actions/upload-artifact@v4
+        with:
+          name: Talking-Musa-3D-model
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 30
