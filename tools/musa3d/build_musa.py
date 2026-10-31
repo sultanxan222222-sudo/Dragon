@@ -27,16 +27,61 @@ mouthmat=mat("Mouth",(.075,.018,.015))
 zipmat=mat("Zipper",(.48,.43,.30),.35,.45)
 
 parts=[]
+
+def make_mesh(name, verts, faces, material, bone, smooth=True):
+    mesh=bpy.data.meshes.new(name+'_QuadTopology')
+    mesh.from_pydata(verts,[],faces); mesh.materials.append(material); mesh.update()
+    obj=bpy.data.objects.new(name,mesh); bpy.context.collection.objects.link(obj)
+    if smooth:
+        for poly in mesh.polygons: poly.use_smooth=True
+    parts.append((obj,bone)); return obj
+
 def uv(name,loc,scale,material,bone,seg=32,rings=20):
-    bpy.ops.mesh.primitive_uv_sphere_add(segments=seg,ring_count=rings, location=loc)
-    o=bpy.context.object; o.name=name; o.scale=scale
-    bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
-    o.data.materials.append(material); parts.append((o,bone)); return o
+    # Hand-built quad-dominant organic surface; no Blender sphere primitives.
+    sx,sy,sz=scale; cx,cy,cz=loc
+    verts=[]; faces=[]
+    nr=max(10,rings); ns=max(16,seg)
+    for j in range(1,nr):
+        phi=-pi/2 + pi*j/nr
+        yshape=sin(phi)
+        radial=cos(phi)
+        for i in range(ns):
+            th=2*pi*i/ns
+            # Slight anatomical asymmetry and front/back shaping avoid perfect balls.
+            x=radial*cos(th); z=radial*sin(th)
+            front=max(0.0,z)
+            verts.append((cx+sx*x*(1-.035*yshape), cy+sy*yshape, cz+sz*z*(1-.10*front)))
+    bottom=len(verts); verts.append((cx,cy-sy,cz))
+    top=len(verts); verts.append((cx,cy+sy,cz))
+    for j in range(nr-2):
+        row=j*ns; nxt=(j+1)*ns
+        for i in range(ns):
+            ni=(i+1)%ns; faces.append((row+i,row+ni,nxt+ni,nxt+i))
+    for i in range(ns):
+        ni=(i+1)%ns; faces.append((bottom,ni,i))
+        row=(nr-2)*ns; faces.append((top,row+i,row+ni))
+    obj=make_mesh(name,verts,faces,material,bone)
+    sub=obj.modifiers.new('Quad Surface Smoothing','SUBSURF'); sub.levels=1; sub.render_levels=2
+    return obj
+
 def cyl(name,a,b,r1,r2,material,bone,verts=24):
-    a,b=Vector(a),Vector(b); d=b-a
-    bpy.ops.mesh.primitive_cone_add(vertices=verts, radius1=r1, radius2=r2, depth=d.length, location=(a+b)/2)
-    o=bpy.context.object; o.name=name; o.rotation_mode='QUATERNION'; o.rotation_quaternion=d.to_track_quat('Z','Y')
-    o.data.materials.append(material); parts.append((o,bone)); return o
+    # Tapered quad-loop tube with support rings and closed polygon caps.
+    a,b=Vector(a),Vector(b); axis=(b-a).normalized()
+    ref=Vector((0,0,1)) if abs(axis.z)<.92 else Vector((0,1,0))
+    u=axis.cross(ref).normalized(); v=axis.cross(u).normalized()
+    rings=[(0.0,r1*.88),(0.08,r1),(0.28,r1*.96),(0.72,r2*1.04),(0.92,r2),(1.0,r2*.9)]
+    verts=[]; faces=[]; n=max(12, int(verts))
+    for t,r in rings:
+        center=a+(b-a)*t
+        for i in range(n):
+            ang=2*pi*i/n; p=center+r*(cos(ang)*u+sin(ang)*v)
+            verts.append(tuple(p))
+    for j in range(len(rings)-1):
+        for i in range(n):
+            ni=(i+1)%n; faces.append((j*n+i,j*n+ni,(j+1)*n+ni,(j+1)*n+i))
+    faces.append(tuple(reversed(tuple(range(n)))))
+    faces.append(tuple((len(rings)-1)*n+i for i in range(n)))
+    return make_mesh(name,verts,faces,material,bone)
 
 # Torso / jacket silhouette and hood
 uv("Jacket torso",(0,1.02,0),(.49,.68,.29),jacket,"spine")
