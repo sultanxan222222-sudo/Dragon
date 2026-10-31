@@ -35,7 +35,7 @@ jobs:
           curl --fail --location --retry 3 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/loaders/GLTFLoader.js' -o app/src/main/assets/GLTFLoader.js
           test -s app/src/main/assets/three.module.js
           test -s app/src/main/assets/GLTFLoader.js
-          sed -i 's|"three":"./three.module.js"|"three":"./three.module.js","three/addons/":"./"|' app/src/main/assets/musa3d.html
+          sed -i 's|"three":"./three.module.js"|"three":"./three.module.js","three/addons/loaders/GLTFLoader.js":"./GLTFLoader.js"|' app/src/main/assets/musa3d.html
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
