@@ -30,6 +30,11 @@ lines = [
     "Total vertices: " + str(sum(len(o.data.vertices) for o in meshes)),
     "Triangles: " + str(sum(sum(len(p.vertices)-2 for p in o.data.polygons) for o in meshes)),
     "Bones: " + str(len(bones)),
+    "Objects and bounds:",
+    *[
+        f"{o.name} | type={o.type} | location={tuple(round(v, 5) for v in o.location)} | dimensions={tuple(round(v, 5) for v in o.dimensions)} | vertices={len(o.data.vertices) if o.type == 'MESH' else 0} | groups={','.join(g.name for g in o.vertex_groups)}"
+        for o in bpy.context.scene.objects
+    ],
     "Bone names:",
     *bones,
 ]
