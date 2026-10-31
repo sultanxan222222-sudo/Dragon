@@ -14,8 +14,8 @@
 <script type="importmap">{"imports":{"three":"./three.module.js"}}</script>
 </head>
 <body>
-<div id="top"><strong>ГОВОРЯЩИЙ МУСА</strong><div id="hint">Прикоснись к любой части Мусы</div></div>
-<div id="stage"></div><div id="status">Коснись персонажа — он ответит именно на это прикосновение</div>
+<div id="top"><strong>ГОВОРЯЩИЙ МУСА</strong><div id="hint">Коснись для реакции • удерживай для записи голоса</div></div>
+<div id="stage"></div><div id="status">Удерживай палец 0,5 сек., говори и отпусти — Муса повторит голос</div>
 <script type="module">
 import * as THREE from 'three';
 const host=document.getElementById('stage'),status=document.getElementById('status');
@@ -101,9 +101,53 @@ let mood='idle',until=0,hoodAngle=0,hoodTarget=0,blink=0,blinkAt=2.5;
 function say(text){status.textContent=text}
 function react(kind){mood=kind;until=performance.now()+1500;if(kind==='head'){hoodTarget=1;headPivot.rotation.x=-.18;say('Ой! Капюшон откинулся!');}else if(kind==='face'){say('Ой, не щекочи!');blink=1;headPivot.rotation.x=.12;}else if(kind==='legs'){say('Эй! Ноги щекотно!');body.rotation.x=.08;}else if(kind==='pet'){say('Ха… приятно!');headPivot.rotation.z=.10;}else{say('Эй! Полегче!');}}
 const ray=new THREE.Raycaster(),pointer=new THREE.Vector2();let touchStart=null;
-renderer.domElement.addEventListener('pointerdown',e=>{touchStart={x:e.clientX,y:e.clientY,time:performance.now()};});
-renderer.domElement.addEventListener('pointerup',e=>{if(!touchStart)return;const r=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);const hits=ray.intersectObject(character,true);if(hits.length){const hit=hits[0].point;const distance=Math.hypot(e.clientX-touchStart.x,e.clientY-touchStart.y);if(distance>42){react('shake');}else if(hit.y>1.55){react('head');}else if(hit.y>.65&&hit.z>.25){react('face');}else if(hit.y<-.95){react('legs');}else{react('pet');}}touchStart=null;});
-renderer.domElement.addEventListener('pointercancel',()=>{touchStart=null;});
+// Long press records the user's voice; playback is pitch-shifted for the talking-pet effect.
+let holdTimer=null,holdRecording=false,recordingPending=false,recorder=null,voiceStream=null,voiceChunks=[];
+async function beginVoiceRecording(){
+  holdRecording=true;recordingPending=true;
+  try{
+    if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder)throw new Error('Запись голоса не поддерживается этим WebView');
+    voiceStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});
+    if(!holdRecording){voiceStream.getTracks().forEach(t=>t.stop());voiceStream=null;recordingPending=false;return;}
+    voiceChunks=[];recorder=new MediaRecorder(voiceStream);
+    recorder.ondataavailable=e=>{if(e.data&&e.data.size)voiceChunks.push(e.data);};
+    recorder.onstop=async()=>{
+      const blob=new Blob(voiceChunks,{type:recorder.mimeType||'audio/webm'});
+      voiceStream?.getTracks().forEach(t=>t.stop());voiceStream=null;recordingPending=false;
+      if(blob.size<1200){say('Запись слишком короткая — подержи палец дольше');return;}
+      try{
+        const ctx=new (window.AudioContext||window.webkitAudioContext)();
+        const bytes=await blob.arrayBuffer(),buffer=await ctx.decodeAudioData(bytes);
+        const source=ctx.createBufferSource();source.buffer=buffer;source.playbackRate.value=1.27;
+        source.connect(ctx.destination);source.start();
+        say('Муса повторяет твой голос!');
+        source.onended=()=>ctx.close();
+      }catch(err){say('Не удалось обработать запись голоса');}
+    };
+    recorder.start();say('Говори… отпусти палец, чтобы Муса повторил');
+  }catch(err){
+    holdRecording=false;recordingPending=false;
+    voiceStream?.getTracks().forEach(t=>t.stop());voiceStream=null;
+    say(err.name==='NotAllowedError'?'Разреши доступ к микрофону для записи голоса':'Микрофон пока недоступен');
+  }
+}
+function endVoiceRecording(){
+  holdRecording=false;
+  if(recorder&&recorder.state!=='inactive')recorder.stop();
+  else if(recordingPending){recordingPending=false;voiceStream?.getTracks().forEach(t=>t.stop());voiceStream=null;}
+}
+renderer.domElement.addEventListener('pointerdown',e=>{
+  touchStart={x:e.clientX,y:e.clientY,time:performance.now()};
+  clearTimeout(holdTimer);holdRecording=false;
+  holdTimer=setTimeout(()=>beginVoiceRecording(),550);
+});
+renderer.domElement.addEventListener('pointerup',e=>{
+  if(!touchStart)return;
+  clearTimeout(holdTimer);
+  if(holdRecording||recordingPending){endVoiceRecording();touchStart=null;return;}
+  const r=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);const hits=ray.intersectObject(character,true);if(hits.length){const hit=hits[0].point;const distance=Math.hypot(e.clientX-touchStart.x,e.clientY-touchStart.y);if(distance>42){react('shake');}else if(hit.y>1.55){react('head');}else if(hit.y>.65&&hit.z>.25){react('face');}else if(hit.y<-.95){react('legs');}else{react('pet');}}touchStart=null;
+});
+renderer.domElement.addEventListener('pointercancel',()=>{clearTimeout(holdTimer);endVoiceRecording();touchStart=null;});
 let last=performance.now();
 function animate(now){requestAnimationFrame(animate);const dt=Math.min((now-last)/1000,.05);last=now;const t=now/1000;
 body.position.y=Math.sin(t*2)*.018;body.rotation.x*=.9;body.rotation.x*=.9;
