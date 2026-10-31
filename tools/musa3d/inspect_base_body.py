@@ -1,7 +1,7 @@
 import bpy, os
 from pathlib import Path
 
-source = Path("assets/human-base-rigged.glb")
+source = Path("assets/male-base-mesh-base_male.glb")
 out = Path("artifacts")
 out.mkdir(exist_ok=True)
 if not source.is_file() or source.stat().st_size < 100000:
@@ -19,12 +19,12 @@ if not rigs:
     raise RuntimeError("Base mesh GLB imported without an armature")
 
 bones = sorted({b.name for rig in rigs for b in rig.data.bones})
-if len(bones) < 30:
+if len(bones) < 150:
     raise RuntimeError("Unexpectedly small base skeleton: " + str(len(bones)))
 
 lines = [
-    "MUSA_BASE_BODY_SOURCE_VALIDATION_OK",
-    "Source: Innerscene / MakeHuman MPFB",
+    "MUSA_MALE_BASE_BODY_VALIDATION_OK",
+    "Source: Innerscene / MakeHuman CC0 male base mesh",
     "License: CC0",
     "Format: GLB",
     "Mesh objects: " + str(len(meshes)),
