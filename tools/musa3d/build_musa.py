@@ -44,13 +44,26 @@ def uv(name,loc,scale,material,bone,seg=32,rings=20):
     for j in range(1,nr):
         phi=-pi/2 + pi*j/nr
         yshape=sin(phi)
-        radial=cos(phi)
+        radial=max(0.0,cos(phi))
         for i in range(ns):
             th=2*pi*i/ns
-            # Slight anatomical asymmetry and front/back shaping avoid perfect balls.
-            x=radial*cos(th); z=radial*sin(th)
+            # Superelliptic cross-section: flatter planes and more readable game-art silhouettes,
+            # instead of a mathematically perfect sphere. Keep quad loops for deformation.
+            rawx=cos(th); rawz=sin(th)
+            x=(1 if rawx>=0 else -1)*abs(rawx)**0.82
+            z=(1 if rawz>=0 else -1)*abs(rawz)**0.82
             front=max(0.0,z)
-            verts.append((cx+sx*x*(1-.035*yshape), cy+sy*yshape, cz+sz*z*(1-.10*front)))
+            # The front plane is flatter; the rear stays rounder. Tiny name-based shaping
+            # gives head, beard, clothing and facial parts distinct silhouettes.
+            depth=1.0-.16*front
+            width=1.0-.045*yshape
+            if name.startswith("Eye") or name.startswith("Iris") or name.startswith("Pupil"):
+                depth *= .62
+            if name.startswith("Brow"):
+                depth *= .82
+            if name.startswith("Nose"):
+                depth *= 1.12
+            verts.append((cx+sx*x*radial*width, cy+sy*yshape, cz+sz*z*radial*depth))
     bottom=len(verts); verts.append((cx,cy-sy,cz))
     top=len(verts); verts.append((cx,cy+sy,cz))
     for j in range(nr-2):
@@ -90,19 +103,25 @@ def loft(name, profile, material, bone, sides=32, subd=1):
 def head_surface():
     # Chin, jaw, cheekbones, temples and crown are shaped by the profile rather than a sphere.
     profile=[
-        (1.66,.105,.13,.055),(1.70,.205,.205,.055),(1.78,.275,.245,.045),
-        (1.90,.325,.275,.025),(2.04,.365,.305,.010),(2.18,.375,.310,.005),
-        (2.31,.345,.292,.000),(2.41,.300,.260,-.005),(2.48,.205,.205,-.005),
-        (2.51,.055,.085,-.005)
+        # Denser support rings define the chin, jaw angle, cheek plane, temples and crown.
+        (1.635,.065,.095,.075),(1.665,.125,.145,.065),(1.705,.205,.195,.050),
+        (1.755,.255,.225,.035),(1.815,.292,.250,.025),(1.885,.322,.270,.018),
+        (1.965,.350,.292,.012),(2.055,.370,.305,.008),(2.145,.378,.310,.004),
+        (2.225,.370,.305,.002),(2.295,.352,.292,-.002),(2.355,.325,.276,-.004),
+        (2.405,.285,.245,-.005),(2.445,.230,.205,-.005),(2.475,.155,.150,-.005),
+        (2.495,.075,.090,-.005),(2.505,.025,.035,-.005)
     ]
     return loft("Head • sculpted quad topology",profile,skin,"head",40,2)
 
 def torso_surface():
     # A continuous jacket silhouette: pelvis, waist, chest, shoulders and upper collar.
     profile=[
-        (.35,.285,.205,0),(.43,.355,.235,0),(.62,.405,.255,0),
-        (.88,.435,.275,0),(1.12,.465,.292,0),(1.32,.505,.285,0),
-        (1.47,.465,.255,0),(1.57,.335,.205,0),(1.62,.205,.155,0)
+        # Tailored silhouette with shoulder/chest/waist support loops for cleaner deformation.
+        (.32,.255,.185,0),(.36,.295,.210,0),(.42,.350,.235,0),
+        (.52,.385,.250,0),(.66,.405,.260,0),(.82,.425,.270,0),
+        (.98,.445,.282,0),(1.12,.470,.292,0),(1.24,.495,.292,0),
+        (1.33,.505,.285,0),(1.39,.495,.275,0),(1.46,.455,.250,0),
+        (1.52,.385,.225,0),(1.57,.305,.190,0),(1.62,.205,.155,0)
     ]
     return loft("Jacket torso • tailored quad topology",profile,jacket,"spine",40,2)
 
