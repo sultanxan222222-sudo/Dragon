@@ -40,7 +40,9 @@ const fill=new THREE.DirectionalLight(0xb6c89b,1.0);fill.position.set(4,2,-4);sc
 const mat=(c,r=.82)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
 const skin=mat(0xb97855),skinLight=mat(0xd18d68),beard=mat(0x171717),beardMid=mat(0x242321),coat=mat(0x566344),coatLight=mat(0x68764f),seam=mat(0x38452e),capMat=mat(0x17191b),cloth=mat(0x3d4933),white=mat(0xf3eadb),iris=mat(0x39271c),pupil=mat(0x100f0e),mouthMat=mat(0x321b19),bootMat=mat(0x252a25);
 const character=new THREE.Group();scene.add(character);
-let runtimeModel=null,runtimeMixer=null,runtimeActions={},runtimeFitHeight=3.2,runtimeFitWidth=1.2;\nlet renderedFrames=0;\nconst gpuProbe=new THREE.Mesh(new THREE.BoxGeometry(.34,.34,.34),new THREE.MeshBasicMaterial({color:0xff4d8d}));gpuProbe.position.set(1.25,1.55,.1);scene.add(gpuProbe);
+let runtimeModel=null,runtimeMixer=null,runtimeActions={},runtimeFitHeight=3.2,runtimeFitWidth=1.2;
+let renderedFrames=0;
+const gpuProbe=new THREE.Mesh(new THREE.BoxGeometry(.34,.34,.34),new THREE.MeshBasicMaterial({color:0xff4d8d}));gpuProbe.position.set(1.25,1.55,.1);scene.add(gpuProbe);
 function fitRuntimeCamera(){
   const vFov=THREE.MathUtils.degToRad(camera.fov);
   const hFov=2*Math.atan(Math.tan(vFov/2)*camera.aspect);
@@ -52,7 +54,8 @@ function fitRuntimeCamera(){
 const gltfLoader=new GLTFLoader();
 say('Графика запущена • загружаю 3D-модель…');
 gltfLoader.load('./Talking_Musa_Rigged.glb',gltf=>{
-  runtimeModel=gltf.scene; runtimeModel.name='Musa_Rigged_Runtime';\n  scene.remove(gpuProbe);
+  runtimeModel=gltf.scene; runtimeModel.name='Musa_Rigged_Runtime';
+  scene.remove(gpuProbe);
   runtimeModel.position.set(0,0,0); runtimeModel.scale.setScalar(1.0);
   scene.add(runtimeModel); character.visible=false;
   runtimeMixer=new THREE.AnimationMixer(runtimeModel);
@@ -204,7 +207,10 @@ if(blink>0){for(const eye of eyes)eye.scale.y=Math.max(.012,.17*(1-blink));blink
 if(now>until&&mood!=='idle'){mood='idle';say('Коснись Мусы — он отреагирует');}
 renderer.render(scene,camera);renderedFrames++;if(renderedFrames===1)say('GPU-отрисовка работает • проверяю модель…');}
 function resize(){const w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight);camera.aspect=w/h;camera.fov=h>w?32:27;fitRuntimeCamera();renderer.setSize(w,h,false);}
-addEventListener('resize',resize);resize();\nrenderer.setAnimationLoop(animate);\nsetTimeout(()=>{if(!runtimeModel&&renderedFrames>0)say('GPU работает • тестовый объект виден? Модель ещё не загружена');},5000);\nsetTimeout(()=>{if(renderedFrames===0)say('Ошибка: WebGL не выводит кадры');},2500);
+addEventListener('resize',resize);resize();
+renderer.setAnimationLoop(animate);
+setTimeout(()=>{if(!runtimeModel&&renderedFrames>0)say('GPU работает • тестовый объект виден? Модель ещё не загружена');},5000);
+setTimeout(()=>{if(renderedFrames===0)say('Ошибка: WebGL не выводит кадры');},2500);
 if(window.AndroidMusa)window.AndroidMusa.ready();
 </script>
 </body></html>
