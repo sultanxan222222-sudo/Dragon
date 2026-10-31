@@ -104,15 +104,14 @@ const shadowMat=new THREE.MeshBasicMaterial({color:0x080a09,transparent:true,opa
 const shadow=mesh(new THREE.CircleGeometry(.92,48),shadowMat,scene);shadow.rotation.x=-Math.PI/2;shadow.position.set(0,-1.965,0);shadow.scale.set(1,.48,1);
 let mood='idle',until=0,hoodAngle=0,hoodTarget=0,blink=0,blinkAt=2.5;
 function say(text){status.textContent=text}
-function react(kind){mood=kind;until=performance.now()+1500;if(kind==='head'){hoodTarget=1;headPivot.rotation.x=-.18;say('Ой! Капюшон откинулся!');}else if(kind==='pet'){say('Ха… приятно!');headPivot.rotation.z=.10;}else{say('Эй! Полегче!');}}
-document.getElementById('pet').onclick=()=>react('pet');
-document.getElementById('head').onclick=()=>react('head');
-document.getElementById('shake').onclick=()=>react('shake');
-const ray=new THREE.Raycaster(),pointer=new THREE.Vector2();
-renderer.domElement.addEventListener('pointerup',e=>{const r=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);if(ray.intersectObject(character,true).length)react('head');});
+function react(kind){mood=kind;until=performance.now()+1500;if(kind==='head'){hoodTarget=1;headPivot.rotation.x=-.18;say('Ой! Капюшон откинулся!');}else if(kind==='face'){say('Ой, не щекочи!');blink=1;headPivot.rotation.x=.12;}else if(kind==='legs'){say('Эй! Ноги щекотно!');body.rotation.x=.08;}else if(kind==='pet'){say('Ха… приятно!');headPivot.rotation.z=.10;}else{say('Эй! Полегче!');}}
+const ray=new THREE.Raycaster(),pointer=new THREE.Vector2();let touchStart=null;
+renderer.domElement.addEventListener('pointerdown',e=>{touchStart={x:e.clientX,y:e.clientY,time:performance.now()};});
+renderer.domElement.addEventListener('pointerup',e=>{if(!touchStart)return;const r=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);const hits=ray.intersectObject(character,true);if(hits.length){const hit=hits[0].point;const distance=Math.hypot(e.clientX-touchStart.x,e.clientY-touchStart.y);if(distance>42){react('shake');}else if(hit.y>1.55){react('head');}else if(hit.y>.65&&hit.z>.25){react('face');}else if(hit.y<-.95){react('legs');}else{react('pet');}}touchStart=null;});
+renderer.domElement.addEventListener('pointercancel',()=>{touchStart=null;});
 let last=performance.now();
 function animate(now){requestAnimationFrame(animate);const dt=Math.min((now-last)/1000,.05);last=now;const t=now/1000;
-body.position.y=Math.sin(t*2)*.018;body.rotation.x*=.9;
+body.position.y=Math.sin(t*2)*.018;body.rotation.x*=.9;body.rotation.x*=.9;
 if(mood==='shake'&&now<until){character.rotation.z=Math.sin(t*25)*.09;headPivot.rotation.z=Math.sin(t*18)*.08;}
 else{character.rotation.z*=.88;headPivot.rotation.z*=.88;headPivot.rotation.x*=.9;}
 if(mood==='pet'&&now<until)headPivot.rotation.z=.10+Math.sin(t*4)*.025;
