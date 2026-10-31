@@ -70,9 +70,9 @@ class MainActivity : Activity() {
                     }
                 }
             }
-            loadUrl("https://appassets.androidplatform.net/assets/musa3d.html")
         }
         setContentView(webView)
+        webView.post { webView.loadUrl("https://appassets.androidplatform.net/assets/musa3d.html") }
     }
 
     private inner class MusaBridge {
