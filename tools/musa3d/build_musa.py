@@ -124,11 +124,12 @@ def action(name,keys):
     bpy.context.view_layer.objects.active=arm; arm.select_set(True)
     bpy.ops.object.mode_set(mode='POSE')
     for pb in arm.pose.bones: pb.rotation_mode='XYZ'
+    act=bpy.data.actions.new(name)
+    arm.animation_data.action=act
     for frame,poses in keys:
         for bn,rot in poses.items():
             pb=arm.pose.bones[bn]; pb.rotation_euler=rot; pb.keyframe_insert(data_path="rotation_euler",frame=frame,group=bn)
     bpy.ops.object.mode_set(mode='OBJECT')
-    act=arm.animation_data.action; act.name=name
     act.use_fake_user=True
     return act
 arm.animation_data_create()
