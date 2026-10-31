@@ -53,12 +53,12 @@ uv("Mustache L",(-.105,1.98,.295),(.16,.075,.075),beard,"head")
 uv("Mustache R",(.105,1.98,.295),(.16,.075,.075),beard,"head")
 # facial features
 for side in (-1,1):
-    uv("Eye white "+str(side),(side*.145,2.20,.300),(.075,.052,.035),white,"head",24,16)
-    uv("Iris "+str(side),(side*.145,2.195,.332),(.030,.034,.014),iris,"head",20,12)
-    uv("Pupil "+str(side),(side*.145,2.195,.344),(.014,.021,.008),pupil,"head",16,10)
+    uv("Eye white "+str(side),(side*.145,2.20,.300),(.075,.052,.035),white,"eye."+("L" if side<0 else "R"),24,16)
+    uv("Iris "+str(side),(side*.145,2.195,.332),(.030,.034,.014),iris,"eye."+("L" if side<0 else "R"),20,12)
+    uv("Pupil "+str(side),(side*.145,2.195,.344),(.014,.021,.008),pupil,"eye."+("L" if side<0 else "R"),16,10)
     uv("Brow "+str(side),(side*.15,2.29,.29),(.105,.028,.04),beard,"head",20,12)
 uv("Nose",(0,2.08,.34),(.075,.09,.095),skin,"head")
-uv("Mouth",(0,1.99,.303),(.075,.025,.018),mouthmat,"head",20,12)
+uv("Mouth",(0,1.99,.303),(.075,.025,.018),mouthmat,"jaw",20,12)
 # cap
 uv("Black beanie",(0,2.49,0),(.405,.19,.355),black,"head",40,24)
 uv("Beanie rim",(0,2.40,.01),(.407,.065,.36),black,"head",40,16)
@@ -98,6 +98,9 @@ bones=[
 ("spine",(0,.65,0),(0,1.52,0),"root"),
 ("neck",(0,1.52,0),(0,1.83,0),"spine"),
 ("head",(0,1.83,0),(0,2.45,0),"neck"),
+("jaw",(0,2.02,.12),(0,1.88,.28),"head"),
+("eye.L",(-.14,2.18,.25),(-.14,2.22,.31),"head"),
+("eye.R",(.14,2.18,.25),(.14,2.22,.31),"head"),
 ("hood",(0,1.8,-.2),(0,2.35,-.2),"neck"),
 ]
 for s,l in [(-1,"L"),(1,"R")]:
@@ -129,7 +132,9 @@ def action(name, keys, loop=False):
     for frame,poses in keys:
         for pb in arm.pose.bones:
             pb.rotation_euler=poses.get(pb.name,(0,0,0))
+            pb.scale=poses.get(pb.name+'_scale',(1,1,1))
             pb.keyframe_insert(data_path='rotation_euler',frame=frame,group=pb.name)
+            pb.keyframe_insert(data_path='scale',frame=frame,group=pb.name)
     for fc in act.fcurves:
         for kp in fc.keyframe_points:
             kp.interpolation='BEZIER'; kp.handle_left_type='AUTO_CLAMPED'; kp.handle_right_type='AUTO_CLAMPED'
@@ -138,6 +143,7 @@ def action(name, keys, loop=False):
     return act
 arm.animation_data_create()
 action('Musa_Idle_Breath_Loop',[(1,{'spine':(0,0,0),'head':(0,0,0)}),(10,{'spine':(.018,0,0),'head':(-.008,0,.008)}),(20,{'spine':(.028,0,0),'head':(-.014,0,0)}),(30,{'spine':(.012,0,0),'head':(-.006,0,-.006)}),(40,{'spine':(0,0,0),'head':(0,0,0)})],True)
+action('Musa_Blink_Loop',[(1,{'eye.L_scale':(1,1,1),'eye.R_scale':(1,1,1)}),(8,{'eye.L_scale':(1,.10,1),'eye.R_scale':(1,.10,1)}),(10,{'eye.L_scale':(1,.08,1),'eye.R_scale':(1,.08,1)}),(13,{'eye.L_scale':(1,1,1),'eye.R_scale':(1,1,1)}),(52,{'eye.L_scale':(1,1,1),'eye.R_scale':(1,1,1)})],True)
 action('Musa_Hood_Hit_Return',[(1,{'hood':(0,0,0)}),(3,{'hood':(-.58,0,0)}),(6,{'hood':(-.48,0,0)}),(10,{'hood':(-.29,0,0)}),(16,{'hood':(-.12,0,0)}),(24,{'hood':(0,0,0)})])
 action('Musa_Head_Reaction',[(1,{'head':(0,0,0),'spine':(0,0,0)}),(4,{'head':(.22,0,.16),'spine':(.035,0,0)}),(9,{'head':(-.08,0,-.08),'spine':(-.015,0,0)}),(16,{'head':(.035,0,.025)}),(26,{'head':(0,0,0),'spine':(0,0,0)})])
 action('Musa_Wave_L',[(1,{'upper_arm.L':(0,0,0),'forearm.L':(0,0,0)}),(7,{'upper_arm.L':(-.35,0,-.72),'forearm.L':(-.25,0,0)}),(13,{'upper_arm.L':(-.35,0,-.72),'forearm.L':(.28,0,0)}),(19,{'upper_arm.L':(-.35,0,-.72),'forearm.L':(-.22,0,0)}),(25,{'upper_arm.L':(-.35,0,-.72),'forearm.L':(.28,0,0)}),(34,{'upper_arm.L':(0,0,0),'forearm.L':(0,0,0)})])
@@ -156,11 +162,11 @@ bpy.ops.wm.save_as_mainfile(filepath=BLEND)
 bpy.ops.wm.open_mainfile(filepath=BLEND)
 arm=bpy.data.objects.get("Musa_Rig")
 assert arm and arm.type=="ARMATURE"
-required={"root","spine","neck","head","hood","upper_arm.L","forearm.L","hand.L","thigh.L","shin.L","foot.L"}
+required={"root","spine","neck","head","jaw","eye.L","eye.R","hood","upper_arm.L","forearm.L","hand.L","thigh.L","shin.L","foot.L"}
 assert required.issubset(set(arm.data.bones.keys())), "Missing expected rig bones"
 assert len([o for o in bpy.data.objects if o.type=="MESH"]) >= 20, "Character mesh incomplete"
 acts={a.name for a in bpy.data.actions}
-for a in ["Musa_Idle_Breath_Loop","Musa_Hood_Hit_Return","Musa_Head_Reaction","Musa_Wave_L","Musa_Talking_Loop","Musa_Laugh_Loop"]:
+for a in ["Musa_Idle_Breath_Loop","Musa_Blink_Loop","Musa_Hood_Hit_Return","Musa_Head_Reaction","Musa_Wave_L","Musa_Talking_Loop","Musa_Laugh_Loop"]:
     assert a in acts, "Missing animation "+a
 # Export FBX with mesh and rig, including actions
 bpy.ops.object.select_all(action='DESELECT')
