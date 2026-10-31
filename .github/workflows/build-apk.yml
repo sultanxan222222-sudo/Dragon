@@ -3,7 +3,7 @@ name: Build Talking Musa APK
 on:
   workflow_dispatch:
   push:
-    branches: [talking-musa-rebuild]
+    branches: [talking-musa-rebuild, work/musa-integrated]
 
 permissions:
   contents: read
@@ -30,6 +30,8 @@ jobs:
           /opt/blender/blender -b artifacts/Talking_Musa_Rigged.blend --python tools/musa3d/integrate_base_body.py 2>&1 | tee artifacts/body-integration.log
           grep -q MUSA_ANATOMICAL_BODY_INTEGRATION_OK artifacts/body-integration.log
           test -s artifacts/Talking_Musa_Rigged.glb
+          python3 tools/musa3d/validate_runtime_glb.py artifacts/Talking_Musa_Rigged.glb | tee artifacts/runtime-glb-validation.log
+          grep -q MUSA_RUNTIME_GLB_VALIDATION_OK artifacts/runtime-glb-validation.log
           cp artifacts/Talking_Musa_Rigged.glb app/src/main/assets/Talking_Musa_Rigged.glb
       - name: Download Three.js and GLTF loader
         run: |
