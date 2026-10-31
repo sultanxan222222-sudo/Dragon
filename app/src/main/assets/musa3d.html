@@ -39,7 +39,7 @@ const key=new THREE.DirectionalLight(0xffdfc3,2.3);key.position.set(-3,5,6);scen
 const fill=new THREE.DirectionalLight(0xb6c89b,1.0);fill.position.set(4,2,-4);scene.add(fill);
 const mat=(c,r=.82)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
 const skin=mat(0xb97855),skinLight=mat(0xd18d68),beard=mat(0x171717),beardMid=mat(0x242321),coat=mat(0x566344),coatLight=mat(0x68764f),seam=mat(0x38452e),capMat=mat(0x17191b),cloth=mat(0x3d4933),white=mat(0xf3eadb),iris=mat(0x39271c),pupil=mat(0x100f0e),mouthMat=mat(0x321b19),bootMat=mat(0x252a25);
-const character=new THREE.Group();scene.add(character);
+const character=new THREE.Group();character.visible=false;scene.add(character);
 let runtimeModel=null,runtimeMixer=null,runtimeActions={},runtimeFitHeight=3.2,runtimeFitWidth=1.2;
 let renderedFrames=0;
 const gpuProbe=new THREE.Mesh(new THREE.BoxGeometry(.34,.34,.34),new THREE.MeshBasicMaterial({color:0xff4d8d}));gpuProbe.position.set(1.25,1.55,.1);scene.add(gpuProbe);
@@ -54,25 +54,39 @@ function fitRuntimeCamera(){
 const gltfLoader=new GLTFLoader();
 say('Графика запущена • загружаю 3D-модель…');
 gltfLoader.load('./Talking_Musa_Rigged.glb',gltf=>{
-  runtimeModel=gltf.scene; runtimeModel.name='Musa_Rigged_Runtime';
-  scene.remove(gpuProbe);
-  runtimeModel.position.set(0,0,0); runtimeModel.scale.setScalar(1.0);
-  scene.add(runtimeModel); character.visible=false;
-  runtimeMixer=new THREE.AnimationMixer(runtimeModel);
-  for(const clip of gltf.animations){runtimeActions[clip.name]=runtimeMixer.clipAction(clip);}
-  const idle=Object.entries(runtimeActions).find(([name])=>name.includes('Idle_Breath'));
-  if(idle){idle[1].reset().play();}
-  const bounds=new THREE.Box3().setFromObject(runtimeModel);
+  // The runtime GLB is the only visible character. Never reveal the old
+  // procedural block-out while the production model is loading or on failure.
+  const candidate=gltf.scene;
+  const meshes=[]; candidate.traverse(o=>{if(o.isMesh)meshes.push(o);});
+  const skinned=meshes.filter(o=>o.isSkinnedMesh);
+  if(meshes.length===0)throw new Error('GLB загружен, но в нём нет 3D-мешей');
+  if(skinned.length===0)throw new Error('В GLB нет SkinnedMesh: риг не подключён к геометрии');
+  if(!gltf.animations||gltf.animations.length===0)throw new Error('В GLB отсутствуют анимации персонажа');
+  const bounds=new THREE.Box3().setFromObject(candidate);
   const size=bounds.getSize(new THREE.Vector3());
+  if(!Number.isFinite(size.y)||size.y<0.5||size.x<0.1)throw new Error('Некорректные размеры 3D-модели');
+  runtimeModel=candidate; runtimeModel.name='Musa_Rigged_Runtime';
+  runtimeModel.position.set(0,0,0); runtimeModel.scale.setScalar(1.0);
   const center=bounds.getCenter(new THREE.Vector3());
   runtimeModel.position.x-=center.x;
   runtimeModel.position.y-=bounds.min.y;
   runtimeModel.position.z-=center.z;
   runtimeFitHeight=Math.max(size.y,1);
   runtimeFitWidth=Math.max(size.x,1);
+  scene.add(runtimeModel);
+  scene.remove(gpuProbe);
+  character.visible=false;
+  runtimeMixer=new THREE.AnimationMixer(runtimeModel);
+  for(const clip of gltf.animations){runtimeActions[clip.name]=runtimeMixer.clipAction(clip);}
+  const idle=Object.entries(runtimeActions).find(([name])=>name.includes('Idle_Breath'));
+  if(idle){idle[1].reset().play();}
   fitRuntimeCamera();
-  say('Муса загружен • '+gpuBackend+' • '+gpuName);
-},xhr=>{if(xhr.total)say('Загрузка модели: '+Math.round(xhr.loaded/xhr.total*100)+'%');},err=>{console.error('Rigged Musa GLB load failed',err);say('Ошибка загрузки 3D-модели: '+(err?.message||String(err)));});
+  say('Муса загружен • мешей: '+meshes.length+' • скинированных: '+skinned.length+' • анимаций: '+gltf.animations.length+' • '+gpuBackend);
+},xhr=>{if(xhr.total)say('Загрузка модели: '+Math.round(xhr.loaded/xhr.total*100)+'%');},err=>{
+  console.error('Rigged Musa GLB load failed',err);
+  character.visible=false; scene.remove(gpuProbe);
+  say('Не удалось загрузить рабочую 3D-модель: '+(err?.message||String(err)));
+});
 function mesh(geo,m,parent=character){const o=new THREE.Mesh(geo,m);parent.add(o);return o}
 function ellipsoid(parent,m,p,s,seg=40){const o=mesh(new THREE.SphereGeometry(1,seg,28),m,parent);o.position.set(...p);o.scale.set(...s);return o}
 function capsule(parent,m,a,b,r1,r2){const d=new THREE.Vector3(...b).sub(new THREE.Vector3(...a));const o=mesh(new THREE.CylinderGeometry(r2,r1,d.length(),24,1),m,parent);o.position.copy(new THREE.Vector3(...a).add(new THREE.Vector3(...b)).multiplyScalar(.5));o.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());ellipsoid(parent,m,a,[r1,r1,r1],20);ellipsoid(parent,m,b,[r2,r2,r2],20);return o}
