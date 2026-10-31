@@ -61,7 +61,7 @@ scale = 3.18 / height
 def fit_point(p):
     return Vector(((p.x - center_x) * scale,
                    (p.y - min_y) * scale - 0.70,
-                   (p.z - center_z) * scale))
+                   (p.z - center_z) * scale * 0.72))
 
 # Source skeleton and body share the same imported coordinate system.
 source_bones = source_rig.data.bones
