@@ -1,10 +1,16 @@
-# Inferno Dragon — Android prototype
+# Говорящий Муса
 
-Android overlay prototype: an animated crimson serpentine dragon with glowing eyes and sparks, displayed above other apps after the user grants Android's Display over other apps permission.
+Android-приложение с интерактивным 3D-персонажем. Проект создан на отдельной ветке `talking-musa-rebuild` на основе репозитория Dragon; исходная ветка `main` не изменена.
 
-The overlay is intentionally non-touchable so apps underneath continue receiving taps. The test bite is triggered by a button in the app. Global tap-to-bite is not implemented in this prototype.
+## Что уже заложено
+- отдельное полноэкранное приложение вместо нетронутого overlay дракона;
+- локальная 3D-сцена Three.js;
+- интерактивные реакции персонажа на касания, встряхивание и удар по голове;
+- отдельная анимация капюшона, которую можно вызвать нажатием по голове;
+- Android APK собирается через GitHub Actions.
 
-Package: `com.infernadragon`
-Version: `0.2-prototype`
+## Текущий статус
+Персонаж в этой первой сборочной версии — процедурный 3D-блок-аут, а не финальная похожая на Мусу модель с готовым скелетом. Для точного сходства требуется полноценная модель по исходной фотографии, rigging и проверка анимаций. Не считать этот этап финальной игрой.
 
-The APK is built automatically by GitHub Actions when the source and build workflow are pushed. See Actions for the build result and download the `InfernoDragon-debug-apk` artifact after a successful run.
+Package: `com.vaynax.talkingmusa`
+Branch: `talking-musa-rebuild`
