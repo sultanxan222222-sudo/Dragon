@@ -1,11 +1,11 @@
-import bpy, os
+import bpy
 from pathlib import Path
 
 source = Path("assets/male-base-mesh-base_male.glb")
 out = Path("artifacts")
 out.mkdir(exist_ok=True)
 if not source.is_file() or source.stat().st_size < 100000:
-    raise RuntimeError("CC0 base mesh download missing or unexpectedly small")
+    raise RuntimeError("CC0 male base mesh download missing or unexpectedly small")
 
 bpy.ops.object.select_all(action="SELECT")
 bpy.ops.object.delete(use_global=False)
@@ -13,14 +13,12 @@ bpy.ops.import_scene.gltf(filepath=str(source))
 
 meshes = [o for o in bpy.context.scene.objects if o.type == "MESH"]
 rigs = [o for o in bpy.context.scene.objects if o.type == "ARMATURE"]
-if not meshes:
-    raise RuntimeError("Base mesh GLB imported without mesh objects")
-if not rigs:
-    raise RuntimeError("Base mesh GLB imported without an armature")
+if not meshes or not rigs:
+    raise RuntimeError("Imported base mesh must contain meshes and an armature")
 
 bones = sorted({b.name for rig in rigs for b in rig.data.bones})
 if len(bones) < 150:
-    raise RuntimeError("Unexpectedly small base skeleton: " + str(len(bones)))
+    raise RuntimeError("Expected 163-bone base skeleton, got " + str(len(bones)))
 
 lines = [
     "MUSA_MALE_BASE_BODY_VALIDATION_OK",
@@ -35,6 +33,6 @@ lines = [
     "Bone names:",
     *bones,
 ]
-(out / "Musa_BaseBody_Inspection.txt").write_text("\\n".join(lines) + "\\n", encoding="utf-8")
+(out / "Musa_BaseBody_Inspection.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
 bpy.ops.wm.save_as_mainfile(filepath=str(out / "Musa_BaseBody_Source.blend"))
-print("\\n".join(lines))
+print("\n".join(lines))
