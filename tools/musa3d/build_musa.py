@@ -456,9 +456,12 @@ bpy.context.view_layer.objects.active=arm
 bpy.ops.export_scene.fbx(filepath=FBX, use_selection=True, object_types={'ARMATURE','MESH'}, add_leaf_bones=False, use_mesh_modifiers=False, bake_anim=True, bake_anim_use_all_actions=True, path_mode='COPY')
 assert os.path.getsize(FBX)>10000, "FBX export unexpectedly small"
 # Binary glTF is the runtime format consumed by the Android Three.js app.
+# This character is authored with Blender Y as its vertical axis (not Blender's
+# usual Z-up axis). Preserve those coordinates in glTF so the Android/Three.js
+# Y-up scene receives an upright character instead of a quarter-turned model.
 bpy.ops.export_scene.gltf(filepath=GLB, export_format='GLB', use_selection=True,
     export_animations=True, export_skins=True, export_morph=True,
-    export_materials='EXPORT', export_image_format='AUTO')
+    export_materials='EXPORT', export_image_format='AUTO', export_yup=False)
 assert os.path.getsize(GLB)>10000, "GLB export unexpectedly small"
 # Re-import FBX into clean scene to validate exported data
 bpy.ops.object.select_all(action='SELECT'); bpy.ops.object.delete(use_global=False)
