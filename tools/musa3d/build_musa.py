@@ -6,6 +6,7 @@ OUT=os.path.abspath("artifacts")
 os.makedirs(OUT,exist_ok=True)
 BLEND=os.path.join(OUT,"Talking_Musa_Rigged.blend")
 FBX=os.path.join(OUT,"Talking_Musa_Rigged.fbx")
+GLB=os.path.join(OUT,"Talking_Musa_Rigged.glb")
 
 # Clean scene
 bpy.ops.object.select_all(action='SELECT'); bpy.ops.object.delete(use_global=False)
@@ -454,6 +455,11 @@ for o in bpy.data.objects:
 bpy.context.view_layer.objects.active=arm
 bpy.ops.export_scene.fbx(filepath=FBX, use_selection=True, object_types={'ARMATURE','MESH'}, add_leaf_bones=False, use_mesh_modifiers=False, bake_anim=True, bake_anim_use_all_actions=True, path_mode='COPY')
 assert os.path.getsize(FBX)>10000, "FBX export unexpectedly small"
+# Binary glTF is the runtime format consumed by the Android Three.js app.
+bpy.ops.export_scene.gltf(filepath=GLB, export_format='GLB', use_selection=True,
+    export_animations=True, export_skins=True, export_morph=True,
+    export_materials='EXPORT', export_image_format='AUTO')
+assert os.path.getsize(GLB)>10000, "GLB export unexpectedly small"
 # Re-import FBX into clean scene to validate exported data
 bpy.ops.object.select_all(action='SELECT'); bpy.ops.object.delete(use_global=False)
 bpy.ops.import_scene.fbx(filepath=FBX, automatic_bone_orientation=False)
