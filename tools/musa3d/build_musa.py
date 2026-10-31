@@ -83,10 +83,12 @@ def loft(name, profile, material, bone, sides=32, subd=1):
     for y,w,d,zc in profile:
         for i in range(sides):
             a=2*pi*i/sides
-            x=cos(a); z=sin(a)
-            # Slightly fuller front plane and narrower rear silhouette.
+            rawx=cos(a); rawz=sin(a)
+            # Superellipse loops create readable planar regions while retaining quad topology.
+            x=(1 if rawx>=0 else -1)*abs(rawx)**.88
+            z=(1 if rawz>=0 else -1)*abs(rawz)**.88
             front=max(0.0,z)
-            verts.append((w*x, y, zc+d*z*(1.0-.07*front)))
+            verts.append((w*x, y, zc+d*z*(1.0-.13*front)))
     for j in range(len(profile)-1):
         for i in range(sides):
             ni=(i+1)%sides
@@ -115,6 +117,7 @@ def head_surface():
 
 def torso_surface():
     # A continuous jacket silhouette: pelvis, waist, chest, shoulders and upper collar.
+    # Keep this as a quad-loop surface; do not replace it with stacked primitive objects.
     profile=[
         # Tailored silhouette with shoulder/chest/waist support loops for cleaner deformation.
         (.32,.255,.185,0),(.36,.295,.210,0),(.42,.350,.235,0),
@@ -126,16 +129,24 @@ def torso_surface():
     return loft("Jacket torso • tailored quad topology",profile,jacket,"spine",40,2)
 
 def cyl(name,a,b,r1,r2,material,bone,sides=24):
-    # Tapered quad-loop tube with support rings and closed polygon caps.
+    # Quad-loop anatomical tube, with flatter front/back planes and dense support rings.
     a,b=Vector(a),Vector(b); axis=(b-a).normalized()
     ref=Vector((0,0,1)) if abs(axis.z)<.92 else Vector((0,1,0))
     u=axis.cross(ref).normalized(); v=axis.cross(u).normalized()
-    rings=[(0.0,r1*.88),(0.08,r1),(0.28,r1*.96),(0.72,r2*1.04),(0.92,r2),(1.0,r2*.9)]
-    verts=[]; faces=[]; n=max(12, int(sides))
+    # Extra rings preserve shape around elbows, wrists, knees, ankles and finger joints.
+    rings=[(0.0,r1*.84),(0.035,r1*.94),(0.08,r1),(0.16,r1*.99),
+           (0.30,r1*.95),(0.48,r1*.86),(0.68,r2*1.06),
+           (0.84,r2),(0.93,r2*.98),(0.975,r2*.93),(1.0,r2*.86)]
+    verts=[]; faces=[]; n=max(16, int(sides))
     for t,r in rings:
         center=a+(b-a)*t
         for i in range(n):
-            ang=2*pi*i/n; p=center+r*(cos(ang)*u+sin(ang)*v)
+            ang=2*pi*i/n
+            # Superellipse-like section: less circular, more game-art sculpted.
+            rawx=cos(ang); rawy=sin(ang)
+            x=(1 if rawx>=0 else -1)*abs(rawx)**.88
+            y=(1 if rawy>=0 else -1)*abs(rawy)**.88
+            p=center+r*(x*u+y*v)
             verts.append(tuple(p))
     for j in range(len(rings)-1):
         for i in range(n):
