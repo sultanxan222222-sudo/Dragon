@@ -275,6 +275,11 @@ def prepare_unity_textures():
         principled=next((n for n in nodes if n.type=='BSDF_PRINCIPLED'),None)
         if not principled:
             continue
+        # Ensure rendered/exported materials use the authored character palette.
+        # diffuse_color alone is only a viewport hint once nodes are enabled.
+        principled.inputs['Base Color'].default_value=material.diffuse_color
+        principled.inputs['Roughness'].default_value=material.roughness
+        principled.inputs['Metallic'].default_value=material.metallic
         normal_tex=nodes.new('ShaderNodeTexImage')
         normal_tex.name='Musa Tangent Normal (OpenGL Y+)'
         normal_tex.label='Musa_Normal.png • Tangent Space • OpenGL Y+'
