@@ -147,8 +147,8 @@ action('Musa_Blink_Loop',[(1,{'eye.L_scale':(1,1,1),'eye.R_scale':(1,1,1)}),(8,{
 action('Musa_Hood_Hit_Return',[(1,{'hood':(0,0,0)}),(3,{'hood':(-.58,0,0)}),(6,{'hood':(-.48,0,0)}),(10,{'hood':(-.29,0,0)}),(16,{'hood':(-.12,0,0)}),(24,{'hood':(0,0,0)})])
 action('Musa_Head_Reaction',[(1,{'head':(0,0,0),'spine':(0,0,0)}),(4,{'head':(.22,0,.16),'spine':(.035,0,0)}),(9,{'head':(-.08,0,-.08),'spine':(-.015,0,0)}),(16,{'head':(.035,0,.025)}),(26,{'head':(0,0,0),'spine':(0,0,0)})])
 action('Musa_Wave_L',[(1,{'upper_arm.L':(0,0,0),'forearm.L':(0,0,0)}),(7,{'upper_arm.L':(-.35,0,-.72),'forearm.L':(-.25,0,0)}),(13,{'upper_arm.L':(-.35,0,-.72),'forearm.L':(.28,0,0)}),(19,{'upper_arm.L':(-.35,0,-.72),'forearm.L':(-.22,0,0)}),(25,{'upper_arm.L':(-.35,0,-.72),'forearm.L':(.28,0,0)}),(34,{'upper_arm.L':(0,0,0),'forearm.L':(0,0,0)})])
-action('Musa_Talking_Loop',[(1,{'head':(0,0,0)}),(4,{'head':(.025,0,.015)}),(8,{'head':(-.018,0,-.012)}),(12,{'head':(.02,0,.01)}),(16,{'head':(0,0,0)})],True)
-action('Musa_Laugh_Loop',[(1,{'head':(0,0,0),'spine':(0,0,0)}),(5,{'head':(-.06,0,.035),'spine':(.025,0,0)}),(9,{'head':(.035,0,-.025),'spine':(-.01,0,0)}),(13,{'head':(-.045,0,.025),'spine':(.02,0,0)}),(18,{'head':(0,0,0),'spine':(0,0,0)})],True)
+action('Musa_Talking_Loop',[(1,{'jaw':(0,0,0),'head':(0,0,0)}),(4,{'jaw':(.12,0,0),'head':(.025,0,.015)}),(8,{'jaw':(.025,0,0),'head':(-.018,0,-.012)}),(12,{'jaw':(.16,0,0),'head':(.02,0,.01)}),(16,{'jaw':(0,0,0),'head':(0,0,0)})],True)
+action('Musa_Laugh_Loop',[(1,{'jaw':(0,0,0),'head':(0,0,0),'spine':(0,0,0)}),(5,{'jaw':(.23,0,0),'head':(-.06,0,.035),'spine':(.025,0,0)}),(9,{'jaw':(.035,0,0),'head':(.035,0,-.025),'spine':(-.01,0,0)}),(13,{'jaw':(.20,0,0),'head':(-.045,0,.025),'spine':(.02,0,0)}),(18,{'jaw':(0,0,0),'head':(0,0,0),'spine':(0,0,0)})],True)
 # scene, camera-friendly orientation
 arm.show_in_front=True
 bpy.context.scene.frame_start=1; bpy.context.scene.frame_end=40; bpy.context.scene.frame_set(1)
