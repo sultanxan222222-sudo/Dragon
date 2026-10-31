@@ -10,12 +10,23 @@
 #top{position:absolute;top:calc(env(safe-area-inset-top) + 10px);left:12px;right:12px;text-align:center;pointer-events:none;z-index:2}
 #top strong{display:block;font-size:clamp(19px,5vw,27px);letter-spacing:1px}#hint{font-size:13px;color:#c0c3ba;margin-top:5px}
 #status{position:absolute;bottom:calc(18px + env(safe-area-inset-bottom));left:12px;right:12px;text-align:center;color:#d0d4c5;font-size:12px;pointer-events:none;text-shadow:0 1px 3px #000;z-index:2;background:#101416cc;padding:9px;border-radius:8px;min-height:32px}
+#actions{position:absolute;z-index:4;left:12px;right:12px;bottom:calc(72px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;pointer-events:auto}
+.action{min-height:46px;border:1px solid #59634b;border-radius:14px;background:linear-gradient(180deg,#293329ee,#171e19ee);color:#f4f1e9;font-size:12px;font-weight:700;letter-spacing:.2px;box-shadow:0 8px 22px #0006;touch-action:manipulation}
+.action:active{transform:scale(.97);background:#46543b}
+.action.primary{border-color:#a88b45;background:linear-gradient(180deg,#67552bee,#292519ee)}
+@media(max-height:520px){#actions{bottom:calc(62px + env(safe-area-inset-bottom))}.action{min-height:38px}}
 </style>
 <script type="importmap">{"imports":{"three":"./three.module.js","three/addons/loaders/GLTFLoader.js":"./three/addons/loaders/GLTFLoader.js"}}</script>
 </head>
 <body>
 <div id="top"><strong>ГОВОРЯЩИЙ МУСА</strong><div id="hint">Коснись для реакции • удерживай для записи голоса</div></div>
 <div id="stage"></div><div id="status">Удерживай палец 0,5 сек., говори и отпусти — Муса повторит голос</div>
+<div id="actions" aria-label="Действия с Мусой">
+  <button class="action" type="button" data-react="pet">Погладить</button>
+  <button class="action" type="button" data-react="head">Капюшон</button>
+  <button class="action" type="button" data-react="face">Лицо</button>
+  <button class="action primary" type="button" data-react="shake">Реакция</button>
+</div>
 <script>
 window.addEventListener('error',e=>{const s=document.getElementById('status');if(s)s.textContent='Ошибка JavaScript: '+(e.message||'неизвестная ошибка');});
 window.addEventListener('unhandledrejection',e=>{const s=document.getElementById('status');if(s)s.textContent='Ошибка модуля: '+(e.reason?.message||String(e.reason));});
@@ -39,7 +50,7 @@ const key=new THREE.DirectionalLight(0xffdfc3,2.3);key.position.set(-3,5,6);scen
 const fill=new THREE.DirectionalLight(0xb6c89b,1.0);fill.position.set(4,2,-4);scene.add(fill);
 const mat=(c,r=.82)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
 const skin=mat(0xb97855),skinLight=mat(0xd18d68),beard=mat(0x171717),beardMid=mat(0x242321),coat=mat(0x566344),coatLight=mat(0x68764f),seam=mat(0x38452e),capMat=mat(0x17191b),cloth=mat(0x3d4933),white=mat(0xf3eadb),iris=mat(0x39271c),pupil=mat(0x100f0e),mouthMat=mat(0x321b19),bootMat=mat(0x252a25);
-const character=new THREE.Group();scene.add(character);
+const character=new THREE.Group();character.visible=false;scene.add(character);
 let runtimeModel=null,runtimeMixer=null,runtimeActions={},runtimeFitHeight=3.2,runtimeFitWidth=1.2;
 let renderedFrames=0;
 const gpuProbe=new THREE.Mesh(new THREE.BoxGeometry(.34,.34,.34),new THREE.MeshBasicMaterial({color:0xff4d8d}));gpuProbe.position.set(1.25,1.55,.1);scene.add(gpuProbe);
@@ -54,25 +65,39 @@ function fitRuntimeCamera(){
 const gltfLoader=new GLTFLoader();
 say('Графика запущена • загружаю 3D-модель…');
 gltfLoader.load('./Talking_Musa_Rigged.glb',gltf=>{
-  runtimeModel=gltf.scene; runtimeModel.name='Musa_Rigged_Runtime';
-  scene.remove(gpuProbe);
-  runtimeModel.position.set(0,0,0); runtimeModel.scale.setScalar(1.0);
-  scene.add(runtimeModel); character.visible=false;
-  runtimeMixer=new THREE.AnimationMixer(runtimeModel);
-  for(const clip of gltf.animations){runtimeActions[clip.name]=runtimeMixer.clipAction(clip);}
-  const idle=Object.entries(runtimeActions).find(([name])=>name.includes('Idle_Breath'));
-  if(idle){idle[1].reset().play();}
-  const bounds=new THREE.Box3().setFromObject(runtimeModel);
+  // The runtime GLB is the only visible character. Never reveal the old
+  // procedural block-out while the production model is loading or on failure.
+  const candidate=gltf.scene;
+  const meshes=[]; candidate.traverse(o=>{if(o.isMesh)meshes.push(o);});
+  const skinned=meshes.filter(o=>o.isSkinnedMesh);
+  if(meshes.length===0){scene.remove(gpuProbe);say('Ошибка модели: GLB не содержит 3D-мешей');return;}
+  if(skinned.length===0){scene.remove(gpuProbe);say('Ошибка модели: скелет не привязан к геометрии');return;}
+  if(!gltf.animations||gltf.animations.length===0){scene.remove(gpuProbe);say('Ошибка модели: анимации не найдены');return;}
+  const bounds=new THREE.Box3().setFromObject(candidate);
   const size=bounds.getSize(new THREE.Vector3());
+  if(!Number.isFinite(size.y)||size.y<0.5||size.x<0.1){scene.remove(gpuProbe);say('Ошибка модели: неверные размеры 3D-модели');return;}
+  runtimeModel=candidate; runtimeModel.name='Musa_Rigged_Runtime';
+  runtimeModel.position.set(0,0,0); runtimeModel.scale.setScalar(1.0);
   const center=bounds.getCenter(new THREE.Vector3());
   runtimeModel.position.x-=center.x;
   runtimeModel.position.y-=bounds.min.y;
   runtimeModel.position.z-=center.z;
   runtimeFitHeight=Math.max(size.y,1);
   runtimeFitWidth=Math.max(size.x,1);
+  scene.add(runtimeModel);
+  scene.remove(gpuProbe);
+  character.visible=false;
+  runtimeMixer=new THREE.AnimationMixer(runtimeModel);
+  for(const clip of gltf.animations){runtimeActions[clip.name]=runtimeMixer.clipAction(clip);}
+  const idle=Object.entries(runtimeActions).find(([name])=>name.includes('Idle_Breath'));
+  if(idle){idle[1].reset().play();}
   fitRuntimeCamera();
-  say('Муса загружен • '+gpuBackend+' • '+gpuName);
-},xhr=>{if(xhr.total)say('Загрузка модели: '+Math.round(xhr.loaded/xhr.total*100)+'%');},err=>{console.error('Rigged Musa GLB load failed',err);say('Ошибка загрузки 3D-модели: '+(err?.message||String(err)));});
+  say('Муса загружен • мешей: '+meshes.length+' • скинированных: '+skinned.length+' • анимаций: '+gltf.animations.length+' • '+gpuBackend);
+},xhr=>{if(xhr.total)say('Загрузка модели: '+Math.round(xhr.loaded/xhr.total*100)+'%');},err=>{
+  console.error('Rigged Musa GLB load failed',err);
+  character.visible=false; scene.remove(gpuProbe);
+  say('Не удалось загрузить рабочую 3D-модель: '+(err?.message||String(err)));
+});
 function mesh(geo,m,parent=character){const o=new THREE.Mesh(geo,m);parent.add(o);return o}
 function ellipsoid(parent,m,p,s,seg=40){const o=mesh(new THREE.SphereGeometry(1,seg,28),m,parent);o.position.set(...p);o.scale.set(...s);return o}
 function capsule(parent,m,a,b,r1,r2){const d=new THREE.Vector3(...b).sub(new THREE.Vector3(...a));const o=mesh(new THREE.CylinderGeometry(r2,r1,d.length(),24,1),m,parent);o.position.copy(new THREE.Vector3(...a).add(new THREE.Vector3(...b)).multiplyScalar(.5));o.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());ellipsoid(parent,m,a,[r1,r1,r1],20);ellipsoid(parent,m,b,[r2,r2,r2],20);return o}
@@ -145,6 +170,9 @@ let mood='idle',until=0,hoodAngle=0,hoodTarget=0,blink=0,blinkAt=2.5;
 function say(text){status.textContent=text}
 function react(kind){mood=kind;until=performance.now()+1500;
   if(runtimeMixer){const key=kind==='head'?'Hood_Hit_Return':kind==='face'?'Head_Reaction':kind==='shake'?'Head_Reaction':kind==='pet'?'Wave_L':null;const action=key&&Object.entries(runtimeActions).find(([name])=>name.includes(key));if(action){for(const a of Object.values(runtimeActions))a.fadeOut(.12);action[1].reset().fadeIn(.12).play();}}if(kind==='head'){hoodTarget=1;headPivot.rotation.x=-.18;say('Ой! Капюшон откинулся!');}else if(kind==='face'){say('Ой, не щекочи!');blink=1;headPivot.rotation.x=.12;}else if(kind==='legs'){say('Эй! Ноги щекотно!');body.rotation.x=.08;}else if(kind==='pet'){say('Ха… приятно!');headPivot.rotation.z=.10;}else{say('Эй! Полегче!');}}
+document.querySelectorAll('[data-react]').forEach(button=>{
+  button.addEventListener('click',()=>react(button.dataset.react));
+});
 const ray=new THREE.Raycaster(),pointer=new THREE.Vector2();let touchStart=null;
 // Long press records the user's voice; playback is pitch-shifted for the talking-pet effect.
 let holdTimer=null,holdRecording=false,recordingPending=false,recorder=null,voiceStream=null,voiceChunks=[];
