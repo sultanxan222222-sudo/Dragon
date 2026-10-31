@@ -40,7 +40,15 @@ const fill=new THREE.DirectionalLight(0xb6c89b,1.0);fill.position.set(4,2,-4);sc
 const mat=(c,r=.82)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
 const skin=mat(0xb97855),skinLight=mat(0xd18d68),beard=mat(0x171717),beardMid=mat(0x242321),coat=mat(0x566344),coatLight=mat(0x68764f),seam=mat(0x38452e),capMat=mat(0x17191b),cloth=mat(0x3d4933),white=mat(0xf3eadb),iris=mat(0x39271c),pupil=mat(0x100f0e),mouthMat=mat(0x321b19),bootMat=mat(0x252a25);
 const character=new THREE.Group();scene.add(character);
-let runtimeModel=null,runtimeMixer=null,runtimeActions={};
+let runtimeModel=null,runtimeMixer=null,runtimeActions={},runtimeFitHeight=3.2,runtimeFitWidth=1.2;
+function fitRuntimeCamera(){
+  const vFov=THREE.MathUtils.degToRad(camera.fov);
+  const hFov=2*Math.atan(Math.tan(vFov/2)*camera.aspect);
+  const distance=Math.max(runtimeFitHeight/(2*Math.tan(vFov/2)),runtimeFitWidth/(2*Math.tan(hFov/2)))*1.22;
+  camera.position.set(0,runtimeFitHeight*.49,distance);
+  camera.lookAt(0,runtimeFitHeight*.49,0);
+  camera.updateProjectionMatrix();
+}
 const gltfLoader=new GLTFLoader();
 say('Графика запущена • загружаю 3D-модель…');
 gltfLoader.load('./Talking_Musa_Rigged.glb',gltf=>{
@@ -57,10 +65,9 @@ gltfLoader.load('./Talking_Musa_Rigged.glb',gltf=>{
   runtimeModel.position.x-=center.x;
   runtimeModel.position.y-=bounds.min.y;
   runtimeModel.position.z-=center.z;
-  const fitHeight=Math.max(size.y,1);
-  camera.position.set(0,fitHeight*.48,Math.max(8.8,fitHeight*2.45));
-  camera.lookAt(0,fitHeight*.48,0);
-  camera.updateProjectionMatrix();
+  runtimeFitHeight=Math.max(size.y,1);
+  runtimeFitWidth=Math.max(size.x,1);
+  fitRuntimeCamera();
   say('Муса загружен • '+gpuBackend+' • '+gpuName);
 },xhr=>{if(xhr.total)say('Загрузка модели: '+Math.round(xhr.loaded/xhr.total*100)+'%');},err=>{console.error('Rigged Musa GLB load failed',err);say('Ошибка загрузки 3D-модели: '+(err?.message||String(err)));});
 function mesh(geo,m,parent=character){const o=new THREE.Mesh(geo,m);parent.add(o);return o}
@@ -196,7 +203,7 @@ if(now>blinkAt){blink=1;blinkAt=t+2.2+Math.random()*2.8;}
 if(blink>0){for(const eye of eyes)eye.scale.y=Math.max(.012,.17*(1-blink));blink=Math.max(0,blink-dt*8);}else for(const eye of eyes)eye.scale.y=.17;
 if(now>until&&mood!=='idle'){mood='idle';say('Коснись Мусы — он отреагирует');}
 renderer.render(scene,camera);}
-function resize(){const w=host.clientWidth,h=host.clientHeight;camera.aspect=w/h;camera.fov=h>w?32:27;camera.position.z=h>w?8.8:7.2;camera.updateProjectionMatrix();renderer.setSize(w,h);}
+function resize(){const w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight);camera.aspect=w/h;camera.fov=h>w?32:27;fitRuntimeCamera();renderer.setSize(w,h);}
 addEventListener('resize',resize);resize();requestAnimationFrame(animate);
 if(window.AndroidMusa)window.AndroidMusa.ready();
 </script>
