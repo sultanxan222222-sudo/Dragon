@@ -206,6 +206,118 @@ for s,label in [(-1,"L"),(1,"R")]:
     cyl("Trouser lower "+label,knee,ankle,.15,.11,jacket,"shin."+label)
     uv("Boot "+label,(s*.23,-.64,.10),(.16,.13,.27),black,"foot."+label)
 
+
+# Unity-oriented texture preparation: UVs, tangent-space normal detail and mask map.
+# Keep this procedural and lightweight; no shell/fur shader is used.
+def make_texture(name, pixels, size=512):
+    from array import array
+    image=bpy.data.images.new(name,width=size,height=size,alpha=False, float_buffer=False)
+    image.colorspace_settings.name='Non-Color'
+    image.pixels.foreach_set(pixels)
+    image.file_format='PNG'
+    filepath=os.path.join(OUT,name)
+    image.filepath_raw=filepath
+    image.save()
+    return image
+
+def prepare_unity_textures():
+    from array import array
+    size=512
+    normal=array('f')
+    mask=array('f')
+    for y in range(size):
+        v=y/size
+        for x in range(size):
+            u=x/size
+            # Fine directional micro-relief resembling short hair/fabric fibres.
+            nx=0.5 + 0.022*sin(u*2*pi*83 + 0.7*sin(v*2*pi*7))
+            ny=0.5 + 0.020*cos(v*2*pi*97 + 0.6*sin(u*2*pi*5))
+            normal.extend((nx,ny,0.998,1.0))
+            # Unity-style packed channels per the supplied brief:
+            # R metallic (non-metal by default), G baked-AO approximation,
+            # B smoothness (low for matte character surfaces).
+            seam=max(0.0, 1.0-abs(sin(u*2*pi*9))*34.0)
+            ao=max(0.62, 0.88 - seam*0.12 - 0.025*(0.5+0.5*sin(v*2*pi*13)))
+            mask.extend((0.0,ao,0.22,1.0))
+    normal_img=make_texture('Musa_Normal.png',normal,size)
+    mask_img=make_texture('Musa_Mask.png',mask,size)
+
+    # Smart UV unwrap every mesh independently; the image files are also delivered
+    # separately so Unity artists can replace/atlas them later without rebuilding the rig.
+    for obj,_bone in parts:
+        if obj.type!='MESH' or not obj.data.polygons:
+            continue
+        bpy.ops.object.select_all(action='DESELECT')
+        obj.select_set(True)
+        bpy.context.view_layer.objects.active=obj
+        if not obj.data.uv_layers:
+            obj.data.uv_layers.new(name='UVMap')
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.uv.smart_project(island_margin=0.018)
+        bpy.ops.object.mode_set(mode='OBJECT')
+        obj['Unity_UV_Ready']=True
+
+    # Hook the tangent-space normal map into the character materials. The packed
+    # mask remains an explicit Unity delivery texture; material roughness stays
+    # per-material in Blender so glossy eyes/nose are not flattened by one shared map.
+    material_list=[skin,jacket,jacket_dark,black,beard,white,iris,pupil,mouthmat,zipmat]
+    smoothness={
+        'Skin • warm natural':0.32,'Jacket • olive fabric':0.18,
+        'Jacket seams':0.20,'Black knit cap':0.16,'Dense dark beard':0.12,
+        'Eye whites':0.72,'Dark hazel eyes':0.92,'Pupils':0.98,
+        'Mouth':0.55,'Zipper':0.82
+    }
+    for material in material_list:
+        material.use_nodes=True
+        nodes=material.node_tree.nodes
+        links=material.node_tree.links
+        principled=next((n for n in nodes if n.type=='BSDF_PRINCIPLED'),None)
+        if not principled:
+            continue
+        normal_tex=nodes.new('ShaderNodeTexImage')
+        normal_tex.name='Musa Tangent Normal (OpenGL Y+)'
+        normal_tex.label='Musa_Normal.png • Tangent Space • OpenGL Y+'
+        normal_tex.image=normal_img
+        normal_tex.interpolation='Linear'
+        normal_tex.image.colorspace_settings.name='Non-Color'
+        normal_node=nodes.new('ShaderNodeNormalMap')
+        normal_node.space='TANGENT'
+        normal_node.inputs['Strength'].default_value=0.28
+        links.new(normal_tex.outputs['Color'],normal_node.inputs['Color'])
+        links.new(normal_node.outputs['Normal'],principled.inputs['Normal'])
+        mask_tex=nodes.new('ShaderNodeTexImage')
+        mask_tex.name='Musa Unity Mask Map'
+        mask_tex.label='Musa_Mask.png • R Metallic / G AO / B Smoothness'
+        mask_tex.image=mask_img
+        mask_tex.interpolation='Linear'
+        mask_tex.image.colorspace_settings.name='Non-Color'
+        material['Unity_Mask_Map']='Musa_Mask.png'
+        material['Unity_Smoothness_Target']=smoothness.get(material.name,0.2)
+        material['Unity_Normal_Map']='Musa_Normal.png (Tangent Space, OpenGL Y+)'
+    return normal_img,mask_img
+
+def add_face_blendshapes():
+    head=next((o for o,_ in parts if o.name.startswith('Head • sculpted')),None)
+    if not head or not head.data.vertices:
+        raise RuntimeError('Head mesh unavailable for facial blendshapes')
+    basis=head.shape_key_add(name='Basis')
+    smile=head.shape_key_add(name='Musa_Smile')
+    brow=head.shape_key_add(name='Musa_BrowRaise')
+    for i,vert in enumerate(head.data.vertices):
+        x,y,z=vert.co
+        # Head mesh is built in character coordinates; subtly lift mouth corners
+        # and raise the forehead region without changing the base expression.
+        if 1.91 <= y <= 2.03 and z > 0.12:
+            weight=min(1.0,abs(x)/0.34)
+            smile.data[i].co.z += 0.018*weight
+        if y >= 2.25 and z > 0.08:
+            brow.data[i].co.z += 0.014
+    head['Blendshapes']='Musa_Smile;Musa_BrowRaise'
+
+prepare_unity_textures()
+add_face_blendshapes()
+
 # Armature with connected hierarchy
 arm_data=bpy.data.armatures.new("Musa_Skeleton")
 arm=bpy.data.objects.new("Musa_Rig",arm_data); bpy.context.collection.objects.link(arm)
@@ -282,6 +394,10 @@ assert arm and arm.type=="ARMATURE"
 required={"root","spine","neck","head","jaw","eye.L","eye.R","hood","upper_arm.L","forearm.L","hand.L","thigh.L","shin.L","foot.L"}
 assert required.issubset(set(arm.data.bones.keys())), "Missing expected rig bones"
 assert len([o for o in bpy.data.objects if o.type=="MESH"]) >= 20, "Character mesh incomplete"
+assert os.path.exists(os.path.join(OUT,"Musa_Normal.png")), "Normal map missing"
+assert os.path.exists(os.path.join(OUT,"Musa_Mask.png")), "Mask map missing"
+head_for_keys=next((o for o in bpy.data.objects if o.type=="MESH" and o.name.startswith("Head • sculpted")),None)
+assert head_for_keys and head_for_keys.data.shape_keys and {"Musa_Smile","Musa_BrowRaise"}.issubset({k.name for k in head_for_keys.data.shape_keys.key_blocks}), "Facial blendshapes missing"
 acts={a.name for a in bpy.data.actions}
 for a in ["Musa_Idle_Breath_Loop","Musa_Blink_Loop","Musa_Hood_Hit_Return","Musa_Head_Reaction","Musa_Wave_L","Musa_Talking_Loop","Musa_Laugh_Loop"]:
     assert a in acts, "Missing animation "+a
@@ -301,4 +417,8 @@ imported_mesh=[o for o in bpy.data.objects if o.type=="MESH"]
 assert imported_arm, "FBX re-import contains no armature"
 assert imported_mesh, "FBX re-import contains no mesh"
 assert len(imported_arm[0].data.bones)>=len(required), "FBX re-import rig has too few bones"
-print("MUSA_3D_VALIDATION_OK",len(imported_mesh),len(imported_arm[0].data.bones),len(acts),os.path.getsize(FBX))
+imported_shape_keys=sum(1 for o in imported_mesh if o.data.shape_keys for k in o.data.shape_keys.key_blocks if k.name not in {"Basis"})
+assert imported_shape_keys >= 2, "FBX round-trip lost facial blendshapes"
+for texture_name in ("Musa_Normal.png","Musa_Mask.png"):
+    assert os.path.getsize(os.path.join(OUT,texture_name)) > 1000, "Texture export invalid: "+texture_name
+print("MUSA_3D_VALIDATION_OK",len(imported_mesh),len(imported_arm[0].data.bones),len(acts),imported_shape_keys,os.path.getsize(FBX))
