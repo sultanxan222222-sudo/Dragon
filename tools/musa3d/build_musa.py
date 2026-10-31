@@ -64,13 +64,13 @@ def uv(name,loc,scale,material,bone,seg=32,rings=20):
     sub=obj.modifiers.new('Quad Surface Smoothing','SUBSURF'); sub.levels=1; sub.render_levels=2
     return obj
 
-def cyl(name,a,b,r1,r2,material,bone,verts=24):
+def cyl(name,a,b,r1,r2,material,bone,sides=24):
     # Tapered quad-loop tube with support rings and closed polygon caps.
     a,b=Vector(a),Vector(b); axis=(b-a).normalized()
     ref=Vector((0,0,1)) if abs(axis.z)<.92 else Vector((0,1,0))
     u=axis.cross(ref).normalized(); v=axis.cross(u).normalized()
     rings=[(0.0,r1*.88),(0.08,r1),(0.28,r1*.96),(0.72,r2*1.04),(0.92,r2),(1.0,r2*.9)]
-    verts=[]; faces=[]; n=max(12, int(verts))
+    verts=[]; faces=[]; n=max(12, int(sides))
     for t,r in rings:
         center=a+(b-a)*t
         for i in range(n):
