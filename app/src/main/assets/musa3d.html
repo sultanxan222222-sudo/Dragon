@@ -9,13 +9,17 @@
 #stage{position:absolute;inset:0;touch-action:none}canvas{display:block;width:100%;height:100%;touch-action:none;user-select:none;-webkit-user-select:none}
 #top{position:absolute;top:calc(env(safe-area-inset-top) + 10px);left:12px;right:12px;text-align:center;pointer-events:none;z-index:2}
 #top strong{display:block;font-size:clamp(19px,5vw,27px);letter-spacing:1px}#hint{font-size:13px;color:#c0c3ba;margin-top:5px}
-#status{position:absolute;bottom:calc(18px + env(safe-area-inset-bottom));left:12px;right:12px;text-align:center;color:#d0d4c5;font-size:12px;pointer-events:none;text-shadow:0 1px 3px #000;z-index:2}
+#status{position:absolute;bottom:calc(18px + env(safe-area-inset-bottom));left:12px;right:12px;text-align:center;color:#d0d4c5;font-size:12px;pointer-events:none;text-shadow:0 1px 3px #000;z-index:2;background:#101416cc;padding:9px;border-radius:8px;min-height:32px}
 </style>
 <script type="importmap">{"imports":{"three":"./three.module.js","three/addons/loaders/GLTFLoader.js":"./GLTFLoader.js"}}</script>
 </head>
 <body>
 <div id="top"><strong>ГОВОРЯЩИЙ МУСА</strong><div id="hint">Коснись для реакции • удерживай для записи голоса</div></div>
 <div id="stage"></div><div id="status">Удерживай палец 0,5 сек., говори и отпусти — Муса повторит голос</div>
+<script>
+window.addEventListener('error',e=>{const s=document.getElementById('status');if(s)s.textContent='Ошибка JavaScript: '+(e.message||'неизвестная ошибка');});
+window.addEventListener('unhandledrejection',e=>{const s=document.getElementById('status');if(s)s.textContent='Ошибка модуля: '+(e.reason?.message||String(e.reason));});
+</script>
 <script type="module">
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -27,7 +31,7 @@ renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.6));renderer.outputColorSp
 const gl=renderer.getContext();
 const debugInfo=gl.getExtension('WEBGL_debug_renderer_info');
 const gpuName=debugInfo?gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL):'GPU details hidden by Android WebView';
-const gpuBackend=gl instanceof WebGL2RenderingContext?'WebGL 2':'WebGL 1';
+const gpuBackend=(typeof WebGL2RenderingContext!=='undefined' && gl instanceof WebGL2RenderingContext)?'WebGL 2':'WebGL 1';
 renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();say('Графический контекст GPU потерян — перезапусти приложение');});
 renderer.domElement.addEventListener('webglcontextrestored',()=>say('Графический контекст GPU восстановлен'));
 scene.add(new THREE.HemisphereLight(0xe8edff,0x45402f,1.8));
@@ -38,6 +42,7 @@ const skin=mat(0xb97855),skinLight=mat(0xd18d68),beard=mat(0x171717),beardMid=ma
 const character=new THREE.Group();scene.add(character);
 let runtimeModel=null,runtimeMixer=null,runtimeActions={};
 const gltfLoader=new GLTFLoader();
+say('Графика запущена • загружаю 3D-модель…');
 gltfLoader.load('./Talking_Musa_Rigged.glb',gltf=>{
   runtimeModel=gltf.scene; runtimeModel.name='Musa_Rigged_Runtime';
   runtimeModel.position.set(0,0,0); runtimeModel.scale.setScalar(1.0);
@@ -57,7 +62,7 @@ gltfLoader.load('./Talking_Musa_Rigged.glb',gltf=>{
   camera.lookAt(0,fitHeight*.48,0);
   camera.updateProjectionMatrix();
   say('Муса загружен • '+gpuBackend+' • '+gpuName);
-},undefined,err=>{console.error('Rigged Musa GLB load failed',err);say('Ошибка загрузки 3D-модели: '+(err?.message||'проверь GLB и загрузчик'));});
+},xhr=>{if(xhr.total)say('Загрузка модели: '+Math.round(xhr.loaded/xhr.total*100)+'%');},err=>{console.error('Rigged Musa GLB load failed',err);say('Ошибка загрузки 3D-модели: '+(err?.message||String(err)));});
 function mesh(geo,m,parent=character){const o=new THREE.Mesh(geo,m);parent.add(o);return o}
 function ellipsoid(parent,m,p,s,seg=40){const o=mesh(new THREE.SphereGeometry(1,seg,28),m,parent);o.position.set(...p);o.scale.set(...s);return o}
 function capsule(parent,m,a,b,r1,r2){const d=new THREE.Vector3(...b).sub(new THREE.Vector3(...a));const o=mesh(new THREE.CylinderGeometry(r2,r1,d.length(),24,1),m,parent);o.position.copy(new THREE.Vector3(...a).add(new THREE.Vector3(...b)).multiplyScalar(.5));o.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());ellipsoid(parent,m,a,[r1,r1,r1],20);ellipsoid(parent,m,b,[r2,r2,r2],20);return o}
