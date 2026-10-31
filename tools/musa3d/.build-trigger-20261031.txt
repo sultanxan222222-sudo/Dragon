@@ -1,0 +1,1 @@
+Trigger a fresh APK build from the current talking-musa-rebuild HEAD after the Activity attachment fix.
