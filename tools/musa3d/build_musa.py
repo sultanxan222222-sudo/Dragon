@@ -383,7 +383,10 @@ arm.show_in_front=True
 bpy.context.scene.frame_start=1; bpy.context.scene.frame_end=40; bpy.context.scene.frame_set(1)
 # Studio preview render for visual QA (transparent background, full-body framing).
 scene=bpy.context.scene
-scene.render.engine='BLENDER_EEVEE_NEXT'
+scene.render.engine='CYCLES'
+scene.cycles.device='CPU'
+scene.cycles.samples=12
+scene.render.resolution_percentage=75
 scene.render.resolution_x=900
 scene.render.resolution_y=900
 scene.render.resolution_percentage=100
