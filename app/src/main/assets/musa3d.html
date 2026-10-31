@@ -2,75 +2,129 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Говорящий Муса</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0f1215;color:#f4f1e9;font-family:Arial,sans-serif}#stage{position:absolute;inset:0 0 104px}canvas{display:block;width:100%;height:100%}#top{position:absolute;top:env(safe-area-inset-top,12px);left:0;right:0;text-align:center;pointer-events:none}#top strong{font-size:22px;letter-spacing:1px}#hint{font-size:12px;color:#b7b8b3;margin-top:6px}#controls{position:absolute;bottom:env(safe-area-inset-bottom,12px);left:12px;right:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}button{border:1px solid #65704d;border-radius:14px;padding:14px 5px;background:#252d22;color:#f3f0e8;font-weight:700;font-size:13px}button:active{background:#596641}#status{position:absolute;bottom:78px;left:0;right:0;text-align:center;color:#c4c9b9;font-size:12px;pointer-events:none}
+:root{color-scheme:dark}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101416;color:#f4f1e9;font-family:Arial,sans-serif}
+#stage{position:absolute;inset:82px 0 112px}canvas{display:block;width:100%;height:100%;touch-action:pan-y}
+#top{position:absolute;top:calc(env(safe-area-inset-top) + 10px);left:12px;right:12px;text-align:center;pointer-events:none}
+#top strong{display:block;font-size:clamp(19px,5vw,27px);letter-spacing:1px}#hint{font-size:13px;color:#c0c3ba;margin-top:5px}
+#status{position:absolute;bottom:calc(102px + env(safe-area-inset-bottom));left:12px;right:12px;text-align:center;color:#d0d4c5;font-size:12px;pointer-events:none;text-shadow:0 1px 3px #000}
+#controls{position:absolute;bottom:calc(12px + env(safe-area-inset-bottom));left:12px;right:12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+button{min-height:54px;border:1px solid #75805c;border-radius:16px;padding:10px 4px;background:#283126;color:#f5f2e9;font-weight:700;font-size:clamp(11px,3vw,14px);box-shadow:0 3px 12px #0006}
+button:active{background:#526343;transform:scale(.98)}button:focus-visible{outline:2px solid #e5d69c}
+@media(max-height:650px){#stage{inset:70px 0 95px}#controls button{min-height:46px}#status{bottom:calc(82px + env(safe-area-inset-bottom))}}
 </style>
 <script type="importmap">{"imports":{"three":"./three.module.js"}}</script>
 </head>
 <body>
-<div id="stage"></div>
-<div id="top"><strong>ГОВОРЯЩИЙ МУСА</strong><div id="hint">Коснись персонажа — он ответит</div></div>
-<div id="status">3D-персонаж: первая тестовая модель</div>
-<div id="controls">
-<button id="pet">ПОГЛАДИТЬ</button><button id="head">ПО ГОЛОВЕ</button><button id="shake">РАЗБУДИТЬ</button>
-</div>
+<div id="top"><strong>ГОВОРЯЩИЙ МУСА</strong><div id="hint">Коснись Мусы — он отреагирует</div></div>
+<div id="stage"></div><div id="status">Новая тестовая 3D-модель</div>
+<div id="controls"><button id="pet">ПОГЛАДИТЬ</button><button id="head">ПО ГОЛОВЕ</button><button id="shake">РАЗБУДИТЬ</button></div>
 <script type="module">
 import * as THREE from 'three';
-const host=document.getElementById('stage'), status=document.getElementById('status');
-const scene=new THREE.Scene(); scene.background=new THREE.Color(0x0f1215);
-const camera=new THREE.PerspectiveCamera(35,1,.1,100); camera.position.set(0,1.35,7.6); camera.lookAt(0,1.35,0);
-const renderer=new THREE.WebGLRenderer({antialias:true, powerPreference:'low-power'});
-renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5)); renderer.outputColorSpace=THREE.SRGBColorSpace; renderer.setSize(host.clientWidth,host.clientHeight); host.appendChild(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xe9edff,0x454333,2));
-const key=new THREE.DirectionalLight(0xffe4c6,2.2);key.position.set(-3,6,5);scene.add(key);
-const rim=new THREE.DirectionalLight(0x9cae82,1.1);rim.position.set(4,3,-4);scene.add(rim);
-const mat=(color,roughness=.8)=>new THREE.MeshStandardMaterial({color,roughness});
-const skin=mat(0xb98260), beardMat=mat(0x17191a), jacket=mat(0x596448), hoodMat=mat(0x414c35), black=mat(0x17191d), white=mat(0xf1e8d8), iris=mat(0x38261c), mouthMat=mat(0x321819);
-const root=new THREE.Group();scene.add(root);
-function sphere(parent,m,pos,scale){const o=new THREE.Mesh(new THREE.SphereGeometry(1,28,20),m);o.position.set(...pos);o.scale.set(...scale);parent.add(o);return o}
-function cylinder(parent,m,a,b,r1,r2){const h=a.distanceTo(b),o=new THREE.Mesh(new THREE.CylinderGeometry(r2,r1,h,20),m);o.position.copy(a).add(b).multiplyScalar(.5);o.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),b.clone().sub(a).normalize());parent.add(o);return o}
-const torso=sphere(root,jacket,[0,.45,0],[.83,1.05,.48]);
-sphere(root,skin,[0,1.68,0],[.66,.78,.53]);
-// hood behind head, with opening facing camera
-const hood=sphere(root,hoodMat,[0,1.78,-.18],[.79,.9,.58]);hood.scale.set(.79,.9,.58);
-sphere(root,black,[0,2.43,.01],[.67,.18,.56]); // dark cap
-// ears
-sphere(root,skin,[-.65,1.72,0],[.14,.22,.13]);sphere(root,skin,[.65,1.72,0],[.14,.22,.13]);
-// beard mass and tapered chin
-sphere(root,beardMat,[0,1.26,.28],[.52,.55,.32]);
-const chin=sphere(root,beardMat,[0,.96,.27],[.34,.4,.29]);
-// moustache
-sphere(root,beardMat,[-.19,1.55,.53],[.25,.12,.12]);sphere(root,beardMat,[.19,1.55,.53],[.25,.12,.12]);
-// eyes, brows
-for(const x of [-.25,.25]){sphere(root,white,[x,1.86,.475],[.13,.105,.07]);sphere(root,iris,[x,1.86,.535],[.055,.07,.025]);sphere(root,black,[x,2.02,.49],[.19,.055,.07]);}
-const nose=sphere(root,skin,[0,1.68,.56],[.12,.16,.13]);
-const mouth=sphere(root,mouthMat,[0,1.43,.55],[.16,.035,.035]);
-// shoulders and arms
-for(const side of [-1,1]){sphere(root,jacket,[side*.78,.88,0],[.27,.3,.3]);cylinder(root,jacket,new THREE.Vector3(side*.82,.8,0),new THREE.Vector3(side*1.02,-.02,.04),.2,.14);sphere(root,skin,[side*1.02,-.08,.04],[.16,.17,.15]);}
-// legs and boots
-for(const side of [-1,1]){cylinder(root,mat(0x343b32),new THREE.Vector3(side*.34,-.35,0),new THREE.Vector3(side*.36,-1.25,0),.23,.18);sphere(root,black,[side*.36,-1.3,.12],[.25,.15,.38]);}
-const floor=new THREE.Mesh(new THREE.CircleGeometry(2.2,48),mat(0x202622));floor.rotation.x=-Math.PI/2;floor.position.y=-1.47;scene.add(floor);
-let mood='idle',moodUntil=0,hoodDrop=0,hoodTarget=0,headTap=0;
-function react(kind){mood=kind;moodUntil=performance.now()+1300;if(kind==='head'){hoodTarget=1;headTap=1;status.textContent='Ой! Капюшон слетел!';}else if(kind==='pet'){status.textContent='Мусе приятно';}else{status.textContent='Эй! Не тряси меня!';}}
+const host=document.getElementById('stage'),status=document.getElementById('status');
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x101416);
+const camera=new THREE.PerspectiveCamera(32,1,.1,80);camera.position.set(0,1.15,8.8);camera.lookAt(0,.85,0);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'low-power'});
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.6));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.setSize(host.clientWidth,host.clientHeight);host.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xe8edff,0x45402f,1.8));
+const key=new THREE.DirectionalLight(0xffdfc3,2.3);key.position.set(-3,5,6);scene.add(key);
+const fill=new THREE.DirectionalLight(0xb6c89b,1.0);fill.position.set(4,2,-4);scene.add(fill);
+const mat=(c,r=.82)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
+const skin=mat(0xb97855),skinLight=mat(0xd18d68),beard=mat(0x171717),beardMid=mat(0x242321),coat=mat(0x566344),coatLight=mat(0x68764f),seam=mat(0x38452e),capMat=mat(0x17191b),cloth=mat(0x3d4933),white=mat(0xf3eadb),iris=mat(0x39271c),pupil=mat(0x100f0e),mouthMat=mat(0x321b19),bootMat=mat(0x252a25);
+const character=new THREE.Group();scene.add(character);
+function mesh(geo,m,parent=character){const o=new THREE.Mesh(geo,m);parent.add(o);return o}
+function ellipsoid(parent,m,p,s,seg=40){const o=mesh(new THREE.SphereGeometry(1,seg,28),m,parent);o.position.set(...p);o.scale.set(...s);return o}
+function capsule(parent,m,a,b,r1,r2){const d=new THREE.Vector3(...b).sub(new THREE.Vector3(...a));const o=mesh(new THREE.CylinderGeometry(r2,r1,d.length(),24,1),m,parent);o.position.copy(new THREE.Vector3(...a).add(new THREE.Vector3(...b)).multiplyScalar(.5));o.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());ellipsoid(parent,m,a,[r1,r1,r1],20);ellipsoid(parent,m,b,[r2,r2,r2],20);return o}
+function lathe(parent,m,profile,x=0,y=0,z=0){const o=mesh(new THREE.LatheGeometry(profile.map(v=>new THREE.Vector2(v[0],v[1])),48),m,parent);o.position.set(x,y,z);return o}
+const body=new THREE.Group();character.add(body);
+// Tailored jacket: shaped lathe torso, shoulder slope and visible hem
+lathe(body,coat,[[.05,-1.15],[.38,-1.08],[.58,-.82],[.67,-.25],[.62,.35],[.49,.72],[.30,.84],[.05,.86]],0,.05,0);
+ellipsoid(body,coatLight,[-.57,.53,0],[.25,.29,.34]);ellipsoid(body,coatLight,[.57,.53,0],[.25,.29,.34]);
+// collar and front seams
+capsule(body,seam,[-.12,.82,.39],[0,.55,.43],.045,.035);capsule(body,seam,[.12,.82,.39],[0,.55,.43],.045,.035);
+for(const side of [-1,1]){
+ const arm=new THREE.Group();arm.position.set(side*.58,.48,0);body.add(arm);
+ capsule(arm,coat,[0,0,0],[side*.12,-.56,.02],.205,.17);
+ capsule(arm,coat,[side*.12,-.56,.02],[side*.20,-1.22,.10],.17,.135);
+ ellipsoid(arm,skinLight,[side*.20,-1.34,.12],[.145,.19,.14]);
+ arm.userData.side=side;arm.name='arm'+side;
+}
+// neck
+capsule(body,skin,[0,1.0,0],[0,1.34,0],.23,.22);
+// Head pivots as a group for nods
+const headPivot=new THREE.Group();headPivot.position.set(0,1.40,0);body.add(headPivot);
+const head=new THREE.Group();head.position.y=.15;headPivot.add(head);
+// head custom lathe silhouette, broader temples and tapered jaw
+lathe(head,skin,[[.05,-.55],[.30,-.52],[.48,-.34],[.57,.02],[.55,.40],[.43,.72],[.27,.84],[.05,.86]],0,0,0);
+// ears with inner ear
+for(const s of [-1,1]){ellipsoid(head,skin,[s*.54,.02,0],[.13,.23,.13]);ellipsoid(head,skinLight,[s*.575,.02,.09],[.055,.13,.045]);}
+// ears partly covered by hood
+// cheeks
+ellipsoid(head,skinLight,[-.30,-.12,.38],[.20,.19,.12]);ellipsoid(head,skinLight,[.30,-.12,.38],[.20,.19,.12]);
+// eyes, eyelids, eyeballs, pupils, highlights and thick brows
+const eyes=[];
+for(const s of [-1,1]){
+ const eye=ellipsoid(head,white,[s*.225,.29,.475],[.135,.17,.085]);eyes.push(eye);
+ ellipsoid(head,iris,[s*.225,.285,.548],[.065,.105,.028]);
+ ellipsoid(head,pupil,[s*.225,.285,.57],[.031,.075,.018]);
+ ellipsoid(head,white,[s*.205,.33,.589],[.018,.026,.012]);
+ const brow=ellipsoid(head,beardMid,[s*.23,.53,.46],[.19,.065,.07]);brow.rotation.z=s*-.12;
+}
+// nose bridge and rounded nose
+ellipsoid(head,skin,[0,.12,.49],[.105,.22,.12]);ellipsoid(head,skinLight,[0,.015,.57],[.13,.105,.12]);
+// beard as sculpted extruded silhouette, not stacked spheres
+const beardShape=new THREE.Shape();beardShape.moveTo(-.48,-.04);beardShape.quadraticCurveTo(-.52,.30,-.38,.40);beardShape.quadraticCurveTo(-.22,.34,0,.35);beardShape.quadraticCurveTo(.22,.34,.38,.40);beardShape.quadraticCurveTo(.52,.30,.48,-.04);beardShape.quadraticCurveTo(.44,-.42,.27,-.67);beardShape.quadraticCurveTo(.12,-.88,0,-.91);beardShape.quadraticCurveTo(-.12,-.88,-.27,-.67);beardShape.quadraticCurveTo(-.44,-.42,-.48,-.04);
+const beardGeo=new THREE.ExtrudeGeometry(beardShape,{depth:.18,bevelEnabled:true,bevelSegments:4,steps:1,bevelSize:.055,bevelThickness:.06,curveSegments:12});
+const beardMesh=mesh(beardGeo,beard,head);beardMesh.position.set(0,-.28,.43);beardMesh.scale.set(1,1,.8);
+// moustache shaped lobes and mouth
+ellipsoid(head,beardMid,[-.16,-.005,.61],[.22,.09,.09]);ellipsoid(head,beardMid,[.16,-.005,.61],[.22,.09,.09]);
+const mouth=ellipsoid(head,mouthMat,[0,-.20,.585],[.13,.025,.025]);
+// Cap: crown and visor, fitted to scalp
+const cap= new THREE.Group();head.add(cap);
+ellipsoid(cap,capMat,[0,.83,-.005],[.49,.22,.43]);
+const visor=ellipsoid(cap,capMat,[0,.75,.32],[.46,.075,.24]);
+// Hood has a real cloth shell and collar, mounted behind head on hinge pivot
+const hoodPivot=new THREE.Group();hoodPivot.position.set(0,.48,-.16);head.add(hoodPivot);
+const hoodShell=ellipsoid(hoodPivot,cloth,[0,.18,-.14],[.67,.77,.43]);
+hoodShell.scale.set(.67,.77,.43);
+const hoodRim=ellipsoid(hoodPivot,coatLight,[0,-.30,.17],[.58,.16,.22]);
+const hoodSeam=ellipsoid(hoodPivot,seam,[0,.16,-.515],[.48,.055,.035]);
+// Hood should sit behind head, so front face is not covered
+hoodShell.renderOrder=0;hoodRim.renderOrder=0;
+// trousers and boots
+for(const s of [-1,1]){
+ capsule(body,bootMat,[s*.27,-.88,0],[s*.29,-1.78,.02],.19,.15);
+ ellipsoid(body,bootMat,[s*.29,-1.83,.16],[.22,.13,.34]);
+}
+// floor and soft shadow
+const floor=mesh(new THREE.CircleGeometry(2.1,64),mat(0x202722),scene);floor.rotation.x=-Math.PI/2;floor.position.y=-1.98;
+const shadowMat=new THREE.MeshBasicMaterial({color:0x080a09,transparent:true,opacity:.34});
+const shadow=mesh(new THREE.CircleGeometry(.92,48),shadowMat,scene);shadow.rotation.x=-Math.PI/2;shadow.position.set(0,-1.965,0);shadow.scale.set(1,.48,1);
+let mood='idle',until=0,hoodAngle=0,hoodTarget=0,blink=0,blinkAt=2.5;
+function say(text){status.textContent=text}
+function react(kind){mood=kind;until=performance.now()+1500;if(kind==='head'){hoodTarget=1;headPivot.rotation.x=-.18;say('Ой! Капюшон откинулся!');}else if(kind==='pet'){say('Ха… приятно!');headPivot.rotation.z=.10;}else{say('Эй! Полегче!');}}
 document.getElementById('pet').onclick=()=>react('pet');
 document.getElementById('head').onclick=()=>react('head');
 document.getElementById('shake').onclick=()=>react('shake');
-const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
-renderer.domElement.addEventListener('pointerup',e=>{const r=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);raycaster.setFromCamera(pointer,camera);if(raycaster.intersectObjects(root.children,true).length)react('head');});
-let last=performance.now(),blink=0;
+const ray=new THREE.Raycaster(),pointer=new THREE.Vector2();
+renderer.domElement.addEventListener('pointerup',e=>{const r=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);if(ray.intersectObject(character,true).length)react('head');});
+let last=performance.now();
 function animate(now){requestAnimationFrame(animate);const dt=Math.min((now-last)/1000,.05);last=now;const t=now/1000;
-root.position.y=Math.sin(t*2)*.025;root.rotation.y=Math.sin(t*.55)*.08;
-if(mood==='shake'&&now<moodUntil)root.rotation.z=Math.sin(t*28)*.11;else root.rotation.z*=.9;
-if(mood==='pet'&&now<moodUntil)root.rotation.x=Math.sin(t*5)*.035;else root.rotation.x*=.9;
-hoodDrop+=(hoodTarget-hoodDrop)*Math.min(1,dt*5);hood.position.y=1.78-hoodDrop*.66;hood.rotation.x=hoodDrop*.9;hood.rotation.z=hoodDrop*.18;
-if(headTap){root.position.y+=Math.sin(t*30)*.045;headTap*=.88;}
-mouth.scale.y=.035+(mood!=='idle'&&now<moodUntil?Math.abs(Math.sin(t*13))*.095:Math.abs(Math.sin(t*2))*.008);
-if(now>moodUntil&&mood!=='idle'){mood='idle';if(hoodDrop<.03){hoodTarget=0;status.textContent='Коснись персонажа — он ответит';}}
+body.position.y=Math.sin(t*2)*.018;
+if(mood==='shake'&&now<until){character.rotation.z=Math.sin(t*25)*.09;headPivot.rotation.z=Math.sin(t*18)*.08;}
+else{character.rotation.z*=.88;headPivot.rotation.z*=.88;headPivot.rotation.x*=.9;}
+if(mood==='pet'&&now<until)headPivot.rotation.z=.10+Math.sin(t*4)*.025;
+hoodAngle+=(hoodTarget-hoodAngle)*Math.min(1,dt*4.8);hoodPivot.rotation.x=-hoodAngle*1.18;hoodPivot.rotation.z=hoodAngle*.16;
+if(hoodAngle>.94&&hoodTarget===1){hoodTarget=0;setTimeout(()=>{if(mood==='idle')hoodTarget=0;},400);}
+mouth.scale.y=.025+(mood!=='idle'&&now<until?Math.abs(Math.sin(t*12))*.09:Math.abs(Math.sin(t*2))*.004);
+if(now>blinkAt){blink=1;blinkAt=t+2.2+Math.random()*2.8;}
+if(blink>0){for(const eye of eyes)eye.scale.y=Math.max(.012,.17*(1-blink));blink=Math.max(0,blink-dt*8);}else for(const eye of eyes)eye.scale.y=.17;
+if(now>until&&mood!=='idle'){mood='idle';say('Коснись Мусы — он отреагирует');}
 renderer.render(scene,camera);}
-function resize(){camera.aspect=host.clientWidth/host.clientHeight;camera.updateProjectionMatrix();renderer.setSize(host.clientWidth,host.clientHeight);}
-addEventListener('resize',resize);requestAnimationFrame(animate);
+function resize(){const w=host.clientWidth,h=host.clientHeight;camera.aspect=w/h;camera.fov=h>w?32:27;camera.position.z=h>w?8.8:7.2;camera.updateProjectionMatrix();renderer.setSize(w,h);}
+addEventListener('resize',resize);resize();requestAnimationFrame(animate);
 if(window.AndroidMusa)window.AndroidMusa.ready();
 </script>
 </body></html>
