@@ -23,16 +23,26 @@ rig = bpy.data.objects.get("Musa_Rig")
 if not rig or rig.type != "ARMATURE":
     raise RuntimeError("Existing Musa animation rig was not found")
 
-# Keep the existing outfit, beard, hood, cap, animation actions and app-facing rig.
-# Replace only the primitive exposed skin/face pieces with the anatomical base body.
-remove_prefixes = (
-    "Head • sculpted", "Neck", "Hand ", "Finger "
+# Keep the tailored garment shells and identity details, but remove every
+# legacy exposed-body primitive that would sit on top of / duplicate the CC0 body.
+# Shoulder/elbow/knee blobs are old body-shaping pieces, not required garment shells;
+# sleeves and trouser shells remain and provide the clothing silhouette.
+legacy_body_prefixes = (
+    "Head • sculpted", "Neck", "Ear ", "Shoulder ",
+    "Elbow ", "Knee ", "Hand ", "Finger "
 )
 removed = []
 for obj in list(bpy.data.objects):
-    if obj.type == "MESH" and obj.name.startswith(remove_prefixes):
+    if obj.type == "MESH" and obj.name.startswith(legacy_body_prefixes):
         removed.append(obj.name)
         bpy.data.objects.remove(obj, do_unlink=True)
+
+if not any(name.startswith("Head • sculpted") for name in removed):
+    raise RuntimeError("Legacy head mesh was not removed")
+if not any(name.startswith("Neck") for name in removed):
+    raise RuntimeError("Legacy neck mesh was not removed")
+if not any(name.startswith("Hand ") for name in removed):
+    raise RuntimeError("Legacy hand meshes were not removed")
 
 # Import the source mesh and its 163-bone skeleton.
 bpy.ops.import_scene.gltf(filepath=BASE)
@@ -210,6 +220,14 @@ if missing:
 if len(body.data.vertices) < 50000 or len(target_groups) < 10:
     raise RuntimeError("Integrated body topology or skin weights are incomplete")
 
+# Fail closed if any of the known legacy anatomy remains in the scene.
+legacy_left = [o.name for o in bpy.data.objects
+               if o.type == "MESH" and o.name.startswith(legacy_body_prefixes)]
+if legacy_left:
+    raise RuntimeError("Duplicate legacy body geometry remains: " + ", ".join(legacy_left))
+if body.name in removed:
+    raise RuntimeError("New anatomical body was accidentally classified as legacy")
+
 # Re-render the final integrated character for visual inspection.
 scene = bpy.context.scene
 scene.render.filepath = PREVIEW
@@ -252,6 +270,9 @@ with open(GLB, "rb") as stream:
 node_names = {node.get("name", "") for node in document.get("nodes", [])}
 if "Musa • anatomical base body" not in node_names:
     raise RuntimeError("Integrated anatomical body missing from exported GLB")
+legacy_exported = [name for name in node_names if name.startswith(legacy_body_prefixes)]
+if legacy_exported:
+    raise RuntimeError("GLB still contains duplicate legacy body nodes: " + ", ".join(legacy_exported))
 if not document.get("skins"):
     raise RuntimeError("Integrated GLB has no skin rig")
 actions = {a.name for a in bpy.data.actions}
