@@ -64,6 +64,48 @@ def uv(name,loc,scale,material,bone,seg=32,rings=20):
     sub=obj.modifiers.new('Quad Surface Smoothing','SUBSURF'); sub.levels=1; sub.render_levels=2
     return obj
 
+def loft(name, profile, material, bone, sides=32, subd=1):
+    # Anatomical quad-loop surface. profile rows: y, half_width, half_depth, z_center.
+    verts=[]; faces=[]
+    for y,w,d,zc in profile:
+        for i in range(sides):
+            a=2*pi*i/sides
+            x=cos(a); z=sin(a)
+            # Slightly fuller front plane and narrower rear silhouette.
+            front=max(0.0,z)
+            verts.append((w*x, y, zc+d*z*(1.0-.07*front)))
+    for j in range(len(profile)-1):
+        for i in range(sides):
+            ni=(i+1)%sides
+            faces.append((j*sides+i,j*sides+ni,(j+1)*sides+ni,(j+1)*sides+i))
+    faces.append(tuple(reversed(tuple(range(sides)))))
+    last=(len(profile)-1)*sides
+    faces.append(tuple(last+i for i in range(sides)))
+    obj=make_mesh(name,verts,faces,material,bone)
+    if subd:
+        mod=obj.modifiers.new("Anatomical Quad Subdivision","SUBSURF")
+        mod.levels=subd; mod.render_levels=subd+1
+    return obj
+
+def head_surface():
+    # Chin, jaw, cheekbones, temples and crown are shaped by the profile rather than a sphere.
+    profile=[
+        (1.66,.105,.13,.055),(1.70,.205,.205,.055),(1.78,.275,.245,.045),
+        (1.90,.325,.275,.025),(2.04,.365,.305,.010),(2.18,.375,.310,.005),
+        (2.31,.345,.292,.000),(2.41,.300,.260,-.005),(2.48,.205,.205,-.005),
+        (2.51,.055,.085,-.005)
+    ]
+    return loft("Head • sculpted quad topology",profile,skin,"head",40,2)
+
+def torso_surface():
+    # A continuous jacket silhouette: pelvis, waist, chest, shoulders and upper collar.
+    profile=[
+        (.35,.285,.205,0),(.43,.355,.235,0),(.62,.405,.255,0),
+        (.88,.435,.275,0),(1.12,.465,.292,0),(1.32,.505,.285,0),
+        (1.47,.465,.255,0),(1.57,.335,.205,0),(1.62,.205,.155,0)
+    ]
+    return loft("Jacket torso • tailored quad topology",profile,jacket,"spine",40,2)
+
 def cyl(name,a,b,r1,r2,material,bone,sides=24):
     # Tapered quad-loop tube with support rings and closed polygon caps.
     a,b=Vector(a),Vector(b); axis=(b-a).normalized()
@@ -84,11 +126,11 @@ def cyl(name,a,b,r1,r2,material,bone,sides=24):
     return make_mesh(name,verts,faces,material,bone)
 
 # Torso / jacket silhouette and hood
-uv("Jacket torso",(0,1.02,0),(.49,.68,.29),jacket,"spine")
+torso_surface()
 uv("Shoulder left",(-.39,1.43,0),(.30,.24,.29),jacket,"spine")
 uv("Shoulder right",(.39,1.43,0),(.30,.24,.29),jacket,"spine")
 uv("Neck",(0,1.76,0),(.17,.20,.17),skin,"neck")
-uv("Head",(0,2.10,0),(.39,.48,.34),skin,"head",40,28)
+head_surface()
 uv("Ear L",(-.39,2.10,0),(.085,.13,.075),skin,"head")
 uv("Ear R",(.39,2.10,0),(.085,.13,.075),skin,"head")
 # beard wraps jaw and cheeks
