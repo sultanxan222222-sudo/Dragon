@@ -9,18 +9,13 @@
 #stage{position:absolute;inset:0;touch-action:none}canvas{display:block;width:100%;height:100%;touch-action:none;user-select:none;-webkit-user-select:none}
 #top{position:absolute;top:calc(env(safe-area-inset-top) + 10px);left:12px;right:12px;text-align:center;pointer-events:none;z-index:2}
 #top strong{display:block;font-size:clamp(19px,5vw,27px);letter-spacing:1px}#hint{font-size:13px;color:#c0c3ba;margin-top:5px}
-#status{position:absolute;bottom:calc(102px + env(safe-area-inset-bottom));left:12px;right:12px;text-align:center;color:#d0d4c5;font-size:12px;pointer-events:none;text-shadow:0 1px 3px #000}
-#controls{position:absolute;bottom:calc(12px + env(safe-area-inset-bottom));left:12px;right:12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-button{min-height:54px;border:1px solid #75805c;border-radius:16px;padding:10px 4px;background:#283126;color:#f5f2e9;font-weight:700;font-size:clamp(11px,3vw,14px);box-shadow:0 3px 12px #0006}
-button:active{background:#526343;transform:scale(.98)}button:focus-visible{outline:2px solid #e5d69c}
-@media(max-height:650px){#stage{inset:70px 0 95px}#controls button{min-height:46px}#status{bottom:calc(82px + env(safe-area-inset-bottom))}}
+#status{position:absolute;bottom:calc(18px + env(safe-area-inset-bottom));left:12px;right:12px;text-align:center;color:#d0d4c5;font-size:12px;pointer-events:none;text-shadow:0 1px 3px #000;z-index:2}
 </style>
 <script type="importmap">{"imports":{"three":"./three.module.js"}}</script>
 </head>
 <body>
-<div id="top"><strong>ГОВОРЯЩИЙ МУСА</strong><div id="hint">Коснись Мусы — он отреагирует</div></div>
-<div id="stage"></div><div id="status">Новая тестовая 3D-модель</div>
-<div id="controls"><button id="pet">ПОГЛАДИТЬ</button><button id="head">ПО ГОЛОВЕ</button><button id="shake">РАЗБУДИТЬ</button></div>
+<div id="top"><strong>ГОВОРЯЩИЙ МУСА</strong><div id="hint">Прикоснись к любой части Мусы</div></div>
+<div id="stage"></div><div id="status">Коснись персонажа — он ответит именно на это прикосновение</div>
 <script type="module">
 import * as THREE from 'three';
 const host=document.getElementById('stage'),status=document.getElementById('status');
