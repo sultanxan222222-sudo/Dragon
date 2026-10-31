@@ -53,6 +53,11 @@ jobs:
           test -s artifacts/Talking_Musa_Rigged.glb
           test -s artifacts/Talking_Musa_Rigged.fbx
           test -s artifacts/Musa_Preview.png
+      - name: Validate the exact runtime GLB delivered to Android
+        run: |
+          set -euo pipefail
+          python3 tools/musa3d/validate_runtime_glb.py artifacts/Talking_Musa_Rigged.glb | tee artifacts/runtime-glb-validation.log
+          grep -q MUSA_RUNTIME_GLB_VALIDATION_OK artifacts/runtime-glb-validation.log
       - name: Upload Blender project, FBX and validation log
         uses: actions/upload-artifact@v4
         with:
