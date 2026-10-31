@@ -22,9 +22,13 @@ jobs:
           wget -q https://download.blender.org/release/Blender4.2/blender-4.2.3-linux-x64.tar.xz -O /tmp/blender.tar.xz
           mkdir -p /opt/blender
           tar -xf /tmp/blender.tar.xz -C /opt/blender --strip-components=1
-          mkdir -p artifacts app/src/main/assets
+          mkdir -p artifacts app/src/main/assets assets
+          curl -fL --retry 3 "https://files.innerscene.com/library/male-base-mesh-3d-person-rigged-a-pose-380e6d89/038f3a526b2fc3efd012/male-base-mesh-base_male.glb" -o assets/male-base-mesh-base_male.glb
+          test "$(stat -c%s assets/male-base-mesh-base_male.glb)" -gt 100000
           /opt/blender/blender -b --factory-startup --python tools/musa3d/build_musa.py 2>&1 | tee artifacts/blender-validation.log
           grep -q MUSA_3D_VALIDATION_OK artifacts/blender-validation.log
+          /opt/blender/blender -b artifacts/Talking_Musa_Rigged.blend --python tools/musa3d/integrate_base_body.py 2>&1 | tee artifacts/body-integration.log
+          grep -q MUSA_ANATOMICAL_BODY_INTEGRATION_OK artifacts/body-integration.log
           test -s artifacts/Talking_Musa_Rigged.glb
           cp artifacts/Talking_Musa_Rigged.glb app/src/main/assets/Talking_Musa_Rigged.glb
       - name: Download Three.js and GLTF loader
