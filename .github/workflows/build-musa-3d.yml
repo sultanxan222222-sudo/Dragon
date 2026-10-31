@@ -25,6 +25,17 @@ jobs:
           mkdir -p /opt/blender
           tar -xf /tmp/blender.tar.xz -C /opt/blender --strip-components=1
           /opt/blender/blender --version
+      - name: Download CC0 anatomical base mesh
+        run: |
+          set -euo pipefail
+          mkdir -p assets
+          curl -fL --retry 3 "https://files.innerscene.com/library/human-base-mesh-with-editable-53-bone-rig-8e7c8ab1/329f39cef2f95a0f0a24/human-base-rigged.glb" -o assets/human-base-rigged.glb
+          test "$(stat -c%s assets/human-base-rigged.glb)" -gt 100000
+      - name: Inspect base mesh topology and skeleton
+        run: |
+          set -euo pipefail
+          /opt/blender/blender -b --factory-startup --python tools/musa3d/inspect_base_body.py 2>&1 | tee artifacts/base-body-inspection.log
+          grep -q MUSA_BASE_BODY_SOURCE_VALIDATION_OK artifacts/base-body-inspection.log
       - name: Generate, save, export and round-trip validate Musa
         run: |
           set -euo pipefail
