@@ -6,7 +6,7 @@
 <title>Говорящий Муса</title>
 <style>
 :root{color-scheme:dark}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101416;color:#f4f1e9;font-family:Arial,sans-serif}
-#stage{position:absolute;inset:0;touch-action:none}canvas{display:block;width:100%;height:100%;touch-action:none;user-select:none;-webkit-user-select:none}
+#stage{position:absolute;inset:0;touch-action:none;background:#101416}canvas{display:block;width:100%;height:100%;touch-action:none;user-select:none;-webkit-user-select:none}
 #top{position:absolute;top:calc(env(safe-area-inset-top) + 10px);left:12px;right:12px;text-align:center;pointer-events:none;z-index:2}
 #top strong{display:block;font-size:clamp(19px,5vw,27px);letter-spacing:1px}#hint{font-size:13px;color:#c0c3ba;margin-top:5px}
 #status{position:absolute;bottom:calc(18px + env(safe-area-inset-bottom));left:12px;right:12px;text-align:center;color:#d0d4c5;font-size:12px;pointer-events:none;text-shadow:0 1px 3px #000;z-index:2;background:#101416cc;padding:9px;border-radius:8px;min-height:32px}
@@ -26,8 +26,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 const host=document.getElementById('stage'),status=document.getElementById('status');
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x101416);
 const camera=new THREE.PerspectiveCamera(32,1,.1,80);camera.position.set(0,1.15,8.8);camera.lookAt(0,.85,0);
-const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.6));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.setSize(host.clientWidth,host.clientHeight);host.appendChild(renderer.domElement);
+const renderer=new THREE.WebGLRenderer({antialias:false,alpha:false,powerPreference:'default',stencil:false,depth:true,preserveDrawingBuffer:false});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.25));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.setClearColor(0x101416,1);renderer.setSize(Math.max(1,host.clientWidth),Math.max(1,host.clientHeight),false);host.appendChild(renderer.domElement);
 const gl=renderer.getContext();
 const debugInfo=gl.getExtension('WEBGL_debug_renderer_info');
 const gpuName=debugInfo?gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL):'GPU details hidden by Android WebView';
@@ -40,7 +40,7 @@ const fill=new THREE.DirectionalLight(0xb6c89b,1.0);fill.position.set(4,2,-4);sc
 const mat=(c,r=.82)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
 const skin=mat(0xb97855),skinLight=mat(0xd18d68),beard=mat(0x171717),beardMid=mat(0x242321),coat=mat(0x566344),coatLight=mat(0x68764f),seam=mat(0x38452e),capMat=mat(0x17191b),cloth=mat(0x3d4933),white=mat(0xf3eadb),iris=mat(0x39271c),pupil=mat(0x100f0e),mouthMat=mat(0x321b19),bootMat=mat(0x252a25);
 const character=new THREE.Group();scene.add(character);
-let runtimeModel=null,runtimeMixer=null,runtimeActions={},runtimeFitHeight=3.2,runtimeFitWidth=1.2;
+let runtimeModel=null,runtimeMixer=null,runtimeActions={},runtimeFitHeight=3.2,runtimeFitWidth=1.2;\nlet renderedFrames=0;\nconst gpuProbe=new THREE.Mesh(new THREE.BoxGeometry(.34,.34,.34),new THREE.MeshBasicMaterial({color:0xff4d8d}));gpuProbe.position.set(1.25,1.55,.1);scene.add(gpuProbe);
 function fitRuntimeCamera(){
   const vFov=THREE.MathUtils.degToRad(camera.fov);
   const hFov=2*Math.atan(Math.tan(vFov/2)*camera.aspect);
@@ -52,7 +52,7 @@ function fitRuntimeCamera(){
 const gltfLoader=new GLTFLoader();
 say('Графика запущена • загружаю 3D-модель…');
 gltfLoader.load('./Talking_Musa_Rigged.glb',gltf=>{
-  runtimeModel=gltf.scene; runtimeModel.name='Musa_Rigged_Runtime';
+  runtimeModel=gltf.scene; runtimeModel.name='Musa_Rigged_Runtime';\n  scene.remove(gpuProbe);
   runtimeModel.position.set(0,0,0); runtimeModel.scale.setScalar(1.0);
   scene.add(runtimeModel); character.visible=false;
   runtimeMixer=new THREE.AnimationMixer(runtimeModel);
@@ -191,7 +191,7 @@ renderer.domElement.addEventListener('pointerup',e=>{
 });
 renderer.domElement.addEventListener('pointercancel',()=>{clearTimeout(holdTimer);endVoiceRecording();touchStart=null;});
 let last=performance.now();
-function animate(now){requestAnimationFrame(animate);const dt=Math.min((now-last)/1000,.05);last=now;const t=now/1000;if(runtimeMixer)runtimeMixer.update(dt);
+function animate(now){const dt=Math.min((now-last)/1000,.05);last=now;const t=now/1000;if(runtimeMixer)runtimeMixer.update(dt);
 body.position.y=Math.sin(t*2)*.018;body.rotation.x*=.9;body.rotation.x*=.9;
 if(mood==='shake'&&now<until){character.rotation.z=Math.sin(t*25)*.09;headPivot.rotation.z=Math.sin(t*18)*.08;}
 else{character.rotation.z*=.88;headPivot.rotation.z*=.88;headPivot.rotation.x*=.9;}
@@ -202,9 +202,9 @@ mouth.scale.y=.025+(mood!=='idle'&&now<until?Math.abs(Math.sin(t*12))*.09:Math.a
 if(now>blinkAt){blink=1;blinkAt=t+2.2+Math.random()*2.8;}
 if(blink>0){for(const eye of eyes)eye.scale.y=Math.max(.012,.17*(1-blink));blink=Math.max(0,blink-dt*8);}else for(const eye of eyes)eye.scale.y=.17;
 if(now>until&&mood!=='idle'){mood='idle';say('Коснись Мусы — он отреагирует');}
-renderer.render(scene,camera);}
-function resize(){const w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight);camera.aspect=w/h;camera.fov=h>w?32:27;fitRuntimeCamera();renderer.setSize(w,h);}
-addEventListener('resize',resize);resize();requestAnimationFrame(animate);
+renderer.render(scene,camera);renderedFrames++;if(renderedFrames===1)say('GPU-отрисовка работает • проверяю модель…');}
+function resize(){const w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight);camera.aspect=w/h;camera.fov=h>w?32:27;fitRuntimeCamera();renderer.setSize(w,h,false);}
+addEventListener('resize',resize);resize();\nrenderer.setAnimationLoop(animate);\nsetTimeout(()=>{if(!runtimeModel&&renderedFrames>0)say('GPU работает • тестовый объект виден? Модель ещё не загружена');},5000);\nsetTimeout(()=>{if(renderedFrames===0)say('Ошибка: WebGL не выводит кадры');},2500);
 if(window.AndroidMusa)window.AndroidMusa.ready();
 </script>
 </body></html>
