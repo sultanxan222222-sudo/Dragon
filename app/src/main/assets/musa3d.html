@@ -6,8 +6,8 @@
 <title>Говорящий Муса</title>
 <style>
 :root{color-scheme:dark}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101416;color:#f4f1e9;font-family:Arial,sans-serif}
-#stage{position:absolute;inset:82px 0 112px}canvas{display:block;width:100%;height:100%;touch-action:pan-y}
-#top{position:absolute;top:calc(env(safe-area-inset-top) + 10px);left:12px;right:12px;text-align:center;pointer-events:none}
+#stage{position:absolute;inset:0;touch-action:none}canvas{display:block;width:100%;height:100%;touch-action:none;user-select:none;-webkit-user-select:none}
+#top{position:absolute;top:calc(env(safe-area-inset-top) + 10px);left:12px;right:12px;text-align:center;pointer-events:none;z-index:2}
 #top strong{display:block;font-size:clamp(19px,5vw,27px);letter-spacing:1px}#hint{font-size:13px;color:#c0c3ba;margin-top:5px}
 #status{position:absolute;bottom:calc(102px + env(safe-area-inset-bottom));left:12px;right:12px;text-align:center;color:#d0d4c5;font-size:12px;pointer-events:none;text-shadow:0 1px 3px #000}
 #controls{position:absolute;bottom:calc(12px + env(safe-area-inset-bottom));left:12px;right:12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
@@ -112,7 +112,7 @@ const ray=new THREE.Raycaster(),pointer=new THREE.Vector2();
 renderer.domElement.addEventListener('pointerup',e=>{const r=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);if(ray.intersectObject(character,true).length)react('head');});
 let last=performance.now();
 function animate(now){requestAnimationFrame(animate);const dt=Math.min((now-last)/1000,.05);last=now;const t=now/1000;
-body.position.y=Math.sin(t*2)*.018;
+body.position.y=Math.sin(t*2)*.018;body.rotation.x*=.9;
 if(mood==='shake'&&now<until){character.rotation.z=Math.sin(t*25)*.09;headPivot.rotation.z=Math.sin(t*18)*.08;}
 else{character.rotation.z*=.88;headPivot.rotation.z*=.88;headPivot.rotation.x*=.9;}
 if(mood==='pet'&&now<until)headPivot.rotation.z=.10+Math.sin(t*4)*.025;
