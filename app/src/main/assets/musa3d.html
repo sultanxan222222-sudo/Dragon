@@ -59,12 +59,12 @@ gltfLoader.load('./Talking_Musa_Rigged.glb',gltf=>{
   const candidate=gltf.scene;
   const meshes=[]; candidate.traverse(o=>{if(o.isMesh)meshes.push(o);});
   const skinned=meshes.filter(o=>o.isSkinnedMesh);
-  if(meshes.length===0)throw new Error('GLB загружен, но в нём нет 3D-мешей');
-  if(skinned.length===0)throw new Error('В GLB нет SkinnedMesh: риг не подключён к геометрии');
-  if(!gltf.animations||gltf.animations.length===0)throw new Error('В GLB отсутствуют анимации персонажа');
+  if(meshes.length===0){scene.remove(gpuProbe);say('Ошибка модели: GLB не содержит 3D-мешей');return;}
+  if(skinned.length===0){scene.remove(gpuProbe);say('Ошибка модели: скелет не привязан к геометрии');return;}
+  if(!gltf.animations||gltf.animations.length===0){scene.remove(gpuProbe);say('Ошибка модели: анимации не найдены');return;}
   const bounds=new THREE.Box3().setFromObject(candidate);
   const size=bounds.getSize(new THREE.Vector3());
-  if(!Number.isFinite(size.y)||size.y<0.5||size.x<0.1)throw new Error('Некорректные размеры 3D-модели');
+  if(!Number.isFinite(size.y)||size.y<0.5||size.x<0.1){scene.remove(gpuProbe);say('Ошибка модели: неверные размеры 3D-модели');return;}
   runtimeModel=candidate; runtimeModel.name='Musa_Rigged_Runtime';
   runtimeModel.position.set(0,0,0); runtimeModel.scale.setScalar(1.0);
   const center=bounds.getCenter(new THREE.Vector3());
