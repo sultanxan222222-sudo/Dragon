@@ -32,7 +32,7 @@ lines = [
     "Bones: " + str(len(bones)),
     "Objects and bounds:",
     *[
-        f"{o.name} | type={o.type} | location={tuple(round(v, 5) for v in o.location)} | dimensions={tuple(round(v, 5) for v in o.dimensions)} | vertices={len(o.data.vertices) if o.type == 'MESH' else 0} | groups={','.join(g.name for g in o.vertex_groups)}"
+        f"{o.name} | type={o.type} | location={tuple(round(v, 5) for v in o.location)} | dimensions={tuple(round(v, 5) for v in o.dimensions)} | local_bounds={((tuple(round(min(v.co[i] for v in o.data.vertices), 5) for i in range(3)), tuple(round(max(v.co[i] for v in o.data.vertices), 5) for i in range(3))) if o.type == 'MESH' else 'n/a')} | vertices={len(o.data.vertices) if o.type == 'MESH' else 0} | groups={','.join(g.name for g in o.vertex_groups)}"
         for o in bpy.context.scene.objects
     ],
     "Bone names:",
