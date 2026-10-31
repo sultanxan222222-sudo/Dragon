@@ -34,8 +34,9 @@ jobs:
       - name: Inspect base mesh topology and skeleton
         run: |
           set -euo pipefail
+          mkdir -p artifacts
           /opt/blender/blender -b --factory-startup --python tools/musa3d/inspect_base_body.py 2>&1 | tee artifacts/base-body-inspection.log
-          grep -q MUSA_BASE_BODY_SOURCE_VALIDATION_OK artifacts/base-body-inspection.log
+          grep -q MUSA_MALE_BASE_BODY_VALIDATION_OK artifacts/base-body-inspection.log
       - name: Generate, save, export and round-trip validate Musa
         run: |
           set -euo pipefail
