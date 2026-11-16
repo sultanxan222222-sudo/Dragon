@@ -1,0 +1,4824 @@
+{
+  "schemaVersion": 1,
+  "description": "Directory of external 18+ source websites. No video files, stream URLs, scrapers or playback resolvers are included.",
+  "counts": {
+    "registered": 303,
+    "active": 298,
+    "disabled": 5
+  },
+  "categoryNames": {
+    "general": "Общее",
+    "trans": "Транс",
+    "hentai": "Хентай",
+    "jav": "JAV",
+    "rule34": "Rule 34",
+    "fetish": "Фетиш",
+    "live": "Трансляции",
+    "creator": "Авторы"
+  },
+  "sourceCatalogs": [
+    {
+      "name": "AdultHideout",
+      "repository": "https://github.com/Vashiel/repository.adulthideout",
+      "license": "GPL-2.0",
+      "catalogPath": "plugin.video.adulthideout/resources/website_catalog.json",
+      "sourceVersion": "1.0.27",
+      "sourceCommit": "36bf9f9a86985491cf6bdbad8958738683f6cd80"
+    },
+    {
+      "name": "Hedon Haven",
+      "repository": "https://github.com/Hedon-Haven/Hedon-Haven",
+      "license": "AGPL-3.0",
+      "sourceVersion": "0.6.7",
+      "note": "README explicitly names Pornhub and xHamster; both are already represented in the AdultHideout directory."
+    }
+  ],
+  "sources": [
+    {
+      "id": "123av",
+      "name": "123AV",
+      "url": "https://123av.com/en/new",
+      "categories": [
+        "jav",
+        "type:resolver"
+      ],
+      "categoryLabels": [
+        "JAV"
+      ],
+      "catalogId": 285,
+      "introduced": "1.0.22",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "321tube",
+      "name": "321Tube",
+      "url": "https://321tube.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 203,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "3movs",
+      "name": "3Movs",
+      "url": "https://www.3movs.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 112,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "85po",
+      "name": "85po",
+      "url": "https://www.85po.com/en",
+      "categories": [
+        "jav"
+      ],
+      "categoryLabels": [
+        "JAV"
+      ],
+      "catalogId": 130,
+      "introduced": "1.0.11",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "8kporner",
+      "name": "8K Porner",
+      "url": "https://8kporner.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 226,
+      "introduced": "1.0.18",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "abxxx",
+      "name": "Abxxx",
+      "url": "https://abxxx.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 225,
+      "introduced": "1.0.18",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "akih",
+      "name": "Akih",
+      "url": "https://aki-h.com/",
+      "categories": [
+        "hentai"
+      ],
+      "categoryLabels": [
+        "Хентай"
+      ],
+      "catalogId": 247,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "allclassic",
+      "name": "Allclassic",
+      "url": "https://allclassic.porn/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 202,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "allowflash",
+      "name": "Allowflash",
+      "url": "https://www.allowflash.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 141,
+      "introduced": "1.0.12",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "allpornstream",
+      "name": "Allpornstream",
+      "url": "https://allpornstream.com",
+      "categories": [
+        "type:resolver"
+      ],
+      "categoryLabels": [],
+      "catalogId": 147,
+      "introduced": "1.0.13",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "amateur8",
+      "name": "Amateur8",
+      "url": "https://www.amateur8.com/",
+      "categories": [
+        "creator",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Авторы"
+      ],
+      "catalogId": 270,
+      "introduced": "1.0.20",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "analdin",
+      "name": "Analdin",
+      "url": "https://www.analdin.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 54,
+      "introduced": "1.0.5",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "analegg",
+      "name": "Analegg",
+      "url": "https://www.analegg.com/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 271,
+      "introduced": "1.0.20",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "anyporn",
+      "name": "Anyporn",
+      "url": "https://anyporn.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 178,
+      "introduced": "1.0.16",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "anysex",
+      "name": "Anysex",
+      "url": "https://anysex.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 111,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "archivebate",
+      "name": "Archivebate",
+      "url": "https://archivebate.com/",
+      "categories": [
+        "live",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Трансляции"
+      ],
+      "catalogId": 122,
+      "introduced": "1.0.9",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "area51",
+      "name": "Area51",
+      "url": "https://area51.porn/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 62,
+      "introduced": "1.0.6",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "ashemaletube",
+      "name": "Ashemaletube",
+      "url": "https://www.ashemaletube.com",
+      "categories": [
+        "trans"
+      ],
+      "categoryLabels": [
+        "Транс"
+      ],
+      "catalogId": 11,
+      "introduced": "0.9.81-beta1",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "asianviralhub",
+      "name": "Asianviralhub",
+      "url": "https://asianviralhub.com/",
+      "categories": [
+        "jav",
+        "creator",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "JAV",
+        "Авторы"
+      ],
+      "catalogId": 294,
+      "introduced": "1.0.22",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "avjoy",
+      "name": "Avjoy",
+      "url": "https://en.avjoy.me",
+      "categories": [
+        "jav"
+      ],
+      "categoryLabels": [
+        "JAV"
+      ],
+      "catalogId": 33,
+      "introduced": "1.0.3",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "balbums",
+      "name": "Balbums",
+      "url": "https://balbums.st",
+      "categories": [
+        "creator",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Авторы"
+      ],
+      "catalogId": 227,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "bananamovies",
+      "name": "Bananamovies",
+      "url": "https://bananamovies.org",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 110,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "bdsmstreak",
+      "name": "Bdsmstreak",
+      "url": "https://bdsmstreak.com",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 53,
+      "introduced": "1.0.5",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "bdsmvilla",
+      "name": "Bdsmvilla",
+      "url": "https://bdsmvilla.com/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 265,
+      "introduced": "1.0.20",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "beeg",
+      "name": "Beeg",
+      "url": "https://beeg.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 32,
+      "introduced": "1.0.3",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "bestbondagevideos",
+      "name": "Bestbondagevideos",
+      "url": "https://bestbondagevideos.com/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 266,
+      "introduced": "1.0.20",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "bigassporn",
+      "name": "Bigassporn",
+      "url": "https://bigassporn.tv",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 109,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "bigtitslust",
+      "name": "Bigtitslust",
+      "url": "https://www.bigtitslust.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 108,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "bingato",
+      "name": "Bingato",
+      "url": "https://bingato.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 201,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "blackporn24",
+      "name": "Blackporn24",
+      "url": "https://blackporn24.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 107,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "blowjobspro",
+      "name": "Blowjobspro",
+      "url": "https://blowjobs.pro",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 106,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "bondagevalley",
+      "name": "Bondagevalley",
+      "url": "https://bondagevalley.cc/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 267,
+      "introduced": "1.0.20",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "borntobefuck",
+      "name": "Borntobefuck",
+      "url": "https://de.borntobefuck.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 200,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "boundhub",
+      "name": "Boundhub",
+      "url": "https://www.boundhub.com/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 61,
+      "introduced": "1.0.6",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "bravoporn",
+      "name": "Bravoporn",
+      "url": "https://www.bravoporn.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 105,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "camcaps",
+      "name": "Camcaps",
+      "url": "https://camcaps.tv",
+      "categories": [
+        "live",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Трансляции"
+      ],
+      "catalogId": 121,
+      "introduced": "1.0.9",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "camgirlfap",
+      "name": "Camgirlfap",
+      "url": "https://camgirlfap.com/",
+      "categories": [
+        "live",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Трансляции"
+      ],
+      "catalogId": 146,
+      "introduced": "1.0.13",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "camstreams",
+      "name": "Camstreams",
+      "url": "https://camstreams.tv/",
+      "categories": [
+        "live",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Трансляции"
+      ],
+      "catalogId": 242,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "camwhores",
+      "name": "Camwhores",
+      "url": "https://www.camwhores.tv/",
+      "categories": [
+        "live",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Трансляции"
+      ],
+      "catalogId": 243,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "chaturbate",
+      "name": "Chaturbate",
+      "url": "https://chaturbate.com",
+      "categories": [
+        "live",
+        "type:live"
+      ],
+      "categoryLabels": [
+        "Трансляции"
+      ],
+      "catalogId": 120,
+      "introduced": "1.0.9",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "cherrygasp",
+      "name": "Cherrygasp",
+      "url": "https://cherrygasp.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 199,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "cosplayporntube",
+      "name": "Cosplayporntube",
+      "url": "https://cosplayporntube.com/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 253,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "crazyshit",
+      "name": "Crazyshit",
+      "url": "https://crazyshit.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 25,
+      "introduced": "1.0.1",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "cumdrinkingclips",
+      "name": "Cumdrinkingclips",
+      "url": "https://cumdrinkingclips.com/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 254,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "cumlouder",
+      "name": "Cumlouder",
+      "url": "https://www.cumlouder.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 104,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "daftporn",
+      "name": "Daftporn",
+      "url": "https://www.daftporn.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 21,
+      "introduced": "1.0.0",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "darknessporn",
+      "name": "Darknessporn",
+      "url": "https://darknessporn.com",
+      "categories": [
+        "type:resolver"
+      ],
+      "categoryLabels": [],
+      "catalogId": 42,
+      "introduced": "1.0.4",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "deflr",
+      "name": "Deflr",
+      "url": "https://deflr.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 223,
+      "introduced": "1.0.18",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "deutschepornos",
+      "name": "Deutschepornos",
+      "url": "https://www.deutsche-pornos.me/",
+      "categories": [
+        "general"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 309,
+      "introduced": "1.0.24",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "drtuber",
+      "name": "Drtuber",
+      "url": "https://www.drtuber.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 52,
+      "introduced": "1.0.5",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "ebalka26",
+      "name": "Ebalka26",
+      "url": "https://1ebalka.ru.actor/",
+      "categories": [
+        "general"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 306,
+      "introduced": "1.0.24",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "efukt",
+      "name": "Efukt",
+      "url": "https://efukt.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 10,
+      "introduced": "0.9.81-beta1",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "empflix",
+      "name": "Empflix",
+      "url": "https://m.empflix.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 9,
+      "introduced": "0.9.81-beta1",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "epawg",
+      "name": "Epawg",
+      "url": "https://epawg.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 153,
+      "introduced": "1.0.14",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "eporner",
+      "name": "Eporner",
+      "url": "https://www.eporner.com/",
+      "categories": [
+        "general",
+        "trans"
+      ],
+      "categoryLabels": [
+        "Общее",
+        "Транс"
+      ],
+      "catalogId": 20,
+      "introduced": "1.0.0",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "eroasmr",
+      "name": "Eroasmr",
+      "url": "https://eroasmr.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 31,
+      "introduced": "1.0.3",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "erome",
+      "name": "Erome",
+      "url": "https://www.erome.com",
+      "categories": [
+        "creator",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Авторы"
+      ],
+      "catalogId": 51,
+      "introduced": "1.0.5",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "eroprofile",
+      "name": "Eroprofile",
+      "url": "https://www.eroprofile.com/",
+      "categories": [
+        "creator",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Авторы"
+      ],
+      "catalogId": 275,
+      "introduced": "1.0.20",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "eroticmv",
+      "name": "Eroticmv",
+      "url": "https://eroticmv.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 258,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "euroxxx",
+      "name": "Euroxxx",
+      "url": "https://euroxxx.net/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 222,
+      "introduced": "1.0.18",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "faapy",
+      "name": "Faapy",
+      "url": "https://faapy.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 165,
+      "introduced": "1.0.15",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "familypornhd",
+      "name": "Familypornhd",
+      "url": "https://familypornhd.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 145,
+      "introduced": "1.0.13",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "fapality",
+      "name": "Fapality",
+      "url": "https://fapality.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 164,
+      "introduced": "1.0.15",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "fapello",
+      "name": "Fapello",
+      "url": "https://fapello.com/",
+      "categories": [
+        "creator",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Авторы"
+      ],
+      "catalogId": 229,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": false,
+      "reason": "Источник исключён из активного списка: не подтверждены права или согласие на распространение материалов."
+    },
+    {
+      "id": "fapnfuck",
+      "name": "Fapnfuck",
+      "url": "https://fapnfuck.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 198,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "feet9",
+      "name": "Feet9",
+      "url": "https://www.feet9.com/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 260,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "femdomvc",
+      "name": "Femdomvc",
+      "url": "https://www.femdomvc.com/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 250,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "fetishpapa",
+      "name": "Fetishpapa",
+      "url": "https://www.fetishpapa.com/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 268,
+      "introduced": "1.0.20",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "fetishshrine",
+      "name": "Fetishshrine",
+      "url": "https://www.fetishshrine.com/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 269,
+      "introduced": "1.0.20",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "filmadult",
+      "name": "Filmadult",
+      "url": "https://film-adult.video/en/",
+      "categories": [
+        "type:resolver"
+      ],
+      "categoryLabels": [],
+      "catalogId": 280,
+      "introduced": "1.0.21",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "footstockings",
+      "name": "Footstockings",
+      "url": "https://footstockings.com/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 251,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "fourkporn",
+      "name": "Fourkporn",
+      "url": "https://4kporn.xxx/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 197,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "foxnxx",
+      "name": "Foxnxx",
+      "url": "http://foxnxx.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 221,
+      "introduced": "1.0.18",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "fpo",
+      "name": "Fpo",
+      "url": "https://www.fpo.xxx",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 103,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "freeomovie",
+      "name": "Freeomovie",
+      "url": "https://www.freeomovie.to/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 30,
+      "introduced": "1.0.3",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "freeonestube",
+      "name": "Freeonestube",
+      "url": "https://freeonestube.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 176,
+      "introduced": "1.0.16",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "freepornsex",
+      "name": "Freepornsex",
+      "url": "https://www.freepornsex.net/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 220,
+      "introduced": "1.0.18",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "fulleroticmovies",
+      "name": "Fulleroticmovies",
+      "url": "https://www.fulleroticmovies.net/",
+      "categories": [
+        "general",
+        "creator"
+      ],
+      "categoryLabels": [
+        "Общее",
+        "Авторы"
+      ],
+      "catalogId": 298,
+      "introduced": "1.0.24",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "fullporner",
+      "name": "Fullporner",
+      "url": "https://fullporner.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 102,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "fullxcinema",
+      "name": "Fullxcinema",
+      "url": "https://www.fullxcinema.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 41,
+      "introduced": "1.0.4",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "fuqer",
+      "name": "Fuqer",
+      "url": "https://www.fuqer.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 60,
+      "introduced": "1.0.6",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "fuqster",
+      "name": "Fuqster",
+      "url": "https://fuqster.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 175,
+      "introduced": "1.0.16",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "giantessporn",
+      "name": "Giantessporn",
+      "url": "https://giantess.porn/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 262,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "goperv",
+      "name": "Goperv",
+      "url": "https://goperv.com/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 272,
+      "introduced": "1.0.20",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hairydivas",
+      "name": "Hairydivas",
+      "url": "https://hairydivas.com/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 273,
+      "introduced": "1.0.20",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hanime",
+      "name": "Hanime",
+      "url": "https://hanime.red/",
+      "categories": [
+        "hentai"
+      ],
+      "categoryLabels": [
+        "Хентай"
+      ],
+      "catalogId": 29,
+      "introduced": "1.0.3",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hcbdsm",
+      "name": "Hcbdsm",
+      "url": "https://hcbdsm.com/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 263,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hclips",
+      "name": "Hclips",
+      "url": "https://hclips.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 101,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hdeasyporn",
+      "name": "HDEasyPorn",
+      "url": "https://www.hd-easyporn.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 219,
+      "introduced": "1.0.18",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hdporn92",
+      "name": "Hdporn92",
+      "url": "https://hdporn92.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 218,
+      "introduced": "1.0.18",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hdshemalez",
+      "name": "HDShemalez",
+      "url": "https://hdshemalez.com",
+      "categories": [
+        "trans",
+        "type:resolver"
+      ],
+      "categoryLabels": [
+        "Транс"
+      ],
+      "catalogId": 282,
+      "introduced": "1.0.21",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hdzog",
+      "name": "HDZog",
+      "url": "https://hdzog.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 100,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "heavy_r",
+      "name": "Heavy R",
+      "url": "https://www.heavy-r.com/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 13,
+      "introduced": "0.9.81-beta2",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "heavyfetish",
+      "name": "Heavyfetish",
+      "url": "https://heavyfetish.com/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 58,
+      "introduced": "1.0.6",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hentai2w",
+      "name": "Hentai2w",
+      "url": "https://hentai2w.com/",
+      "categories": [
+        "hentai"
+      ],
+      "categoryLabels": [
+        "Хентай"
+      ],
+      "catalogId": 231,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hentaicity",
+      "name": "Hentaicity",
+      "url": "https://www.hentaicity.com/",
+      "categories": [
+        "hentai"
+      ],
+      "categoryLabels": [
+        "Хентай"
+      ],
+      "catalogId": 233,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hentaicosplay",
+      "name": "Hentaicosplay",
+      "url": "https://hentai-cosplay.com/",
+      "categories": [
+        "hentai"
+      ],
+      "categoryLabels": [
+        "Хентай"
+      ],
+      "catalogId": 310,
+      "introduced": "1.0.24",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hentaidude",
+      "name": "Hentaidude",
+      "url": "https://hentaidude.xxx/",
+      "categories": [
+        "hentai"
+      ],
+      "categoryLabels": [
+        "Хентай"
+      ],
+      "catalogId": 119,
+      "introduced": "1.0.9",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hentaigasm",
+      "name": "Hentaigasm",
+      "url": "https://hentaigasm.com",
+      "categories": [
+        "hentai"
+      ],
+      "categoryLabels": [
+        "Хентай"
+      ],
+      "catalogId": 8,
+      "introduced": "0.9.81-beta1",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hentaimama",
+      "name": "Hentaimama",
+      "url": "https://hentaimama.io/",
+      "categories": [
+        "hentai"
+      ],
+      "categoryLabels": [
+        "Хентай"
+      ],
+      "catalogId": 240,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hentaimoon",
+      "name": "Hentaimoon",
+      "url": "https://hentai-moon.com/",
+      "categories": [
+        "hentai"
+      ],
+      "categoryLabels": [
+        "Хентай"
+      ],
+      "catalogId": 232,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hentaiocean",
+      "name": "Hentaiocean",
+      "url": "https://hentaiocean.com/",
+      "categories": [
+        "hentai"
+      ],
+      "categoryLabels": [
+        "Хентай"
+      ],
+      "catalogId": 118,
+      "introduced": "1.0.9",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hentaisea",
+      "name": "Hentaisea",
+      "url": "https://hentaisea.com/",
+      "categories": [
+        "hentai"
+      ],
+      "categoryLabels": [
+        "Хентай"
+      ],
+      "catalogId": 152,
+      "introduced": "1.0.14",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "homemoviestube",
+      "name": "Homemoviestube",
+      "url": "https://www.homemoviestube.com/",
+      "categories": [
+        "general",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 295,
+      "introduced": "1.0.23",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hotmovies",
+      "name": "Hotmovies",
+      "url": "https://mx.hotmovies.cc/",
+      "categories": [
+        "general"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 304,
+      "introduced": "1.0.24",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hqfap",
+      "name": "Hqfap",
+      "url": "https://hqfap.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 217,
+      "introduced": "1.0.18",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hqporner",
+      "name": "Hqporner",
+      "url": "https://hqporner.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 28,
+      "introduced": "1.0.3",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hqpornero",
+      "name": "Hqpornero",
+      "url": "https://hqpornero.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 140,
+      "introduced": "1.0.12",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hstream",
+      "name": "Hstream",
+      "url": "https://hstream.moe/",
+      "categories": [
+        "hentai",
+        "type:resolver"
+      ],
+      "categoryLabels": [
+        "Хентай"
+      ],
+      "catalogId": 129,
+      "introduced": "1.0.11",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hypnoporn",
+      "name": "Hypnoporn",
+      "url": "https://hypnoporn.net/",
+      "categories": [
+        "fetish",
+        "type:resolver"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 252,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "hypnotube",
+      "name": "Hypnotube",
+      "url": "https://hypnotube.com/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 15,
+      "introduced": "0.9.81-beta6",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "iceporncasting",
+      "name": "Iceporncasting",
+      "url": "https://iceporncasting.net",
+      "categories": [
+        "general",
+        "creator",
+        "type:resolver"
+      ],
+      "categoryLabels": [
+        "Общее",
+        "Авторы"
+      ],
+      "catalogId": 257,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "ikisoda",
+      "name": "Ikisoda",
+      "url": "https://ikisoda.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 117,
+      "introduced": "1.0.9",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "inporn",
+      "name": "Inporn",
+      "url": "https://inporn.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 196,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "internetchicks",
+      "name": "Internetchicks",
+      "url": "https://internetchicks.com/",
+      "categories": [
+        "creator",
+        "type:archive",
+        "type:resolver"
+      ],
+      "categoryLabels": [
+        "Авторы"
+      ],
+      "catalogId": 288,
+      "introduced": "1.0.22",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "inxxx",
+      "name": "Inxxx",
+      "url": "https://www.inxxx.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 163,
+      "introduced": "1.0.15",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "iwara",
+      "name": "Iwara",
+      "url": "https://www.iwara.tv/",
+      "categories": [
+        "hentai",
+        "creator",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Хентай",
+        "Авторы"
+      ],
+      "catalogId": 244,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "jable",
+      "name": "Jable",
+      "url": "https://jable.tv/",
+      "categories": [
+        "jav"
+      ],
+      "categoryLabels": [
+        "JAV"
+      ],
+      "catalogId": 241,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "javguru",
+      "name": "JavGuru",
+      "url": "https://jav.guru/",
+      "categories": [
+        "jav",
+        "type:resolver"
+      ],
+      "categoryLabels": [
+        "JAV"
+      ],
+      "catalogId": 237,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "javhdporn",
+      "name": "Javhdporn",
+      "url": "https://www.javhdporn.net/",
+      "categories": [
+        "jav"
+      ],
+      "categoryLabels": [
+        "JAV"
+      ],
+      "catalogId": 116,
+      "introduced": "1.0.9",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "javmix",
+      "name": "Javmix",
+      "url": "https://javmix.com/",
+      "categories": [
+        "jav"
+      ],
+      "categoryLabels": [
+        "JAV"
+      ],
+      "catalogId": 239,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "javrate",
+      "name": "Javrate",
+      "url": "https://hongkong.javrate.com/",
+      "categories": [
+        "jav"
+      ],
+      "categoryLabels": [
+        "JAV"
+      ],
+      "catalogId": 235,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "javsubbed",
+      "name": "Javsubbed",
+      "url": "https://javsubbed.net",
+      "categories": [
+        "jav"
+      ],
+      "categoryLabels": [
+        "JAV"
+      ],
+      "catalogId": 139,
+      "introduced": "1.0.12",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "javtiful",
+      "name": "Javtiful",
+      "url": "https://javtiful.com/",
+      "categories": [
+        "jav"
+      ],
+      "categoryLabels": [
+        "JAV"
+      ],
+      "catalogId": 230,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "jizzberry",
+      "name": "Jizzberry",
+      "url": "https://jizzberry.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 151,
+      "introduced": "1.0.14",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "justfullporn",
+      "name": "Justfullporn",
+      "url": "https://bestporn4free.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 195,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "justporn",
+      "name": "Justporn",
+      "url": "https://www.justporn.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 194,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "latestleaks",
+      "name": "Latestleaks",
+      "url": "https://latestleaks.co/",
+      "categories": [
+        "creator",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Авторы"
+      ],
+      "catalogId": 216,
+      "introduced": "1.0.18",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": false,
+      "reason": "Источник исключён из активного списка: не подтверждены права или согласие на распространение материалов."
+    },
+    {
+      "id": "latestpornvideo",
+      "name": "Latestpornvideo",
+      "url": "https://latestpornvideo.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 215,
+      "introduced": "1.0.18",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "leakgallery",
+      "name": "Leakgallery",
+      "url": null,
+      "categories": [
+        "creator",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Авторы"
+      ],
+      "catalogId": 236,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": false,
+      "reason": "Источник исключён из активного списка: не подтверждены права или согласие на распространение материалов."
+    },
+    {
+      "id": "lesbianporn8",
+      "name": "Lesbianporn8",
+      "url": "https://lesbianporn8.net",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 99,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "letmejerk",
+      "name": "Letmejerk",
+      "url": "https://www.letmejerk.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 98,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "luxuretv",
+      "name": "Luxuretv",
+      "url": "https://en.luxuretv.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 12,
+      "introduced": "0.9.81-beta2",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "mangoporn",
+      "name": "Mangoporn",
+      "url": "https://mangoporn.net/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 162,
+      "introduced": "1.0.15",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "megatube",
+      "name": "Megatube",
+      "url": "https://www.megatube.xxx/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 193,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "milffox",
+      "name": "Milffox",
+      "url": "https://www.milffox.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 161,
+      "introduced": "1.0.15",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "milfporn8",
+      "name": "Milfporn8",
+      "url": "https://milfporn8.net",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 97,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "milfzr",
+      "name": "Milfzr",
+      "url": "https://milfzr.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 160,
+      "introduced": "1.0.15",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "missav",
+      "name": "Missav",
+      "url": "https://missav123.com/",
+      "categories": [
+        "jav"
+      ],
+      "categoryLabels": [
+        "JAV"
+      ],
+      "catalogId": 19,
+      "introduced": "1.0.0",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "mixporn",
+      "name": "Mixporn",
+      "url": "https://r15.mixporn.space/",
+      "categories": [
+        "general"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 303,
+      "introduced": "1.0.24",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "morehardporn",
+      "name": "Morehardporn",
+      "url": "https://morehardporn.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 214,
+      "introduced": "1.0.18",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "movie4days",
+      "name": "Movie4days",
+      "url": "https://movie4days.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 192,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "myclassicp",
+      "name": "Myclassicp",
+      "url": "https://myclassicp.com/",
+      "categories": [
+        "general"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 289,
+      "introduced": "1.0.22",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "mygoodporn",
+      "name": "Mygoodporn",
+      "url": "https://mygoodporn.tv/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 213,
+      "introduced": "1.0.18",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "mylust",
+      "name": "Mylust",
+      "url": "https://mylust.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 150,
+      "introduced": "1.0.14",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "myporntape",
+      "name": "Myporntape",
+      "url": "https://myporntape.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 144,
+      "introduced": "1.0.13",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "neporn",
+      "name": "Neporn",
+      "url": "https://neporn.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 174,
+      "introduced": "1.0.16",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "netfapx",
+      "name": "Netfapx",
+      "url": "https://netfapx.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 191,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "noodlemagazine",
+      "name": "Noodlemagazine",
+      "url": "https://noodlemagazine.com",
+      "categories": [
+        "type:resolver"
+      ],
+      "categoryLabels": [],
+      "catalogId": 40,
+      "introduced": "1.0.4",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "notfans",
+      "name": "Notfans",
+      "url": "https://notfans.com/",
+      "categories": [
+        "creator",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Авторы"
+      ],
+      "catalogId": 138,
+      "introduced": "1.0.12",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "nudez",
+      "name": "Nudez",
+      "url": "https://nudez.com",
+      "categories": [
+        "creator",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Авторы"
+      ],
+      "catalogId": 96,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "okxxx",
+      "name": "Okxxx",
+      "url": "https://ok.xxx",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 95,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pandamovies",
+      "name": "Pandamovies",
+      "url": "https://pandamovies.org",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 189,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "paradisehill",
+      "name": "Paradisehill",
+      "url": "https://en.paradisehill.cc",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 27,
+      "introduced": "1.0.3",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "perfectgirls",
+      "name": "Perfectgirls",
+      "url": "https://www.perfectgirls.xxx",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 94,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pervclips",
+      "name": "Pervclips",
+      "url": "https://www.pervclips.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 50,
+      "introduced": "1.0.5",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pervertium",
+      "name": "Pervertium",
+      "url": "https://www.pervertium.com/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 57,
+      "introduced": "1.0.6",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "perverzija",
+      "name": "Perverzija",
+      "url": "https://tube.perverzija.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 115,
+      "introduced": "1.0.9",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pezdwood",
+      "name": "Pezdwood",
+      "url": "https://pezdwood.com/",
+      "categories": [
+        "general"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 305,
+      "introduced": "1.0.24",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pimpbunny",
+      "name": "Pimpbunny",
+      "url": "https://pimpbunny.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 149,
+      "introduced": "1.0.14",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pmvhaven",
+      "name": "Pmvhaven",
+      "url": "https://pmvhaven.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 114,
+      "introduced": "1.0.9",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "porcore",
+      "name": "Porcore",
+      "url": "https://porcore.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 49,
+      "introduced": "1.0.5",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "porn00",
+      "name": "Porn00",
+      "url": "https://www.porn00.org",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 93,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "porn300",
+      "name": "Porn300",
+      "url": "https://www.porn300.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 92,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "porn4days",
+      "name": "Porn4days",
+      "url": "https://porn4days.pw/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 188,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "porn4fans",
+      "name": "Porn4fans",
+      "url": "https://www.porn4fans.com/",
+      "categories": [
+        "creator",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Авторы"
+      ],
+      "catalogId": 137,
+      "introduced": "1.0.12",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "porn7",
+      "name": "Porn7",
+      "url": "https://www.porn7.xxx",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 91,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornavhd",
+      "name": "Pornavhd",
+      "url": "https://pornavhd.com/",
+      "categories": [
+        "general",
+        "type:resolver"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 286,
+      "introduced": "1.0.22",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornbimbo",
+      "name": "Pornbimbo",
+      "url": "https://pornbimbo.com/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 264,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornbusy",
+      "name": "Pornbusy",
+      "url": "https://pornbusy.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 211,
+      "introduced": "1.0.18",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "porndig",
+      "name": "Porndig",
+      "url": "https://www.porndig.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 90,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "porndoe",
+      "name": "Porndoe",
+      "url": "https://porndoe.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 89,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "porneec",
+      "name": "Porneec",
+      "url": "https://porneec.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 210,
+      "introduced": "1.0.18",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "porner",
+      "name": "Porner",
+      "url": "https://porner.tv",
+      "categories": [
+        "general",
+        "type:tube"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 316,
+      "introduced": "1.0.26",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornez",
+      "name": "Pornez",
+      "url": "https://pornez.cam/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 259,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornflip",
+      "name": "Pornflip",
+      "url": "https://www.pornflip.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 88,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "porngo",
+      "name": "Porngo",
+      "url": "https://www.porngo.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 6,
+      "introduced": "0.9.81-beta1",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornhat",
+      "name": "Pornhat",
+      "url": "https://www.pornhat.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 87,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornhd3x",
+      "name": "Pornhd3x",
+      "url": "https://www.pornhd3x.tv",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 86,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornheed",
+      "name": "Pornheed",
+      "url": "https://www.pornheed.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 85,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornhoarder",
+      "name": "Pornhoarder",
+      "url": "https://pornhoarder.tv/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 125,
+      "introduced": "1.0.10",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornhub",
+      "name": "Pornhub",
+      "url": "https://www.pornhub.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 18,
+      "introduced": "1.0.0",
+      "origins": [
+        "AdultHideout",
+        "Hedon Haven"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornktube",
+      "name": "Pornktube",
+      "url": "https://www.pornktube.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 173,
+      "introduced": "1.0.16",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornmedium",
+      "name": "Pornmedium",
+      "url": "https://pornmedium.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 136,
+      "introduced": "1.0.12",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornmike",
+      "name": "Pornmike",
+      "url": "https://pornmike.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 209,
+      "introduced": "1.0.18",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornmz",
+      "name": "Pornmz",
+      "url": "https://pornmz.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 84,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "porno24",
+      "name": "Porno24",
+      "url": "https://porno24.to/",
+      "categories": [
+        "general",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 297,
+      "introduced": "1.0.23",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornoaffe",
+      "name": "Pornoaffe",
+      "url": "https://www.pornoaffe.net/",
+      "categories": [
+        "general"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 311,
+      "introduced": "1.0.24",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornobae",
+      "name": "Pornobae",
+      "url": "https://pornobae.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 143,
+      "introduced": "1.0.13",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornoente",
+      "name": "Pornoente",
+      "url": "https://www.pornoente.net/",
+      "categories": [
+        "general"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 315,
+      "introduced": "1.0.24",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornofeya",
+      "name": "Pornofeya",
+      "url": "https://ru.pornofeya.org/",
+      "categories": [
+        "general"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 302,
+      "introduced": "1.0.24",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornohirsch",
+      "name": "Pornohirsch",
+      "url": "https://www.pornohirsch.net/",
+      "categories": [
+        "general"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 312,
+      "introduced": "1.0.24",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornone",
+      "name": "Pornone",
+      "url": "https://pornone.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 83,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornrabbit",
+      "name": "Pornrabbit",
+      "url": "https://www.pornrabbit.com/",
+      "categories": [
+        "creator",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Авторы"
+      ],
+      "catalogId": 187,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornslash",
+      "name": "Pornslash",
+      "url": "https://www.pornslash.com",
+      "categories": [
+        "general",
+        "trans"
+      ],
+      "categoryLabels": [
+        "Общее",
+        "Транс"
+      ],
+      "catalogId": 82,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "porntn",
+      "name": "Porntn",
+      "url": "https://porndd.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 17,
+      "introduced": "1.0.0",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "porntop",
+      "name": "Porntop",
+      "url": "https://porntop.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 208,
+      "introduced": "1.0.18",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "porntrex",
+      "name": "Porntrex",
+      "url": "https://www.porntrex.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 81,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "porntry",
+      "name": "Porntry",
+      "url": "https://www.porntry.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 80,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornve",
+      "name": "Pornve",
+      "url": "https://pornve.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 186,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornwhite",
+      "name": "Pornwhite",
+      "url": "https://www.pornwhite.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 79,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornxp",
+      "name": "Pornxp",
+      "url": "https://pxp.news/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 172,
+      "introduced": "1.0.16",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pornzog",
+      "name": "Pornzog",
+      "url": "https://pornzog.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 39,
+      "introduced": "1.0.4",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "premiumporn",
+      "name": "Premiumporn",
+      "url": "https://premiumporn.org/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 128,
+      "introduced": "1.0.11",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "punishbang",
+      "name": "Punishbang",
+      "url": "https://www.punishbang.com",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 14,
+      "introduced": "0.9.81-beta6",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "punishworld",
+      "name": "Punishworld",
+      "url": "https://punishworld.com",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 38,
+      "introduced": "1.0.4",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "pussyspace",
+      "name": "Pussyspace",
+      "url": "https://www.pussyspace.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 56,
+      "introduced": "1.0.6",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "rapelust",
+      "name": "Rapelust",
+      "url": "https://rapelust.com/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 55,
+      "introduced": "1.0.6",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": false,
+      "reason": "Источник исключён из активного списка: не подтверждены права или согласие на распространение материалов."
+    },
+    {
+      "id": "redtube",
+      "name": "Redtube",
+      "url": "https://www.redtube.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 5,
+      "introduced": "0.9.81-beta1",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "retropornarchives",
+      "name": "Retropornarchives",
+      "url": "https://retropornarchives.com/",
+      "categories": [
+        "general"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 290,
+      "introduced": "1.0.22",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "retroporngallery",
+      "name": "Retroporngallery",
+      "url": "https://retroporngallery.com/",
+      "categories": [
+        "general"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 291,
+      "introduced": "1.0.22",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "rule34video",
+      "name": "Rule34Video",
+      "url": "https://rule34video.com",
+      "categories": [
+        "rule34"
+      ],
+      "categoryLabels": [
+        "Rule 34"
+      ],
+      "catalogId": 24,
+      "introduced": "1.0.1",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "ruleporn",
+      "name": "Ruleporn",
+      "url": "https://ruleporn.com/",
+      "categories": [
+        "creator",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Авторы"
+      ],
+      "catalogId": 276,
+      "introduced": "1.0.20",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "ruporno",
+      "name": "Ruporno",
+      "url": "https://wvw.ruporno.net/",
+      "categories": [
+        "general"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 307,
+      "introduced": "1.0.24",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "saintporn",
+      "name": "Saintporn",
+      "url": "https://saintporn.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 78,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "sextb",
+      "name": "Sextb",
+      "url": "https://sextb.net",
+      "categories": [
+        "type:resolver"
+      ],
+      "categoryLabels": [],
+      "catalogId": 135,
+      "introduced": "1.0.12",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "sextu",
+      "name": "Sextu",
+      "url": "https://fullvideosporn.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 171,
+      "introduced": "1.0.16",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "sextvx",
+      "name": "Sextvx",
+      "url": "https://www.sextvx.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 185,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "sexu",
+      "name": "Sexu",
+      "url": "https://sexu.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 170,
+      "introduced": "1.0.16",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "sexvid",
+      "name": "Sexvid",
+      "url": "https://www.sexvid.xxx/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 159,
+      "introduced": "1.0.15",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "sfmcompile",
+      "name": "SFM Compile",
+      "url": "https://sfmcompile.club",
+      "categories": [
+        "hentai"
+      ],
+      "categoryLabels": [
+        "Хентай"
+      ],
+      "catalogId": 313,
+      "introduced": "1.0.24",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "shameless",
+      "name": "Shameless",
+      "url": "https://shameless.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 48,
+      "introduced": "1.0.5",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "shemalez",
+      "name": "Shemalez",
+      "url": "https://shemalez.com/",
+      "categories": [
+        "trans"
+      ],
+      "categoryLabels": [
+        "Транс"
+      ],
+      "catalogId": 37,
+      "introduced": "1.0.4",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "shesfreaky",
+      "name": "Shesfreaky",
+      "url": "https://www.shesfreaky.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 148,
+      "introduced": "1.0.14",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "shooshtime",
+      "name": "Shooshtime",
+      "url": "https://shooshtime.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 47,
+      "introduced": "1.0.5",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "showcamrips",
+      "name": "Showcamrips",
+      "url": "https://www.showcamrips.com/en/",
+      "categories": [
+        "live",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Трансляции"
+      ],
+      "catalogId": 284,
+      "introduced": "1.0.22",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "siska",
+      "name": "Siska",
+      "url": "https://siska.tv",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 184,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "spankbang",
+      "name": "Spankbang",
+      "url": "https://spankbang.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 26,
+      "introduced": "1.0.3",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "spankingtube",
+      "name": "Spankingtube",
+      "url": "https://www.spankingtube.com",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 228,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "speedporn",
+      "name": "Speedporn",
+      "url": "https://speedporn.net",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 124,
+      "introduced": "1.0.10",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "streamporn",
+      "name": "Streamporn",
+      "url": "https://streamporn.li/",
+      "categories": [
+        "type:resolver"
+      ],
+      "categoryLabels": [],
+      "catalogId": 281,
+      "introduced": "1.0.21",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "stripchat",
+      "name": "Stripchat",
+      "url": "https://stripchat.com/",
+      "categories": [
+        "live",
+        "type:live"
+      ],
+      "categoryLabels": [
+        "Трансляции"
+      ],
+      "catalogId": 183,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "sunporno",
+      "name": "Sunporno",
+      "url": "https://www.sunporno.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 46,
+      "introduced": "1.0.5",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "superporn",
+      "name": "Superporn",
+      "url": "https://www.superporn.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 77,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "swingerpornfun",
+      "name": "Swingerpornfun",
+      "url": "https://swingerpornfun.com/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 274,
+      "introduced": "1.0.20",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "sxyprn",
+      "name": "Sxyprn",
+      "url": "https://sxyprn.net",
+      "categories": [
+        "creator",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Авторы"
+      ],
+      "catalogId": 45,
+      "introduced": "1.0.5",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "taxi69",
+      "name": "Taxi69",
+      "url": "https://taxi69.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 207,
+      "introduced": "1.0.18",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "tgtsporn",
+      "name": "Tgtsporn",
+      "url": "https://tgtsporn.com/",
+      "categories": [
+        "trans"
+      ],
+      "categoryLabels": [
+        "Транс"
+      ],
+      "catalogId": 134,
+      "introduced": "1.0.12",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "theclassicporn",
+      "name": "Theclassicporn",
+      "url": "https://theclassicporn.com",
+      "categories": [
+        "general"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 314,
+      "introduced": "1.0.24",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "thepornbang",
+      "name": "Thepornbang",
+      "url": "https://www.thepornbang.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 76,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "theyarehuge",
+      "name": "Theyarehuge",
+      "url": "https://www.theyarehuge.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 75,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "thisvid",
+      "name": "Thisvid",
+      "url": "https://thisvid.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 44,
+      "introduced": "1.0.5",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "thothub",
+      "name": "Thothub",
+      "url": "https://thothub.to/",
+      "categories": [
+        "creator",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Авторы"
+      ],
+      "catalogId": 287,
+      "introduced": "1.0.22",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": false,
+      "reason": "Источник исключён из активного списка: не подтверждены права или согласие на распространение материалов."
+    },
+    {
+      "id": "thumbzilla",
+      "name": "Thumbzilla",
+      "url": "https://www.thumbzilla.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 74,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "tickleporn",
+      "name": "Tickleporn",
+      "url": "https://tickle.porn/",
+      "categories": [
+        "fetish"
+      ],
+      "categoryLabels": [
+        "Фетиш"
+      ],
+      "catalogId": 261,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "tnaflix",
+      "name": "Tnaflix",
+      "url": "https://www.tnaflix.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 43,
+      "introduced": "1.0.5",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "tokyomotion",
+      "name": "Tokyomotion",
+      "url": "https://www.tokyomotion.net/",
+      "categories": [
+        "jav"
+      ],
+      "categoryLabels": [
+        "JAV"
+      ],
+      "catalogId": 158,
+      "introduced": "1.0.15",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "trannyvideosxxx",
+      "name": "Trannyvideosxxx",
+      "url": "https://trannyvideosxxx.com/",
+      "categories": [
+        "trans"
+      ],
+      "categoryLabels": [
+        "Транс"
+      ],
+      "catalogId": 157,
+      "introduced": "1.0.15",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "trendyporn",
+      "name": "Trendyporn",
+      "url": "https://www.trendyporn.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 73,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "tube8",
+      "name": "Tube8",
+      "url": "https://www.tube8.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 72,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "tubeorigin",
+      "name": "Tubeorigin",
+      "url": "https://www.tubeorigin.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 206,
+      "introduced": "1.0.18",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "tubepornclassic",
+      "name": "Tubepornclassic",
+      "url": "https://tubepornclassic.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 16,
+      "introduced": "1.0.0",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "tubev",
+      "name": "Tubev",
+      "url": "https://www.tubev.sex",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 71,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "txxx",
+      "name": "TXXX",
+      "url": "https://txxx.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 23,
+      "introduced": "1.0.1",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "upornia",
+      "name": "Upornia",
+      "url": "https://upornia.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 70,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "veporn",
+      "name": "Veporn",
+      "url": "https://veporn.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 69,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "vikiporn",
+      "name": "Vikiporn",
+      "url": "https://www.vikiporn.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 4,
+      "introduced": "0.9.81-beta1",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "vintagehunterporn",
+      "name": "Vintagehunterporn",
+      "url": "https://vintagehunterporn.com/",
+      "categories": [
+        "general"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 292,
+      "introduced": "1.0.22",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "vintagepornfun",
+      "name": "Vintagepornfun",
+      "url": "https://vintagepornfun.com",
+      "categories": [
+        "general",
+        "type:resolver"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 283,
+      "introduced": "1.0.21",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "vintageworldp",
+      "name": "Vintageworldp",
+      "url": "https://vintageworldp.com/",
+      "categories": [
+        "general"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 293,
+      "introduced": "1.0.22",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "viralxxxporn",
+      "name": "Viralxxxporn",
+      "url": "https://viralxxxporn.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 182,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "vjav",
+      "name": "VJAV",
+      "url": "https://vjav.com/",
+      "categories": [
+        "jav"
+      ],
+      "categoryLabels": [
+        "JAV"
+      ],
+      "catalogId": 36,
+      "introduced": "1.0.4",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "voyeurhit",
+      "name": "Voyeurhit",
+      "url": "https://voyeurhit.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 35,
+      "introduced": "1.0.4",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "vxxx",
+      "name": "Vxxx",
+      "url": "https://vxxx.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 255,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "w1mp",
+      "name": "W1mp",
+      "url": "https://w1mp.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 205,
+      "introduced": "1.0.18",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "watchhentai",
+      "name": "Watchhentai",
+      "url": "https://watchhentai.net/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 248,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "watchmygf",
+      "name": "Watchmygf",
+      "url": "https://www.watchmygf.me/",
+      "categories": [
+        "creator",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Авторы"
+      ],
+      "catalogId": 277,
+      "introduced": "1.0.20",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "watchporn",
+      "name": "Watchporn",
+      "url": "https://watchporn.to",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 68,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "watchxxxfree",
+      "name": "Watchxxxfree",
+      "url": "https://xxxfree.watch/",
+      "categories": [
+        "type:resolver"
+      ],
+      "categoryLabels": [],
+      "catalogId": 256,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "whereismyporn",
+      "name": "Whereismyporn",
+      "url": "https://moneypornvideo.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 127,
+      "introduced": "1.0.11",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "whoreshub",
+      "name": "Whoreshub",
+      "url": "https://www.whoreshub.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 169,
+      "introduced": "1.0.16",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "wowxxx",
+      "name": "WOW.xxx",
+      "url": "https://www.wowxxx.to/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 133,
+      "introduced": "1.0.12",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "x24video",
+      "name": "X24Video",
+      "url": "https://x24video.site",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 300,
+      "introduced": "1.0.24",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "xbabe",
+      "name": "Xbabe",
+      "url": "https://xbabe.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 67,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "xcafe",
+      "name": "Xcafe",
+      "url": "https://xcafe.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 66,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "xfreehd",
+      "name": "Xfreehd",
+      "url": "https://www.xfreehd.com/",
+      "categories": [
+        "creator",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Авторы"
+      ],
+      "catalogId": 156,
+      "introduced": "1.0.15",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "xgroovy",
+      "name": "Xgroovy",
+      "url": "https://xgroovy.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 155,
+      "introduced": "1.0.15",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "xhamster",
+      "name": "xHamster",
+      "url": "https://xhamster.com",
+      "categories": [
+        "general",
+        "trans"
+      ],
+      "categoryLabels": [
+        "Общее",
+        "Транс"
+      ],
+      "catalogId": 3,
+      "introduced": "0.9.81-beta1",
+      "origins": [
+        "AdultHideout",
+        "Hedon Haven"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "xmegadrive",
+      "name": "Xmegadrive",
+      "url": "https://www.xmegadrive.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 181,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "xmoviesforyou",
+      "name": "Xmoviesforyou",
+      "url": "https://xmoviesforyou.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 65,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "xnxx",
+      "name": "XNXX",
+      "url": "https://www.xnxx.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 22,
+      "introduced": "1.0.1",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "xopenload",
+      "name": "Xopenload",
+      "url": "https://xopenload.net",
+      "categories": [
+        "type:resolver"
+      ],
+      "categoryLabels": [],
+      "catalogId": 113,
+      "introduced": "1.0.9",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "xozilla",
+      "name": "Xozilla",
+      "url": "https://www.xozilla.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 180,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "xtapes",
+      "name": "Xtapes",
+      "url": "https://xtapes.org/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 142,
+      "introduced": "1.0.13",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "xvideos",
+      "name": "XVideos",
+      "url": "https://www.xvideos.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 2,
+      "introduced": "0.9.81-beta1",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "xxbrits",
+      "name": "Xxbrits",
+      "url": "https://www.xxbrits.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 168,
+      "introduced": "1.0.16",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "xxthots",
+      "name": "Xxthots",
+      "url": "https://xxthots.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 132,
+      "introduced": "1.0.12",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "xxvideoss",
+      "name": "Xxvideoss",
+      "url": "https://xxvideoss.org",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 179,
+      "introduced": "1.0.17",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "xxxfiles",
+      "name": "Xxxfiles",
+      "url": "https://www.xxxfiles.com",
+      "categories": [
+        "type:resolver"
+      ],
+      "categoryLabels": [],
+      "catalogId": 64,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "xxxperevod",
+      "name": "Xxxperevod",
+      "url": "https://xxxperevod.com/",
+      "categories": [
+        "general"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 308,
+      "introduced": "1.0.24",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "xxxtube",
+      "name": "Xxxtube",
+      "url": "https://x-x-x.tube",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 126,
+      "introduced": "1.0.11",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "yabuchka",
+      "name": "Yabuchka",
+      "url": "https://www1.yabuchka.xyz/",
+      "categories": [
+        "general"
+      ],
+      "categoryLabels": [
+        "Общее"
+      ],
+      "catalogId": 301,
+      "introduced": "1.0.24",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "yespornpleasexxx",
+      "name": "Yespornpleasexxx",
+      "url": "https://yespornpleasexxx.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 204,
+      "introduced": "1.0.18",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "yespornvip",
+      "name": "Yespornvip",
+      "url": "https://yesporn.vip/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 131,
+      "introduced": "1.0.12",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "youjizz",
+      "name": "Youjizz",
+      "url": "https://www.youjizz.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 1,
+      "introduced": "0.9.81-beta1",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "youperv",
+      "name": "Youperv",
+      "url": "https://youperv.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 167,
+      "introduced": "1.0.16",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "youporn",
+      "name": "Youporn",
+      "url": "https://www.youporn.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 34,
+      "introduced": "1.0.4",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "youramateurporn",
+      "name": "Youramateurporn",
+      "url": "https://www.youramateurporn.com/",
+      "categories": [
+        "creator",
+        "type:archive"
+      ],
+      "categoryLabels": [
+        "Авторы"
+      ],
+      "catalogId": 279,
+      "introduced": "1.0.20",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "yourdailypornvideos",
+      "name": "Yourdailypornvideos",
+      "url": "https://yourdailypornvideos.ws/",
+      "categories": [
+        "type:resolver"
+      ],
+      "categoryLabels": [],
+      "catalogId": 249,
+      "introduced": "1.0.19",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "yourlesbians",
+      "name": "Yourlesbians",
+      "url": "https://yourlesbians.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 123,
+      "introduced": "1.0.10",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "yourlust",
+      "name": "Yourlust",
+      "url": "https://yourlust.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 166,
+      "introduced": "1.0.16",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "zbporn",
+      "name": "Zbporn",
+      "url": "https://zbporn.com",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 63,
+      "introduced": "1.0.7",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "zeenite",
+      "name": "Zeenite",
+      "url": "https://zeenite.com/",
+      "categories": [],
+      "categoryLabels": [],
+      "catalogId": 154,
+      "introduced": "1.0.15",
+      "origins": [
+        "AdultHideout"
+      ],
+      "enabled": true,
+      "reason": null
+    }
+  ]
+}
