@@ -31,8 +31,9 @@ internal object ArchiveLicensePolicy {
         return "CC " + match.groupValues[1].uppercase() + " " + match.groupValues[2]
     }
 
-    // Search for all Creative Commons license URLs; each returned item is then checked against the allowlist above.
-    fun searchClause(): String = "(licenseurl:http*by* OR licenseurl:http*publicdomain/mark* OR licenseurl:http*publicdomain/zero*)"
+    // Discover every item that declares a license URL. The app applies the strict allowlist locally;
+    // keeping this server-side query simple avoids losing the entire catalog when IA's query parser changes.
+    fun searchClause(): String = "licenseurl:http*"
 
     fun isSafeIdentifier(value: String): Boolean =
         value.matches(Regex("[A-Za-z0-9._-]{1,100}"))
