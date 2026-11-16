@@ -212,7 +212,13 @@ jobs:
       - name: Install Android SDK platform and build tools
         run: |
           yes | sdkmanager --licenses >/dev/null
-          sdkmanager "platforms;android-37" "build-tools;37.0.0"
+          # Android 17 preview platform is published by SDK Manager as android-37.0.
+          sdkmanager "platforms;android-37.0" "build-tools;37.0.0"
+          # AGP 9.1 resolves compileSdk 37 using the conventional android-37 folder.
+          if [ -d "$ANDROID_HOME/platforms/android-37.0" ] && [ ! -e "$ANDROID_HOME/platforms/android-37" ]; then
+            ln -s android-37.0 "$ANDROID_HOME/platforms/android-37"
+          fi
+          test -f "$ANDROID_HOME/platforms/android-37/android.jar"
 
       - name: Compile and package Sultan Cinema
         run: |
