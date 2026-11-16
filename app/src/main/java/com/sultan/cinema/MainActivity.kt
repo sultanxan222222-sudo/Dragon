@@ -4,15 +4,23 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import android.view.Gravity
 import android.view.KeyEvent
 import android.view.View
+import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.webkit.WebViewAssetLoader
 import org.json.JSONArray
 import org.json.JSONObject
@@ -23,6 +31,17 @@ import java.util.concurrent.Executors
 
 class MainActivity : Activity() {
     private lateinit var webView: WebView
+    private lateinit var rootLayout: FrameLayout
+    private var startupErrorView: View? = null
+    private var pageLoaded = false
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private val cinemaUrl = "https://appassets.androidplatform.net/assets/cinema.html"
+    private val startupTimeout = Runnable {
+        if (!pageLoaded) showStartupError(
+            "Экран не загрузился",
+            "Локальная страница не ответила. Проверь целостность установки и попробуй перезапустить загрузку."
+        )
+    }
     private val io = Executors.newFixedThreadPool(2)
     private val adultProviderUrls: Map<String, String> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         try {
@@ -52,6 +71,7 @@ class MainActivity : Activity() {
         enterImmersiveMode()
 
         val assetLoader = WebViewAssetLoader.Builder()
+            .setDomain("appassets.androidplatform.net")
             .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
             .build()
 
@@ -71,15 +91,45 @@ class MainActivity : Activity() {
                 override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest) =
                     assetLoader.shouldInterceptRequest(request.url)
 
+                override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
+                    if (url == cinemaUrl) {
+                        pageLoaded = false
+                        clearStartupError()
+                        mainHandler.removeCallbacks(startupTimeout)
+                        mainHandler.postDelayed(startupTimeout, 15000)
+                    }
+                }
+
+                override fun onPageCommitVisible(view: WebView?, url: String?) {
+                    if (url == cinemaUrl) {
+                        pageLoaded = true
+                        mainHandler.removeCallbacks(startupTimeout)
+                        webView.visibility = View.VISIBLE
+                        clearStartupError()
+                    }
+                }
+
+                override fun onPageFinished(view: WebView?, url: String?) {
+                    if (url == cinemaUrl) {
+                        pageLoaded = true
+                        mainHandler.removeCallbacks(startupTimeout)
+                        webView.visibility = View.VISIBLE
+                        clearStartupError()
+                    }
+                }
+
                 override fun onReceivedError(
                     view: WebView?,
                     request: WebResourceRequest,
                     error: android.webkit.WebResourceError
                 ) {
                     if (request.isForMainFrame) {
-                        Log.e("SultanCinema", "WebView error: ${error.description}")
+                        Log.e("SultanCinema", "WebView main-frame error: ${error.description}")
                         runOnUiThread {
-                            Toast.makeText(this@MainActivity, "Не удалось открыть экран приложения", Toast.LENGTH_LONG).show()
+                            showStartupError(
+                                "Не удалось открыть экран",
+                                "Ошибка WebView: ${error.description}"
+                            )
                         }
                     }
                 }
@@ -91,8 +141,84 @@ class MainActivity : Activity() {
                 }
             }
         }
-        setContentView(webView)
-        webView.loadUrl("https://appassets.androidplatform.net/assets/cinema.html")
+        rootLayout = FrameLayout(this).apply {
+            setBackgroundColor(android.graphics.Color.rgb(8, 9, 11))
+            addView(
+                webView,
+                FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+            )
+        }
+        setContentView(rootLayout)
+        mainHandler.postDelayed(startupTimeout, 15000)
+        webView.loadUrl(cinemaUrl)
+    }
+
+    private fun clearStartupError() {
+        startupErrorView?.let { rootLayout.removeView(it) }
+        startupErrorView = null
+    }
+
+    private fun showStartupError(title: String, details: String) {
+        if (!::rootLayout.isInitialized) return
+        pageLoaded = false
+        mainHandler.removeCallbacks(startupTimeout)
+        webView.visibility = View.GONE
+        clearStartupError()
+
+        val density = resources.displayMetrics.density
+        fun dp(value: Int) = (value * density).toInt()
+        val panel = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+            setPadding(dp(28), dp(28), dp(28), dp(28))
+            setBackgroundColor(android.graphics.Color.rgb(8, 9, 11))
+        }
+        panel.addView(TextView(this).apply {
+            text = "КИНОТЕАТР СУЛТАНА"
+            textSize = 22f
+            setTextColor(android.graphics.Color.rgb(243, 217, 154))
+            gravity = Gravity.CENTER
+        }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        panel.addView(TextView(this).apply {
+            text = title
+            textSize = 19f
+            setTextColor(android.graphics.Color.WHITE)
+            gravity = Gravity.CENTER
+            setPadding(0, dp(22), 0, dp(10))
+        }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        panel.addView(TextView(this).apply {
+            text = details
+            textSize = 14f
+            setTextColor(android.graphics.Color.LTGRAY)
+            gravity = Gravity.CENTER
+        }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        panel.addView(Button(this).apply {
+            text = "ПОВТОРИТЬ ЗАГРУЗКУ"
+            isFocusable = true
+            isFocusableInTouchMode = true
+            setOnClickListener {
+                clearStartupError()
+                webView.visibility = View.VISIBLE
+                pageLoaded = false
+                mainHandler.removeCallbacks(startupTimeout)
+                mainHandler.postDelayed(startupTimeout, 15000)
+                webView.reload()
+            }
+        }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+            gravity = Gravity.CENTER
+            topMargin = dp(24)
+        })
+        startupErrorView = panel
+        rootLayout.addView(
+            panel,
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        )
     }
 
     private fun enterImmersiveMode() {
@@ -265,6 +391,7 @@ class MainActivity : Activity() {
     }
 
     override fun onDestroy() {
+        mainHandler.removeCallbacks(startupTimeout)
         if (::webView.isInitialized) {
             webView.removeJavascriptInterface("AndroidCinema")
             webView.loadUrl("about:blank")
