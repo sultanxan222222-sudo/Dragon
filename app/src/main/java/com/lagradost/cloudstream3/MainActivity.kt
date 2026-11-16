@@ -1389,7 +1389,15 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
                         "OK",
                         "CineStream",
                         "UakinoProvider",
-                        "KinoTronProvider"
+                        "KinoTronProvider",
+                        "KinostrainProvider",
+                        "KinoVezhaProvider",
+                        "KlonTVProvider",
+                        "UAFlixProvider",
+                        "UASerialsProProvider",
+                        "CikavaIdeyaProvider",
+                        "SerialnoProvider",
+                        "UFDubProvider"
                     )
                     val remoteProviders = RepositoryManager.getRepoPlugins(sultanCinemaRepo).orEmpty()
                     for (providerName in curatedNames) {

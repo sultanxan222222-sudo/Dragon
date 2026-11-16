@@ -68,14 +68,14 @@
   },
   {
     "iconUrl": "https://www.google.com/s2/favicons?domain=uakino.club&sz=%size%",
-    "fileHash": "sha256-bed2490e90a24b564ac19efd457e1d107bd7806343cd74f9f98348acaa65c13c",
+    "fileHash": "sha256-b86689af701a73fff2a744ef19b79f960a38da52327e6e7cf8233fc33043be08",
     "apiVersion": 1,
-    "repositoryUrl": "https://github.com/admknight/CloudstreamExtensions",
-    "fileSize": 47325,
+    "repositoryUrl": "https://github.com/CakesTwix/cloudstream-extensions-uk",
+    "fileSize": 56393,
     "status": 1,
     "language": "uk",
     "authors": [
-      "Adam Knight (Maintainer)"
+      "CakesTwix"
     ],
     "tvTypes": [
       "Anime",
@@ -83,22 +83,22 @@
       "Movie",
       "AsianDrama"
     ],
-    "version": 32,
+    "version": 37,
     "internalName": "UakinoProvider",
     "description": "Дивіться фільми та серіали онлайн в HD якості. У нас можна дивитися кіно онлайн безкоштовно, у високій якості та з якісним українським дубляжем.",
     "url": "https://raw.githubusercontent.com/CakesTwix/cloudstream-extensions-uk/builds/UakinoProvider.cs3",
-    "name": "[Movies] UakinoProvider"
+    "name": "UakinoProvider"
   },
   {
     "iconUrl": "https://www.google.com/s2/favicons?domain=kinotron.top&sz=%size%",
-    "fileHash": "sha256-3a099e9ae79f040f6594a6a693f988d5e3131761c76a6685f0a4bad2c7512ab2",
+    "fileHash": "sha256-543933599ead4f2f656d7b9e448f1b4cce8e613563e24160204f93d178e95d9c",
     "apiVersion": 1,
-    "repositoryUrl": "https://github.com/admknight/CloudstreamExtensions",
-    "fileSize": 22204,
+    "repositoryUrl": "https://github.com/CakesTwix/cloudstream-extensions-uk",
+    "fileSize": 27109,
     "status": 1,
     "language": "uk",
     "authors": [
-      "Adam Knight (Maintainer)"
+      "CakesTwix"
     ],
     "tvTypes": [
       "Cartoon",
@@ -106,10 +106,193 @@
       "Movie",
       "Anime"
     ],
-    "version": 17,
+    "version": 19,
     "internalName": "KinoTronProvider",
     "description": "Твій KinoTron, де фільми завжди українською.",
     "url": "https://raw.githubusercontent.com/CakesTwix/cloudstream-extensions-uk/builds/KinoTronProvider.cs3",
-    "name": "[Movies] KinoTronProvider"
+    "name": "KinoTronProvider"
+  },
+  {
+    "iconUrl": "https://www.google.com/s2/favicons?domain=kinostrain.com&sz=%size%",
+    "fileHash": "sha256-24620e20935384ebc9680ea12a934f3797570945402535ea0c9a21aad33ef252",
+    "apiVersion": 1,
+    "repositoryUrl": "https://github.com/CakesTwix/cloudstream-extensions-uk",
+    "fileSize": 38006,
+    "status": 1,
+    "language": "uk",
+    "authors": [
+      "CakesTwix",
+      "Partizanin"
+    ],
+    "tvTypes": [
+      "TvSeries",
+      "Cartoon",
+      "Movie",
+      "Anime"
+    ],
+    "version": 2,
+    "internalName": "KinostrainProvider",
+    "description": "kinostrain — Дивись фільми і серіали онлайн українською безкоштовно та у HD якості. Новинки 2025–2026, бойовики, комедії, мелодрами та аніме.",
+    "url": "https://raw.githubusercontent.com/CakesTwix/cloudstream-extensions-uk/builds/KinostrainProvider.cs3",
+    "name": "KinostrainProvider"
+  },
+  {
+    "iconUrl": "https://www.google.com/s2/favicons?domain=kinovezha.com&sz=%size%",
+    "fileHash": "sha256-d3d32cb496f62a8422c99658f608a725590b79cd5dbf64e950e9d8c3b9b9470e",
+    "apiVersion": 1,
+    "repositoryUrl": "https://github.com/CakesTwix/cloudstream-extensions-uk",
+    "fileSize": 29187,
+    "status": 1,
+    "language": "uk",
+    "authors": [
+      "CakesTwix"
+    ],
+    "tvTypes": [
+      "Cartoon",
+      "TvSeries",
+      "Movie"
+    ],
+    "version": 14,
+    "internalName": "KinoVezhaProvider",
+    "description": "Наша мета — популяризація нашої рідної мови, шляхом збору в одному місці величезної колекції найкращих і найпопулярніших фільмів, серіалів, мультфільмів та мультсеріалів українською мовою, які ви можете дивитися онлайн в HD якості безкоштовно. Приємного перегляду!",
+    "url": "https://raw.githubusercontent.com/CakesTwix/cloudstream-extensions-uk/builds/KinoVezhaProvider.cs3",
+    "name": "KinoVezhaProvider"
+  },
+  {
+    "iconUrl": "https://www.google.com/s2/favicons?domain=klonua.com&sz=%size%",
+    "fileHash": "sha256-a32c9f51be0d5f3f6bdd10d3882b2af5acfffc27aca92fb06f6e764f7c54aff8",
+    "apiVersion": 1,
+    "repositoryUrl": "https://github.com/CakesTwix/cloudstream-extensions-uk",
+    "fileSize": 40345,
+    "status": 1,
+    "language": "uk",
+    "authors": [
+      "CakesTwix"
+    ],
+    "tvTypes": [
+      "Anime",
+      "TvSeries",
+      "Cartoon",
+      "Movie"
+    ],
+    "version": 25,
+    "internalName": "KlonTVProvider",
+    "description": "Команда Klon.TV створила безкоштовний онлайн-сервіс, щоб кожен наш глядач з легкістю та без зайвих суперечок вибрав цікавий фільм, або одразу продовжив дивитися улюблений серіал. Минула та пора, коли треба стежити за афішами твого міста, і вгадувати якість майбутньої стрічки. Також вже можна забути про трату часу на довгу дорогу в кінотеатр, півгодинного перегляду трейлерів перед показом, сусідами, що чавкають, яким не зрозуміти, що фільм треба іноді й слухати, а не тільки дивитися. Вибравши наш сервіс для перегляду фільмів онлайн безкоштовно, ви будете приємно здивовані: українське озвучення, перегляд без реєстрації, ніякої реклами на весь екран, і багато інших цікавих можливостей. Klon.TV - цінує кожного глядача, і зробить все можливе, щоб Ви до нас повернулися:).",
+    "url": "https://raw.githubusercontent.com/CakesTwix/cloudstream-extensions-uk/builds/KlonTVProvider.cs3",
+    "name": "KlonTVProvider"
+  },
+  {
+    "iconUrl": "https://www.google.com/s2/favicons?domain=uafix.net&sz=%size%",
+    "fileHash": "sha256-f33890e7812d58519066e216d63b252a0c74337fbf02a0d293eea9285bf8d6aa",
+    "apiVersion": 1,
+    "repositoryUrl": "https://github.com/CakesTwix/cloudstream-extensions-uk",
+    "fileSize": 43186,
+    "status": 1,
+    "language": "uk",
+    "authors": [
+      "CakesTwix"
+    ],
+    "tvTypes": [
+      "Anime",
+      "Cartoon",
+      "Movie",
+      "TvSeries"
+    ],
+    "version": 25,
+    "internalName": "UAFlixProvider",
+    "description": "UAFLIX - фільми і серіали NETFLIX українською",
+    "url": "https://raw.githubusercontent.com/CakesTwix/cloudstream-extensions-uk/builds/UAFlixProvider.cs3",
+    "name": "UAFlixProvider"
+  },
+  {
+    "iconUrl": "https://www.google.com/s2/favicons?domain=uaserials.pro&sz=%size%",
+    "fileHash": "sha256-d6dff69efb4c3e4a9bed261224650bb7dda694d617a5c5131dcad494ae10a759",
+    "apiVersion": 1,
+    "repositoryUrl": "https://github.com/CakesTwix/cloudstream-extensions-uk",
+    "fileSize": 45423,
+    "status": 1,
+    "language": "uk",
+    "authors": [
+      "CakesTwix"
+    ],
+    "tvTypes": [
+      "Anime",
+      "Cartoon",
+      "Movie",
+      "TvSeries"
+    ],
+    "version": 29,
+    "internalName": "UASerialsProProvider",
+    "description": "UASerials.pro — твої улюблені серіали українською мовою онлайн.",
+    "url": "https://raw.githubusercontent.com/CakesTwix/cloudstream-extensions-uk/builds/UASerialsProProvider.cs3",
+    "name": "UASerialsProProvider"
+  },
+  {
+    "iconUrl": "https://www.google.com/s2/favicons?domain=cikava-ideya.top&sz=%size%",
+    "fileHash": "sha256-ea6b4b466fa40d48a3230e6bd4d12a901ac2c0dfc3afc1f5878e6234c9d33a4e",
+    "apiVersion": 1,
+    "repositoryUrl": "https://github.com/CakesTwix/cloudstream-extensions-uk",
+    "fileSize": 21636,
+    "status": 1,
+    "language": "uk",
+    "authors": [
+      "CakesTwix"
+    ],
+    "tvTypes": [
+      "Cartoon",
+      "TvSeries",
+      "Movie"
+    ],
+    "version": 5,
+    "internalName": "CikavaIdeyaProvider",
+    "description": "А це ідея)",
+    "url": "https://raw.githubusercontent.com/CakesTwix/cloudstream-extensions-uk/builds/CikavaIdeyaProvider.cs3",
+    "name": "CikavaIdeyaProvider"
+  },
+  {
+    "iconUrl": "https://www.google.com/s2/favicons?domain=serialno.tv&sz=%size%",
+    "fileHash": "sha256-62576c1e8d18a095f8eb41bb792a50c4a95f5f038114de3625022290d58c1784",
+    "apiVersion": 1,
+    "repositoryUrl": "https://github.com/CakesTwix/cloudstream-extensions-uk",
+    "fileSize": 27385,
+    "status": 1,
+    "language": "uk",
+    "authors": [
+      "CakesTwix"
+    ],
+    "tvTypes": [
+      "Cartoon",
+      "TvSeries"
+    ],
+    "version": 13,
+    "internalName": "SerialnoProvider",
+    "description": "Відкриваємо світ серіалів, фентезі, містики, екшну, драми та ще безлічі інших жанрів українською мовою - все це Серіально.ТВ. Можна багато чого писати, але сенсу особливо немає. Ви тут, а значить прийшли дивитися серіали. То ж, вперед!:)",
+    "url": "https://raw.githubusercontent.com/CakesTwix/cloudstream-extensions-uk/builds/SerialnoProvider.cs3",
+    "name": "SerialnoProvider"
+  },
+  {
+    "iconUrl": "https://www.google.com/s2/favicons?domain=ufdub.com&sz=%size%",
+    "fileHash": "sha256-b057e9ca41acb208e2bc315ffc868a5e2dcba11b8f1f4a3fff057dbb0392695f",
+    "apiVersion": 1,
+    "repositoryUrl": "https://github.com/CakesTwix/cloudstream-extensions-uk",
+    "fileSize": 17365,
+    "status": 1,
+    "language": "uk",
+    "authors": [
+      "CakesTwix"
+    ],
+    "tvTypes": [
+      "Anime",
+      "AnimeMovie",
+      "AsianDrama",
+      "Cartoon",
+      "TvSeries",
+      "Movie"
+    ],
+    "version": 14,
+    "internalName": "UFDubProvider",
+    "description": "UFDUB.com - Це команда любителів, що озвучують з душею те, що бажають глядачі й учасники проєкту! 🧡",
+    "url": "https://raw.githubusercontent.com/CakesTwix/cloudstream-extensions-uk/builds/UFDubProvider.cs3",
+    "name": "UFDubProvider"
   }
 ]
