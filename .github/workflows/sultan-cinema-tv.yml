@@ -1,4 +1,5 @@
 name: Sultan Cinema TV — build pipeline
+# Rebuild trigger: verify the current Android TV package after the latest source updates.
 
 on:
   push:
