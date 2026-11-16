@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.util.Base64
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.View
@@ -29,6 +30,10 @@ import java.net.URL
 import java.net.URLEncoder
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
+import java.security.MessageDigest
+import java.security.SecureRandom
+import javax.crypto.SecretKeyFactory
+import javax.crypto.spec.PBEKeySpec
 
 class MainActivity : Activity() {
     private lateinit var webView: WebView
@@ -47,6 +52,9 @@ class MainActivity : Activity() {
     private val catalogSearchGeneration = AtomicInteger(0)
     private val catalogPreferences by lazy {
         getSharedPreferences("sultan-cinema-catalog", MODE_PRIVATE)
+    }
+    private val adultAccessPreferences by lazy {
+        getSharedPreferences("sultan-cinema-adult-access", MODE_PRIVATE)
     }
     private val adultProviderUrls: Map<String, String> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         try {
@@ -462,14 +470,24 @@ class MainActivity : Activity() {
                         throw IllegalStateException("У этой записи не подтверждена свободная лицензия")
                     }
 
+                    data class ArchiveVideo(
+                        val rank: Long,
+                        val fileName: String,
+                        val identity: String,
+                        val displayTitle: String
+                    )
+
                     val files = record.optJSONArray("files") ?: JSONArray()
                     val playableExtensions = setOf("mp4", "m4v", "mov", "mkv", "webm", "ogv", "ogg", "avi")
-                    val candidates = ArrayList<Triple<Long, String, String>>()
+                    val candidates = ArrayList<ArchiveVideo>()
                     for (i in 0 until files.length()) {
                         val file = files.optJSONObject(i) ?: continue
                         val name = file.optString("name")
                         if (name.isBlank() || name.startsWith("__ia_thumb")) continue
                         if (file.optString("private").equals("true", true)) continue
+                        if (name.contains("sample", true) || name.contains("thumbnail", true) ||
+                            name.contains("trailer", true) || name.contains("preview", true)) continue
+
                         val extension = name.substringAfterLast('.', "").lowercase()
                         val format = file.optString("format")
                         val supportedFormat = format.contains("MPEG", true) ||
@@ -481,26 +499,54 @@ class MainActivity : Activity() {
                             format.contains("QuickTime", true) ||
                             format.contains("AVI", true)
                         if (extension !in playableExtensions && !supportedFormat) continue
-                        if (name.contains("sample", true) || name.contains("thumbnail", true)) continue
+
+                        // Archive lists alternate encodings as separate files. Use the
+                        // original filename when supplied, otherwise normalize common
+                        // resolution/bitrate suffixes so they collapse into one episode.
+                        val original = file.optString("original").takeIf { it.isNotBlank() } ?: name
+                        val identity = original.substringAfterLast('/').substringBeforeLast('.')
+                            .replace(Regex("(?i)([_ .-]?512kb)$"), "")
+                            .replace(Regex("(?i)([_ .-]?(2160|1440|1080|720|480|360)p)$"), "")
+                            .replace(Regex("[._-]+"), " ")
+                            .trim()
+                            .lowercase()
+                            .ifBlank { name.substringAfterLast('/').substringBeforeLast('.').lowercase() }
 
                         val height = file.optString("height").toLongOrNull() ?: 0L
                         val width = file.optString("width").toLongOrNull() ?: 0L
                         val size = file.optString("size").toLongOrNull()?.coerceAtMost(4_000_000_000L) ?: 0L
                         val rank = (height.coerceAtMost(4320L) * 1_000_000L) +
                             (width.coerceAtMost(7680L) * 100L) + (size / 10_000L)
-                        candidates.add(Triple(rank, name, format))
+                        val label = file.optString("title").takeIf { it.isNotBlank() }
+                            ?: name.substringAfterLast('/').substringBeforeLast('.')
+                                .replace('_', ' ').replace('-', ' ').trim()
+                        candidates.add(ArchiveVideo(rank, name, identity, label))
                     }
 
-                    val selected = candidates
-                        .sortedByDescending { it.first }
-                        .distinctBy { it.second }
-                        .take(6)
-                    if (selected.isEmpty()) {
+                    // Keep one highest-quality file per distinct original video:
+                    // one original = one movie; several originals = a series/playlist.
+                    val episodes = candidates
+                        .groupBy { it.identity }
+                        .values
+                        .mapNotNull { versions -> versions.maxByOrNull { it.rank } }
+                        .sortedWith(
+                            compareBy<ArchiveVideo> {
+                                val match = Regex("(?i)s(\\d+)e(\\d+)").find(it.displayTitle)
+                                if (match != null) {
+                                    (match.groupValues[1].toLongOrNull() ?: 0L) * 10000L +
+                                        (match.groupValues[2].toLongOrNull() ?: 0L)
+                                } else {
+                                    val episode = Regex("(?i)(?:episode|ep)[ ._-]*(\\d+)").find(it.displayTitle)
+                                    if (episode != null) 1_000_000L + (episode.groupValues[1].toLongOrNull() ?: 0L)
+                                    else Long.MAX_VALUE
+                                }
+                            }.thenBy { it.displayTitle.lowercase() }
+                        )
+
+                    if (episodes.isEmpty()) {
                         throw IllegalStateException("В этой записи не найден видеофайл поддерживаемого формата")
                     }
 
-                    // Archive metadata provides the actual storage host and directory.
-                    // These direct links avoid unnecessary redirect hops through /download/.
                     val hostCandidates = listOf(record.optString("d1"), record.optString("d2"))
                         .map { it.trim().removePrefix("https://").removePrefix("http://").substringBefore('/') }
                         .filter { it.matches(Regex("[A-Za-z0-9.-]{1,180}")) && it.endsWith(".archive.org", true) }
@@ -510,22 +556,38 @@ class MainActivity : Activity() {
                         .trimEnd('/')
 
                     val videoUrls = ArrayList<String>()
-                    selected.forEach { (_, fileName, _) ->
-                        val encodedPath = fileName.split('/').joinToString("/") { Uri.encode(it) }
-                        hostCandidates.forEach { host ->
-                            videoUrls.add("https://$host$archiveDir/$encodedPath")
+                    val episodeTitles = ArrayList<String>()
+                    episodes.forEach { episode ->
+                        val encodedPath = episode.fileName.split('/').joinToString("/") { Uri.encode(it) }
+                        val host = hostCandidates.firstOrNull()
+                        val primary = if (host != null) {
+                            "https://$host$archiveDir/$encodedPath"
+                        } else {
+                            "https://archive.org/download/$identifier/$encodedPath"
                         }
-                        videoUrls.add("https://archive.org/download/$identifier/$encodedPath")
+                        videoUrls.add(primary)
+                        episodeTitles.add(episode.displayTitle)
                     }
-                    val safeUrls = ArrayList(videoUrls.distinct().take(18))
+                    val safeUrls = ArrayList(videoUrls.distinct())
+                    val safeTitles = if (episodes.size > 1) episodeTitles else arrayListOf(title)
                     val intent = Intent(this@MainActivity, PlayerActivity::class.java).apply {
                         putStringArrayListExtra(PlayerActivity.EXTRA_URLS, safeUrls)
+                        putStringArrayListExtra(PlayerActivity.EXTRA_TITLES, safeTitles)
                         putExtra(PlayerActivity.EXTRA_URL, safeUrls.first())
                         putExtra(PlayerActivity.EXTRA_TITLE, title)
                         putExtra(PlayerActivity.EXTRA_SOURCE, "Internet Archive")
                         putExtra(PlayerActivity.EXTRA_LICENSE, license)
                     }
-                    runOnUiThread { startActivity(intent) }
+                    runOnUiThread {
+                        if (safeUrls.size > 1) {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Найдено эпизодов: ${safeUrls.size}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        startActivity(intent)
+                    }
                 } catch (error: Exception) {
                     Log.e("SultanCinema", "Unable to open Archive item", error)
                     runOnUiThread {
@@ -554,17 +616,64 @@ class MainActivity : Activity() {
             val address = adultProviderUrls[providerId]
             if (address == null) {
                 runOnUiThread {
-                    Toast.makeText(this@MainActivity, "Этот источник отключён: адрес или права не подтверждены", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@MainActivity, "Этот источник отключён: адрес не прошёл проверку HTTPS", Toast.LENGTH_LONG).show()
                 }
                 return
             }
-            runOnUiThread {
-                try {
-                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(address)))
-                } catch (_: Exception) {
-                    Toast.makeText(this@MainActivity, "На устройстве не найден браузер для открытия сайта", Toast.LENGTH_LONG).show()
-                }
+            val intent = Intent(this@MainActivity, AdultWebActivity::class.java).apply {
+                putExtra(AdultWebActivity.EXTRA_URL, address)
+                putExtra(AdultWebActivity.EXTRA_TITLE, providerId)
             }
+            runOnUiThread { startActivity(intent) }
+        }
+
+        @JavascriptInterface
+        fun hasAdultPin(): Boolean =
+            adultAccessPreferences.contains("pin_hash") && adultAccessPreferences.contains("pin_salt")
+
+        @JavascriptInterface
+        fun setAdultPin(pin: String): Boolean {
+            if (!pin.matches(Regex("[0-9]{4,8}")) || hasAdultPin()) return false
+            return try {
+                val salt = ByteArray(16).also { SecureRandom().nextBytes(it) }
+                val hash = deriveAdultPinHash(pin, salt)
+                adultAccessPreferences.edit()
+                    .putString("pin_salt", Base64.encodeToString(salt, Base64.NO_WRAP))
+                    .putString("pin_hash", Base64.encodeToString(hash, Base64.NO_WRAP))
+                    .commit()
+            } catch (error: Exception) {
+                Log.e("SultanCinema", "Unable to save adult access PIN", error)
+                false
+            }
+        }
+
+        @JavascriptInterface
+        fun verifyAdultPin(pin: String): Boolean {
+            if (!pin.matches(Regex("[0-9]{4,8}"))) return false
+            return try {
+                val saltText = adultAccessPreferences.getString("pin_salt", null) ?: return false
+                val hashText = adultAccessPreferences.getString("pin_hash", null) ?: return false
+                val salt = Base64.decode(saltText, Base64.NO_WRAP)
+                val expected = Base64.decode(hashText, Base64.NO_WRAP)
+                MessageDigest.isEqual(expected, deriveAdultPinHash(pin, salt))
+            } catch (error: Exception) {
+                Log.e("SultanCinema", "Unable to verify adult access PIN", error)
+                false
+            }
+        }
+    }
+
+    private fun deriveAdultPinHash(pin: String, salt: ByteArray): ByteArray {
+        val spec = PBEKeySpec(pin.toCharArray(), salt, 120000, 256)
+        return try {
+            val factory = try {
+                SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
+            } catch (_: Exception) {
+                SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
+            }
+            factory.generateSecret(spec).encoded
+        } finally {
+            spec.clearPassword()
         }
     }
 
