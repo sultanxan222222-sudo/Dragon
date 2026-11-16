@@ -3,21 +3,21 @@
         <item
             android:id="@+id/navigation_home"
             android:icon="@drawable/home_icon_selector"
-            android:title="@string/title_home" />
+            android:title="Главная" />
         <item
             android:id="@+id/navigation_search"
             android:icon="@drawable/search_icon"
-            android:title="@string/title_search" />
+            android:title="Каталог" />
         <item
             android:id="@+id/navigation_library"
             android:icon="@drawable/library_icon_selector"
-            android:title="@string/library" />
+            android:title="Избранное" />
         <item
             android:id="@+id/navigation_downloads"
             android:icon="@drawable/netflix_download"
-            android:title="@string/title_downloads" />
+            android:title="Загрузки" />
         <item
             android:id="@+id/navigation_settings"
             android:icon="@drawable/settings_icon_selector"
-            android:title="@string/title_settings" />
+            android:title="Настройки" />
 </menu>
