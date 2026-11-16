@@ -7,6 +7,12 @@
     android:layout_height="match_parent"
     android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|keyboard|navigation"
     android:paddingTop="0dp">
+    <com.lagradost.cloudstream3.ui.home.SultanGraffitiWallView
+        android:id="@+id/sultan_graffiti_wall"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no" />
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

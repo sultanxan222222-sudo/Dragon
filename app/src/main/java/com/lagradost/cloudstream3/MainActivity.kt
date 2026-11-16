@@ -1439,7 +1439,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
                 }
 
                 // Prefer the Russian-language HDrezka source as the first home catalogue.
-                val hdrezkaHome = apis.firstOrNull { it.name.contains("HDrezka", ignoreCase = true) }?.name
+                val hdrezkaHome = apis.firstOrNull { it.hasMainPage && it.name.contains("HDrezka", ignoreCase = true) }?.name
                 if (DataStoreHelper.currentHomePage.isNullOrBlank() ||
                     DataStoreHelper.currentHomePage.equals("Internet Archive", ignoreCase = true)
                 ) {
