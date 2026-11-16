@@ -3,8 +3,8 @@
   "description": "Directory of external 18+ source websites. No video files, stream URLs, scrapers or playback resolvers are included.",
   "counts": {
     "registered": 303,
-    "active": 298,
-    "disabled": 5
+    "active": 297,
+    "disabled": 6
   },
   "categoryNames": {
     "general": "Общее",
@@ -1208,8 +1208,8 @@
       "origins": [
         "AdultHideout"
       ],
-      "enabled": true,
-      "reason": null
+      "enabled": false,
+      "reason": "Адрес сайта в исходном каталоге доступен только по HTTP; источник не включён, чтобы не открывать его через незашифрованное соединение."
     },
     {
       "id": "fpo",
