@@ -231,6 +231,8 @@ copyrights and trademarks.
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
 
       - name: Install Android SDK platform and build tools
         run: |
