@@ -123,13 +123,22 @@ button{color:inherit;cursor:pointer}
  text-shadow:0 1px 0 #fff9,0 3px 0 color-mix(in srgb,var(--neon-low),black 25%),
  0 5px 0 color-mix(in srgb,var(--neon-low),black 48%),0 0 5px var(--neon-hi),
  0 0 13px var(--neon),0 0 27px var(--neon),0 0 48px color-mix(in srgb,var(--neon),transparent 22%);
- filter:drop-shadow(0 9px 5px #000b);opacity:.7;transform:rotate(var(--rot)) scale(var(--scale));
+ filter:drop-shadow(0 9px 5px #000b);opacity:.7;transform:rotate(var(--rot)) scale(var(--scale));position:absolute;
  animation:tagPulse var(--speed) ease-in-out var(--delay) infinite alternate;
 }
 .neonTag:before{content:attr(data-text);position:absolute;inset:0;z-index:-1;
  color:var(--neon-low);-webkit-text-fill-color:var(--neon-low);
  -webkit-text-stroke:3px color-mix(in srgb,var(--neon-low),black 24%);
  transform:translate(3px,5px);filter:blur(.25px);opacity:.9}
+
+.neonTag:after{content:attr(data-text);position:absolute;inset:0;z-index:1;pointer-events:none;
+ color:transparent;-webkit-text-fill-color:transparent;
+ background:linear-gradient(112deg,transparent 0%,#ffffff00 31%,#ffffffd9 39%,#eafcff88 43%,transparent 49%,transparent 72%,#ffffff66 77%,transparent 83%);
+ background-size:230% 100%;background-position:-145% 0;
+ background-clip:text;-webkit-background-clip:text;-webkit-text-stroke:.45px #ffffffa8;
+ mix-blend-mode:screen;animation:glassGlint 8.8s ease-in-out var(--glint-delay) infinite;}
+@keyframes glassGlint{0%,58%{background-position:-145% 0;opacity:.05}74%{opacity:.95}100%{background-position:145% 0;opacity:.18}}
+
 @keyframes tagPulse{0%{opacity:.18;filter:brightness(.65) drop-shadow(0 5px 3px #000b)}
  48%{opacity:.95;filter:brightness(1.25) drop-shadow(0 0 15px var(--neon))}
  100%{opacity:.38;filter:brightness(.82) drop-shadow(0 0 7px var(--neon))}}
@@ -153,7 +162,7 @@ button{color:inherit;cursor:pointer}
  55%{opacity:.9;background:radial-gradient(ellipse,#4deaff88,transparent 68%)}
  80%{opacity:.75;background:radial-gradient(ellipse,#d76bff77,transparent 68%)}100%{opacity:.4}}
 @media(max-width:700px){.neonTag{opacity:.45;letter-spacing:-.07em;text-shadow:0 1px 0 #fff9,0 3px 0 #111,0 0 7px var(--neon),0 0 18px var(--neon)}}
-@media(prefers-reduced-motion:reduce){.neonTag,.hero.neon-boot,.hero.neon-boot:before{animation:none!important}}
+@media(prefers-reduced-motion:reduce){.neonTag,.neonTag:after,.hero.neon-boot,.hero.neon-boot:before{animation:none!important}}
 
 </style>
 </head>
@@ -356,7 +365,7 @@ const neonPhrases=[
  "ЕЩЁ ОДНУ СЕРИЮ!","КОТ ОДОБРИЛ!","ПОП-КОРН ГДЕ?!","РАБОТА ПОДОЖДЁТ!",
  "ТЫ ЕЩЁ НЕ СПИШЬ?!","ПУЛЬТ ПРОПАЛ!","СЮЖЕТ КРУЧЕ ЖИЗНИ","ТИШЕ! ИДЁТ КИНО!",
  "Я ТУТ НА ПЯТЬ МИНУТ","НЕ ТРОГАЙ ПОПКОРН","ДИВАН МОЙ БОСС","СПОКОЙНО, Я СМОТРЮ",
- "КИНО ЛЕЧИТ СКУКУ","СОСЕДИ ТОЖЕ СМОТРЯТ","ГДЕ МОИ ТИТРЫ?!","МЫШОНOК В ЗАЛЕ",
+ "КИНО ЛЕЧИТ СКУКУ","СОСЕДИ ТОЖЕ СМОТРЯТ","ГДЕ МОИ ТИТРЫ?!","МЫШОНОК В ЗАЛЕ",
  "ЗАВТРА РАНО? НЕ СЛЫШАЛ","СНАЧАЛА ФИЛЬМ","ПЕРЕРЫВ НА ПОПКОРН","ЭКРАН ВСЁ ВИДИТ",
  "НЕ БУДИ ЗРИТЕЛЯ","СМЕХ БЕЗ БИЛЕТА","ПЯТЬ МИНУТ ДО ФИНАЛА","ФИЛЬМ САМ СЕБЯ НЕ ПОСМОТРИТ",
  "КТО ВЫКЛЮЧИЛ СВЕТ?","КИНО И ТОЧКА","СЮЖЕТ ЗАКРУЧЕН","ПОП-КОРН — МОЯ СЛАБОСТЬ",
@@ -380,10 +389,10 @@ function buildNeonWall(){
  ];
  positions.forEach((p,i)=>{
   const el=document.createElement("span");el.className="neonTag";el.textContent=neonPhrases[i];el.dataset.text=neonPhrases[i];
-  el.style.left=p[0]+"%";el.style.top=p[1]+"%";el.style.fontSize="clamp(12px,"+p[2]+"vw,42px)";
+  el.style.left=p[0]+"%";el.style.top=p[1]+"%";el.style.fontSize="clamp(10px,"+(p[2]*.28)+"vw,34px)";
   el.style.setProperty("--rot",p[3]+"deg");el.style.setProperty("--scale",i%4===0?"1.05":".94");
   const color=neonColors[i%neonColors.length];el.style.setProperty("--neon",color[0]);el.style.setProperty("--neon-hi",color[1]);el.style.setProperty("--neon-low",color[2]);
-  el.style.setProperty("--speed",(3.4+(i%7)*.73)+"s");el.style.setProperty("--delay",(-i*.61)+"s");
+  el.style.setProperty("--speed",(3.4+(i%7)*.73)+"s");el.style.setProperty("--delay",(-i*.61)+"s");el.style.setProperty("--glint-delay",(-i*.83)+"s");
   wall.appendChild(el);
  });
 }
