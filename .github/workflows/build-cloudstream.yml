@@ -1,4 +1,4 @@
-name: Sultan Cinema — CloudStream build
+name: Sultan Cinema — Full CloudStream source build
 
 on:
   push:
@@ -15,18 +15,188 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: sultan-cloudstream-build-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout complete CloudStream fork
+      - name: Checkout Sultan Cinema project
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Import the complete CloudStream Android project once
+        run: |
+          set -euo pipefail
+          if [ -f app/src/main/java/com/lagradost/cloudstream3/MainActivity.kt ] &&
+             grep -q 'applicationId = "com.sultan.cinema"' app/build.gradle.kts; then
+            echo "Full CloudStream source is already imported; keeping project changes."
+            exit 0
+          fi
+
+          mkdir -p /tmp/sultan-preserve /tmp/sultan-preserve/legacy
+          cp .github/workflows/build-cloudstream.yml /tmp/sultan-preserve/
+          if [ -f app/src/main/assets/cinema.html ]; then
+            cp app/src/main/assets/cinema.html /tmp/sultan-preserve/legacy/cinema.html
+          fi
+          if [ -f app/src/main/assets/adult_sources.json ]; then
+            cp app/src/main/assets/adult_sources.json /tmp/sultan-preserve/legacy/adult_sources.json
+          fi
+          if [ -f SOURCES_ADULT_CATALOG.md ]; then
+            cp SOURCES_ADULT_CATALOG.md /tmp/sultan-preserve/legacy/SOURCES_ADULT_CATALOG.md
+          fi
+
+          git clone --depth 1 --branch v4.9.1 https://github.com/recloudstream/cloudstream.git /tmp/cloudstream-upstream
+          rsync -a --delete --exclude='.git/' /tmp/cloudstream-upstream/ ./
+
+          rm -rf .github/workflows
+          mkdir -p .github/workflows legacy/current-cinema
+          cp /tmp/sultan-preserve/build-cloudstream.yml .github/workflows/
+          cp /tmp/sultan-preserve/legacy/* legacy/current-cinema/ 2>/dev/null || true
+
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          gradle = Path("app/build.gradle.kts")
+          text = gradle.read_text(encoding="utf-8")
+          app_id = 'applicationId = "com.lagradost.cloudstream3"'
+          if app_id not in text:
+              raise SystemExit("CloudStream applicationId was not found")
+          text = text.replace(app_id, 'applicationId = "com.sultan.cinema"', 1)
+          text = text.replace('applicationIdSuffix = ".debug"', 'applicationIdSuffix = ""', 1)
+          text = re.sub(
+              r'versionCode = libs\.versions\.versionCode\.get\(\)\.toInt\(\)',
+              "versionCode = 80",
+              text,
+              count=1,
+          )
+          gradle.write_text(text, encoding="utf-8")
+
+          # Preserve the upstream interface, changing only the installed app label.
+          for strings in Path("app/src").rglob("strings.xml"):
+              value = strings.read_text(encoding="utf-8")
+              updated = re.sub(
+                  r'(<string\b[^>]*\bname="app_name"[^>]*>).*?(</string>)',
+                  r'\1Кинотеатр Султана\2',
+                  value,
+                  flags=re.DOTALL,
+              )
+              if updated != value:
+                  strings.write_text(updated, encoding="utf-8")
+
+          main = Path("app/src/main/java/com/lagradost/cloudstream3/MainActivity.kt")
+          source = main.read_text(encoding="utf-8")
+          imports = [
+              "import com.lagradost.cloudstream3.plugins.RepositoryManager",
+              "import com.lagradost.cloudstream3.ui.settings.extensions.REPOSITORIES_KEY",
+              "import com.lagradost.cloudstream3.ui.settings.extensions.RepositoryData",
+          ]
+          for statement in imports:
+              if statement not in source:
+                  anchor = "import com.lagradost.cloudstream3.plugins.PluginManager"
+                  pos = source.find(anchor)
+                  if pos < 0:
+                      raise SystemExit("Cannot locate CloudStream plugin imports")
+                  line_end = source.find("\n", pos)
+                  source = source[:line_end + 1] + statement + "\n" + source[line_end + 1:]
+
+          provider_setup = "\n".join([
+              "                    // Add the official provider repository to the extension manager.",
+              "                    val sultanArchiveRepo = RepositoryData(",
+              '                        name = "CloudStream public providers",',
+              '                        url = "https://raw.githubusercontent.com/recloudstream/extensions/master/repo.json",',
+              '                        description = "Public media providers, including Internet Archive."',
+              "                    )",
+              "                    val savedRepos = getKey<Array<RepositoryData>>(REPOSITORIES_KEY) ?: emptyArray()",
+              "                    if (savedRepos.none { it.url == sultanArchiveRepo.url }) {",
+              "                        setKey(REPOSITORIES_KEY, savedRepos + sultanArchiveRepo)",
+              "                    }",
+              "",
+              "                    // Install the official Internet Archive plugin, validating its published hash.",
+              "                    try {",
+              '                        val archiveAlreadyInstalled = PluginManager.getPluginsOnline().any { it.internalName.equals("InternetArchiveProvider", true) }',
+              "                        if (!archiveAlreadyInstalled) {",
+              "                            val archivePlugin = RepositoryManager.getRepoPlugins(sultanArchiveRepo)?.firstOrNull {",
+              '                                it.plugin.internalName.equals("InternetArchiveProvider", true) && it.plugin.status > 0',
+              "                            }",
+              "                            if (archivePlugin != null) {",
+              "                                val installed = PluginManager.downloadPlugin(",
+              "                                    this@MainActivity,",
+              "                                    archivePlugin.plugin.url,",
+              "                                    archivePlugin.plugin.fileHash,",
+              "                                    archivePlugin.plugin.internalName,",
+              "                                    sultanArchiveRepo.url,",
+              "                                    true",
+              "                                )",
+              '                                if (!installed) Log.w("SultanCinema", "Could not install the Internet Archive provider")',
+              "                            }",
+              "                        }",
+              "                    } catch (error: Throwable) {",
+              "                        logError(error)",
+              "                    }",
+              "                    if (PluginManager.getPluginsOnline().any { it.internalName.equals(\"InternetArchiveProvider\", true) } && DataStoreHelper.currentHomePage == null) {",
+              '                        DataStoreHelper.currentHomePage = "Internet Archive"',
+              "                    }",
+          ])
+          needle = "                ioSafe {\n                    if (settingsManager.getBoolean("
+          if needle not in source:
+              raise SystemExit("Could not locate CloudStream provider startup sequence")
+          source = source.replace(
+              needle,
+              "                ioSafe {\n" + provider_setup + "\n                    if (settingsManager.getBoolean(",
+              1,
+          )
+
+          local_block = "\n".join([
+              "                ioSafe {",
+              "                    PluginManager.___DO_NOT_CALL_FROM_A_PLUGIN_loadAllLocalPlugins(",
+              "                        this@MainActivity,",
+              "                        false",
+              "                    )",
+              "                }",
+          ])
+          if local_block not in source:
+              raise SystemExit("Could not locate local provider loading sequence")
+          source = source.replace(
+              local_block,
+              local_block + "\n\n                DataStoreHelper.currentHomePage?.let { homeApi ->\n                    mainPluginsLoadedEvent.invoke(loadSinglePlugin(this@MainActivity, homeApi))\n                } ?: run {\n                    mainPluginsLoadedEvent.invoke(false)\n                }",
+              1,
+          )
+          main.write_text(source, encoding="utf-8")
+
+          notice = "\n".join([
+              "# Sultan Cinema — source and license notice",
+              "",
+              "This project is a modified fork of **CloudStream v4.9.1**:",
+              "https://github.com/recloudstream/cloudstream",
+              "",
+              "CloudStream is licensed under **GNU GPL v3.0**. The upstream LICENSE file,",
+              "copyright notices and source headers are retained. This fork changes the",
+              "installed package/application label and enables the official Internet",
+              "Archive provider through CloudStream's extension manager.",
+              "",
+              "Official provider repository: https://github.com/recloudstream/extensions",
+              "",
+              "The app is a media player; it does not host or supply copyrighted media.",
+              "Availability depends on each source's catalogue, rights and regional access.",
+          ]) + "\n"
+          Path("SULTAN-CINEMA-SOURCE-NOTICE.md").write_text(notice, encoding="utf-8")
+          PY
+
+          touch .cloudstream-import-complete
+          git config user.name "Sultan Cinema Builder"
+          git config user.email "actions@github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "Import full CloudStream v4.9.1 engine into Sultan Cinema"
+            git push origin HEAD:sultan-cloudstream
+          fi
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
@@ -49,7 +219,7 @@ jobs:
           set -euo pipefail
           chmod +x ./gradlew
           ./gradlew --no-daemon :app:assembleStableDebug
-          APK="$(find app/build/outputs/apk -type f -name 'app-stable-debug.apk' | head -n 1)"
+          APK="$(find app/build/outputs/apk -type f \( -name 'app-stable-debug.apk' -o -name '*stable*debug*.apk' \) | head -n 1)"
           test -n "$APK"
           test -s "$APK"
           "$ANDROID_HOME/build-tools/37.0.0/aapt" dump badging "$APK" | grep -F "package: name='com.sultan.cinema'"
