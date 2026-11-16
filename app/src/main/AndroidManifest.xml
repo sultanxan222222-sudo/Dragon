@@ -15,6 +15,13 @@
         android:supportsRtl="true">
 
         <activity
+            android:name=".AdultWebActivity"
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:hardwareAccelerated="true"
+            android:theme="@style/CinemaTheme" />
+
+        <activity
             android:name=".PlayerActivity"
             android:exported="false"
             android:screenOrientation="landscape"
