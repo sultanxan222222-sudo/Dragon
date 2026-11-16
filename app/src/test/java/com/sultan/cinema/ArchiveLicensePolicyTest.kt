@@ -31,8 +31,10 @@ class ArchiveLicensePolicyTest {
         assertEquals("CC0 1.0", ArchiveLicensePolicy.displayName("https://creativecommons.org/publicdomain/zero/1.0/"))
     }
 
-    @Test fun usesBroadCreativeCommonsDiscoveryQuery() {
-        assertEquals("(licenseurl:http*by* OR licenseurl:http*publicdomain/mark* OR licenseurl:http*publicdomain/zero*)", ArchiveLicensePolicy.searchClause())
+    @Test fun usesBroadDiscoveryQueryAndLeavesFinalDecisionToTheAllowlist() {
+        assertEquals("licenseurl:http*", ArchiveLicensePolicy.searchClause())
+        assertTrue(ArchiveLicensePolicy.isApproved("https://creativecommons.org/publicdomain/mark/1.0/"))
+        assertFalse(ArchiveLicensePolicy.isApproved("https://example.com/license"))
     }
 
     @Test fun onlyAllowsSafeArchiveIdentifiers() {
