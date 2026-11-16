@@ -267,7 +267,7 @@ button{color:inherit;cursor:pointer}
       <section id="favoritesScreen"><div class="sectionHead"><h2>Избранное</h2><span>Сохранено на этом устройстве</span></div><div id="favoriteGrid" class="catalogGrid"></div><div id="favoriteEmpty">Пока ничего не добавлено.</div></section>
       <section id="adultScreen">
         <div class="sectionHead" style="margin-top:4px"><h2>Закрытый каталог 18+</h2><span id="adultCount">Загружаю список источников…</span></div>
-        <div class="adultNotice">Здесь собраны внешние сайты из каталогов AdultHideout и Hedon Haven. Открытие выполняется на сайте-источнике. Каталог не скачивает ролики и не извлекает прямые видеопотоки; права и возрастные ограничения проверяются у самого поставщика.</div>
+        <div class="adultNotice">Источники открываются во встроенном просмотрщике «Кинотеатра Султана». Внешний браузер не запускается; воспроизведение остаётся внутри приложения. Работа конкретного видеоплеера зависит от поддержки сайта и встроенного браузера телевизора.</div>
         <div class="adultToolbar"><input id="adultSearchInput" class="search" type="search" placeholder="Найти сайт по названию…" autocomplete="off"></div>
         <div id="adultCategories" class="adultCategories"></div>
         <div id="adultProviderGrid" class="adultGrid"><div class="adultEmpty">Подключаю справочник источников…</div></div>
@@ -275,7 +275,7 @@ button{color:inherit;cursor:pointer}
     </main>
   </div>
   <div id="detail"><div class="dialog"><div class="eyebrow">КАРТОЧКА КОЛЛЕКЦИИ</div><h2 id="detailTitle"></h2><p id="detailDescription"></p><p id="detailMeta"></p><p id="detailLicense" class="licenseNote"></p><div class="dialogActions"><button id="playButton" class="goldButton">Смотреть</button><button id="favButton" class="secondary">☆ В избранное</button><button id="sourceButton" class="secondary">Источник</button><button id="closeDetail" class="secondary">Назад</button></div></div></div>
-  <div id="pinGate"><div class="dialog"><div class="eyebrow">ЗАКРЫТЫЙ РАЗДЕЛ</div><h2>Доступ 18+</h2><p>Раздел предназначен только для совершеннолетних. Введите код доступа и подтвердите возраст.</p><div id="pinDots" class="pinDots">○ ○ ○</div><div class="pinGrid" id="pinGrid"></div><label class="ageLine"><input id="ageConfirm" type="checkbox"> Мне исполнилось 18 лет</label><div class="dialogActions"><button id="pinEnter" class="goldButton">Войти</button><button id="pinCancel" class="secondary">Отмена</button></div><p class="licenseNote">Защита от случайного открытия; код не является надёжной системой безопасности.</p></div></div>
+  <div id="pinGate"><div class="dialog"><div class="eyebrow">ЗАКРЫТЫЙ РАЗДЕЛ</div><h2 id="adultGateTitle">Доступ 18+</h2><p id="adultGateMessage">Раздел предназначен только для совершеннолетних. Подтверди возраст и введи код доступа.</p><div id="pinDots" class="pinDots">○ ○ ○ ○ ○ ○ ○ ○</div><div class="pinGrid" id="pinGrid"></div><label class="ageLine"><input id="ageConfirm" type="checkbox"> Мне исполнилось 18 лет</label><div class="dialogActions"><button id="pinEnter" class="goldButton">Войти</button><button id="pinCancel" class="secondary">Отмена</button></div><p class="licenseNote">При первом входе придумай собственный код из 4–8 цифр и повтори его. Код хранится в зашифрованном виде.</p></div></div>
   <div id="toast"></div>
 </div>
 <script>
@@ -310,7 +310,7 @@ button{color:inherit;cursor:pointer}
 </script>
 <script>
 const $=id=>document.getElementById(id);
-let archiveItems=[],selectedItem=null,pin='',unlockedAdult=false,audioCtx=null,introDone=false,toastTimer=null;
+let archiveItems=[],selectedItem=null,pin='',pinSetupFirst=null,unlockedAdult=false,audioCtx=null,introDone=false,toastTimer=null;
 let adultSources=[],activeAdultCategory="all",adultCatalogLoaded=false;
 const FAVORITES_KEY='sultan-cinema-favorites-v1';
 const cardRenderGeneration=new WeakMap();
@@ -410,8 +410,26 @@ function openSearch(query){$('searchInput').value=query||'';showPage('catalog');
 function openDetail(item){selectedItem=item;$('detailTitle').textContent=item.title||item.identifier;$('detailDescription').textContent=(item.description||'Описание не предоставлено архивом.').replace(/<[^>]*>/g,' ').slice(0,580);$('detailMeta').textContent=[item.year,item.creator,item.runtime?item.runtime+' мин.':null].filter(Boolean).join(' · ');$('detailLicense').textContent='Лицензия: '+licenseLabel(item)+' · источник: Internet Archive';$('favButton').textContent=getFavorites().includes(item.identifier)?'★ В избранном':'☆ В избранное';$('detail').style.display='flex';$('playButton').focus();}
 function closeDetail(){ $('detail').style.display='none';selectedItem=null;}
 function showPage(page){document.querySelectorAll('.nav').forEach(b=>{b.classList.toggle('active',b.dataset.page===page);});$('homeScreen').style.display=page==='home'?'block':'none';$('catalogScreen').style.display=page==='catalog'?'flex':'none';$('favoritesScreen').style.display=page==='favorites'?'block':'none';$('adultScreen').style.display=page==='adult'&&unlockedAdult?'block':'none';if(page==='search'){showPage('catalog');$('searchInput').focus();return;}if(page==='adult'){if(unlockedAdult){$('adultScreen').style.display='flex';ensureAdultSources();}else openPinGate();return;}}
-function openPinGate(){pin='';$('pinDots').textContent='○ ○ ○';$('ageConfirm').checked=false;$('pinGate').style.display='flex';buildPinGrid();$('pinCancel').focus();}
-function buildPinGrid(){const grid=$('pinGrid');grid.innerHTML='';['1','2','3','4','5','6','7','8','9','⌫','0','С'].forEach(k=>{const b=document.createElement('button');b.className='pinKey';b.textContent=k;b.addEventListener('click',()=>{if(k==='⌫')pin=pin.slice(0,-1);else if(k==='С')pin='';else if(pin.length<3)pin+=k;$('pinDots').textContent=pin.padEnd(3,'○').split('').join(' ');});grid.appendChild(b);});}
+function updatePinDots(){$('pinDots').textContent=Array.from({length:8},(_,i)=>pin[i]||'○').join(' ');}
+function openPinGate(){
+ pin='';pinSetupFirst=null;
+ const configured=!!(window.AndroidCinema&&AndroidCinema.hasAdultPin());
+ $('adultGateTitle').textContent=configured?'Доступ 18+':'Первый вход · создай PIN';
+ $('adultGateMessage').textContent=configured?'Введи свой код доступа и подтверди, что тебе исполнилось 18 лет.':'Придумай код из 4–8 цифр. При первом вводе код запомнится, затем его нужно повторить.';
+ $('pinEnter').textContent=configured?'Войти':'Создать код';
+ updatePinDots();$('ageConfirm').checked=false;$('pinGate').style.display='flex';buildPinGrid();$('pinCancel').focus();
+}
+function buildPinGrid(){
+ const grid=$('pinGrid');grid.innerHTML='';
+ ['1','2','3','4','5','6','7','8','9','⌫','0','С'].forEach(k=>{
+  const b=document.createElement('button');b.className='pinKey';b.textContent=k;
+  b.addEventListener('click',()=>{
+   if(k==='⌫')pin=pin.slice(0,-1);else if(k==='С')pin='';else if(pin.length<8)pin+=k;
+   updatePinDots();
+  });
+  grid.appendChild(b);
+ });
+}
 function finishIntro(){if(introDone)return;introDone=true;window.__sultanBooted=true;$('intro').style.display='none';$('app').style.display='block';$('main').classList.add('ready');$('main').querySelector('.nav').focus();if(window.AndroidCinema)AndroidCinema.searchArchive('');}
 function unlockAudio(){if(!audioCtx){try{audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(_){return;}}if(audioCtx.state==='suspended')audioCtx.resume();}
 function noiseBurst(duration,volume){if(!audioCtx)return;const size=Math.max(1,Math.floor(audioCtx.sampleRate*duration));const buffer=audioCtx.createBuffer(1,size,audioCtx.sampleRate);const data=buffer.getChannelData(0);for(let i=0;i<size;i++)data[i]=(Math.random()*2-1)*(1-i/size);const src=audioCtx.createBufferSource();src.buffer=buffer;const gain=audioCtx.createGain();gain.gain.setValueAtTime(volume,audioCtx.currentTime);gain.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);src.connect(gain).connect(audioCtx.destination);src.start();}
@@ -421,7 +439,19 @@ $('skip').addEventListener('click',()=>finishIntro());$('heroBrowse').addEventLi
 $('playButton').addEventListener('click',()=>{if(selectedItem)AndroidCinema.openArchiveItem(selectedItem.identifier,selectedItem.title||selectedItem.identifier);});
 $('favButton').addEventListener('click',()=>{if(!selectedItem)return;let ids=getFavorites();if(ids.includes(selectedItem.identifier))ids=ids.filter(x=>x!==selectedItem.identifier);else ids.push(selectedItem.identifier);setFavorites(ids);$('favButton').textContent=ids.includes(selectedItem.identifier)?'★ В избранном':'☆ В избранное';updateCatalog();});
 $('sourceButton').addEventListener('click',()=>{if(selectedItem)AndroidCinema.openExternalSource('https://archive.org/details/'+encodeURIComponent(selectedItem.identifier));});$('closeDetail').addEventListener('click',closeDetail);
-$('pinCancel').addEventListener('click',()=>{$('pinGate').style.display='none';showPage('home');});$('pinEnter').addEventListener('click',()=>{if(pin==='123'&&$('ageConfirm').checked){unlockedAdult=true;$('pinGate').style.display='none';showPage('adult');ensureAdultSources();showToast('Раздел открыт на время этого запуска');}else showToast('Проверь код и подтверждение возраста');});
+$('pinCancel').addEventListener('click',()=>{pinSetupFirst=null;$('pinGate').style.display='none';showPage('home');});
+$('pinEnter').addEventListener('click',()=>{
+ if(!$('ageConfirm').checked){showToast('Подтверди, что тебе исполнилось 18 лет');return;}
+ if(pin.length<4){showToast('Нужно не менее 4 цифр');return;}
+ if(!window.AndroidCinema){showToast('Защищённый доступ недоступен');return;}
+ const configured=AndroidCinema.hasAdultPin();
+ if(!configured){
+  if(pinSetupFirst===null){pinSetupFirst=pin;pin='';updatePinDots();$('adultGateMessage').textContent='Теперь повтори тот же код ещё раз.';showToast('Повтори новый код');return;}
+  if(pin!==pinSetupFirst){pinSetupFirst=null;pin='';updatePinDots();$('adultGateMessage').textContent='Коды не совпали. Введи новый код из 4–8 цифр дважды.';showToast('Коды не совпали');return;}
+  if(!AndroidCinema.setAdultPin(pin)){showToast('Не удалось сохранить код. Попробуй ещё раз');return;}
+ }else if(!AndroidCinema.verifyAdultPin(pin)){pin='';updatePinDots();showToast('Неверный код доступа');return;}
+ unlockedAdult=true;pinSetupFirst=null;$('pinGate').style.display='none';showPage('adult');ensureAdultSources();showToast('Раздел открыт на время этого запуска');
+});
 document.querySelectorAll('.nav').forEach(b=>{b.addEventListener('click',()=>showPage(b.dataset.page));b.addEventListener('focus',()=>playComicYelp());});
 let secretTapCount=0,secretTapTimer=null;$('brandSecret').addEventListener('click',()=>{secretTapCount++;clearTimeout(secretTapTimer);secretTapTimer=setTimeout(()=>secretTapCount=0,2500);if(secretTapCount>=7){secretTapCount=0;openPinGate();}});
 document.addEventListener('keydown',e=>{unlockAudio();if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)){const current=document.activeElement;const visible=[...document.querySelectorAll('button:not([disabled]),input:not([disabled])')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden');const cr=current.getBoundingClientRect();const cx=cr.left+cr.width/2,cy=cr.top+cr.height/2;const dir=e.key;const candidates=visible.filter(el=>el!==current).map(el=>{const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,dx=x-cx,dy=y-cy;const primary=dir==='ArrowRight'?dx:dir==='ArrowLeft'?-dx:dir==='ArrowDown'?dy:-dy;const secondary=dir==='ArrowRight'||dir==='ArrowLeft'?Math.abs(dy):Math.abs(dx);return {el,primary,score:primary+secondary*2.1};}).filter(v=>v.primary>2).sort((a,b)=>a.score-b.score);if(candidates.length){candidates[0].el.focus();e.preventDefault();}}if(e.key==='Escape'||e.key==='Backspace'){if($('detail').style.display==='flex'){closeDetail();e.preventDefault();}else if($('pinGate').style.display==='flex'){$('pinGate').style.display='none';e.preventDefault();}else if($('catalogScreen').style.display!=='none'){showPage('home');e.preventDefault();}else if(!introDone)finishIntro();}else if(e.key==='Enter'&&!introDone){finishIntro();}});
