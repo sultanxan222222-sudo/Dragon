@@ -14,6 +14,10 @@ class ArchiveLicensePolicyTest {
         assertTrue(ArchiveLicensePolicy.isApproved("https://creativecommons.org/publicdomain/zero/1.0/"))
     }
 
+    @Test fun usesArchivePublicDomainWildcardForDiscovery() {
+        assertTrue(ArchiveLicensePolicy.searchClause().contains("licenseurl:http*publicdomain*"))
+    }
+
     @Test fun rejectsAttributionAndUnknownLicenses() {
         assertFalse(ArchiveLicensePolicy.isApproved("https://creativecommons.org/licenses/by/4.0/"))
         assertFalse(ArchiveLicensePolicy.isApproved(""))
