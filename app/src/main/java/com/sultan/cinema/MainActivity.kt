@@ -389,7 +389,7 @@ class MainActivity : Activity() {
                 val identifier = item.optString("identifier")
                 if (!ArchiveLicensePolicy.isSafeIdentifier(identifier)) continue
                 if (!itemHasApprovedLicense(item)) continue
-                target.putIfAbsent(identifier, item)
+                if (!target.containsKey(identifier)) target[identifier] = item
             }
         }
 
