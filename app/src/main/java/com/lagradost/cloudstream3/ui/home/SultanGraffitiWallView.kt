@@ -31,7 +31,7 @@ class SultanGraffitiWallView @JvmOverloads constructor(
         strokeWidth = dp(1f)
     }
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        typeface = Typeface.create("sans-serif-condensed", Typeface.BOLD_ITALIC)
+        typeface = Typeface.create("sans-serif-black", Typeface.BOLD_ITALIC)
         textAlign = Paint.Align.LEFT
         isSubpixelText = true
         strokeJoin = Paint.Join.ROUND
@@ -78,12 +78,12 @@ class SultanGraffitiWallView @JvmOverloads constructor(
     )
 
     private val neonPalette = intArrayOf(
-        Color.rgb(68, 220, 255),
-        Color.rgb(255, 83, 190),
-        Color.rgb(172, 126, 255),
-        Color.rgb(72, 238, 191),
-        Color.rgb(255, 202, 92),
-        Color.rgb(255, 132, 83)
+        Color.rgb(82, 234, 255),
+        Color.rgb(255, 99, 200),
+        Color.rgb(168, 121, 255),
+        Color.rgb(85, 240, 199),
+        Color.rgb(255, 200, 93),
+        Color.rgb(255, 100, 123)
     )
 
     init {
@@ -157,14 +157,20 @@ class SultanGraffitiWallView @JvmOverloads constructor(
             canvas.rotate(angle)
             canvas.scale(scaleX, 1f)
 
+            // Deep enamel extrusion: a dark lower edge gives the lettering real depth.
             textPaint.shader = null
+            textPaint.style = Paint.Style.FILL
+            textPaint.color = withAlpha(Color.BLACK, 205)
+            canvas.drawText(phrase, dp(2.8f), dp(3.4f), textPaint)
+
             textPaint.style = Paint.Style.STROKE
-            textPaint.strokeWidth = dp(5f)
-            textPaint.color = withAlpha(color, if (index % 4 == 0) 65 else 48)
+            textPaint.strokeWidth = dp(7f)
+            textPaint.color = withAlpha(color, if (index % 4 == 0) 72 else 58)
             canvas.drawText(phrase, 0f, 0f, textPaint)
 
-            textPaint.strokeWidth = dp(1.2f)
-            textPaint.color = withAlpha(Color.WHITE, 130)
+            // A second inner bevel and sharp glass highlight keep the graffiti crisp.
+            textPaint.strokeWidth = dp(2.2f)
+            textPaint.color = withAlpha(color, 190)
             canvas.drawText(phrase, 0f, 0f, textPaint)
 
             textPaint.style = Paint.Style.FILL
@@ -173,12 +179,22 @@ class SultanGraffitiWallView @JvmOverloads constructor(
                 -textSize,
                 0f,
                 dp(2f),
-                intArrayOf(withAlpha(Color.WHITE, 205), withAlpha(color, 158), withAlpha(color, 124)),
-                null,
+                intArrayOf(
+                    withAlpha(Color.WHITE, 235),
+                    withAlpha(color, 210),
+                    withAlpha(color, 155)
+                ),
+                floatArrayOf(0f, 0.28f, 1f),
                 Shader.TileMode.CLAMP
             )
             canvas.drawText(phrase, 0f, 0f, textPaint)
             textPaint.shader = null
+
+            textPaint.style = Paint.Style.STROKE
+            textPaint.strokeWidth = dp(0.8f)
+            textPaint.color = withAlpha(Color.WHITE, 190)
+            canvas.drawText(phrase, -dp(0.35f), -dp(0.35f), textPaint)
+            textPaint.style = Paint.Style.FILL
             canvas.restore()
         }
 
