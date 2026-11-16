@@ -208,6 +208,13 @@ jobs:
         with:
           packages: platform-tools
 
+      # Reuse one debug certificate so every future APK can update the installed app.
+      - name: Restore stable Sultan Cinema signing key
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: sultan-cinema-debug-signing-v1
+
       - name: Install Android SDK platform and build tools
         run: |
           yes | sdkmanager --licenses >/dev/null
