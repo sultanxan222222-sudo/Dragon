@@ -108,6 +108,53 @@ button{color:inherit;cursor:pointer}
 @media(max-width:900px){.adultGrid{grid-template-columns:repeat(3,minmax(110px,1fr))}}
 
 @media(max-width:900px){#main{grid-template-columns:170px 1fr}.sidebar{padding:24px 12px}.content{padding:25px 22px}.catalogGrid{grid-template-columns:repeat(4,minmax(100px,1fr))}.hero{height:220px}.heroMark{right:4%;transform:scale(.8)}}
+
+/* Sultan Neon Graffiti Glass wall */
+#neonWall{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;isolation:isolate;
+ background:radial-gradient(ellipse at 50% 45%,#10132155,transparent 72%);}
+.neonTag{position:absolute;display:block;white-space:nowrap;pointer-events:none;user-select:none;
+ font-family:Impact,"Arial Black",system-ui,sans-serif;font-weight:1000;font-style:italic;
+ letter-spacing:-.055em;line-height:.9;text-transform:uppercase;
+ color:transparent;-webkit-text-fill-color:transparent;
+ background:linear-gradient(155deg,#fff 0%,var(--neon-hi) 13%,var(--neon) 39%,#fff 48%,var(--neon) 62%,var(--neon-low) 100%);
+ background-clip:text;-webkit-background-clip:text;
+ -webkit-text-stroke:1.25px color-mix(in srgb,var(--neon-hi),white 28%);
+ paint-order:stroke fill;
+ text-shadow:0 1px 0 #fff9,0 3px 0 color-mix(in srgb,var(--neon-low),black 25%),
+ 0 5px 0 color-mix(in srgb,var(--neon-low),black 48%),0 0 5px var(--neon-hi),
+ 0 0 13px var(--neon),0 0 27px var(--neon),0 0 48px color-mix(in srgb,var(--neon),transparent 22%);
+ filter:drop-shadow(0 9px 5px #000b);opacity:.7;transform:rotate(var(--rot)) scale(var(--scale));
+ animation:tagPulse var(--speed) ease-in-out var(--delay) infinite alternate;
+}
+.neonTag:before{content:attr(data-text);position:absolute;inset:0;z-index:-1;
+ color:var(--neon-low);-webkit-text-fill-color:var(--neon-low);
+ -webkit-text-stroke:3px color-mix(in srgb,var(--neon-low),black 24%);
+ transform:translate(3px,5px);filter:blur(.25px);opacity:.9}
+@keyframes tagPulse{0%{opacity:.18;filter:brightness(.65) drop-shadow(0 5px 3px #000b)}
+ 48%{opacity:.95;filter:brightness(1.25) drop-shadow(0 0 15px var(--neon))}
+ 100%{opacity:.38;filter:brightness(.82) drop-shadow(0 0 7px var(--neon))}}
+#main{z-index:2}
+#grain{z-index:1}
+.sidebar{background:linear-gradient(90deg,#09090bc9 0,#101014a8 82%,#10101488);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+.content{background:linear-gradient(110deg,#090a0d38,transparent 55%);backdrop-filter:blur(1.5px)}
+.hero{background:linear-gradient(105deg,#171014b8 0,#281b1bb0 48%,#50301f9c 100%);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.card{background:#151519bb;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+.dialog{background:linear-gradient(145deg,#211b1bd9,#111216df);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+#detail,#pinGate{background:#030304b9;backdrop-filter:blur(7px)}
+.hero.neon-boot{animation:panelPrism 3.4s ease-in-out both}
+.hero.neon-boot:before{animation:prismSweep 3.4s ease-in-out both}
+@keyframes panelPrism{0%{box-shadow:0 18px 50px #0008,0 0 0 #fff0;filter:saturate(.8)}
+ 18%{box-shadow:0 0 22px #ff4c9d88,0 0 55px #4bdcff77,0 18px 50px #0008;filter:saturate(2)}
+ 38%{box-shadow:0 0 28px #a66bff99,0 0 70px #42f2c477,0 18px 50px #0008;filter:saturate(2.2)}
+ 62%{box-shadow:0 0 24px #ffd45c88,0 0 60px #ff5c7d77,0 18px 50px #0008;filter:saturate(1.9)}
+ 100%{box-shadow:0 18px 50px #0008,0 0 22px #6bdcff22;filter:saturate(1.1)}}
+@keyframes prismSweep{0%{opacity:0;transform:translateX(-30%) rotate(-12deg)}
+ 25%{opacity:1;background:radial-gradient(ellipse,#ff4cae88,transparent 68%)}
+ 55%{opacity:.9;background:radial-gradient(ellipse,#4deaff88,transparent 68%)}
+ 80%{opacity:.75;background:radial-gradient(ellipse,#d76bff77,transparent 68%)}100%{opacity:.4}}
+@media(max-width:700px){.neonTag{opacity:.45;letter-spacing:-.07em;text-shadow:0 1px 0 #fff9,0 3px 0 #111,0 0 7px var(--neon),0 0 18px var(--neon)}}
+@media(prefers-reduced-motion:reduce){.neonTag,.hero.neon-boot,.hero.neon-boot:before{animation:none!important}}
+
 </style>
 </head>
 <body>
@@ -172,6 +219,7 @@ button{color:inherit;cursor:pointer}
   <button id="skip" tabindex="0">Пропустить заставки · OK</button>
 </div>
 <div id="app">
+  <div id="neonWall" aria-hidden="true"></div>
   <div id="grain"></div>
   <div id="main">
     <aside class="sidebar">
@@ -303,6 +351,49 @@ $('pinCancel').addEventListener('click',()=>{$('pinGate').style.display='none';s
 document.querySelectorAll('.nav').forEach(b=>{b.addEventListener('click',()=>showPage(b.dataset.page));b.addEventListener('focus',()=>playComicYelp());});
 let secretTapCount=0,secretTapTimer=null;$('brandSecret').addEventListener('click',()=>{secretTapCount++;clearTimeout(secretTapTimer);secretTapTimer=setTimeout(()=>secretTapCount=0,2500);if(secretTapCount>=7){secretTapCount=0;openPinGate();}});
 document.addEventListener('keydown',e=>{unlockAudio();if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)){const current=document.activeElement;const visible=[...document.querySelectorAll('button:not([disabled]),input:not([disabled])')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden');const cr=current.getBoundingClientRect();const cx=cr.left+cr.width/2,cy=cr.top+cr.height/2;const dir=e.key;const candidates=visible.filter(el=>el!==current).map(el=>{const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,dx=x-cx,dy=y-cy;const primary=dir==='ArrowRight'?dx:dir==='ArrowLeft'?-dx:dir==='ArrowDown'?dy:-dy;const secondary=dir==='ArrowRight'||dir==='ArrowLeft'?Math.abs(dy):Math.abs(dx);return {el,primary,score:primary+secondary*2.1};}).filter(v=>v.primary>2).sort((a,b)=>a.score-b.score);if(candidates.length){candidates[0].el.focus();e.preventDefault();}}if(e.key==='Escape'||e.key==='Backspace'){if($('detail').style.display==='flex'){closeDetail();e.preventDefault();}else if($('pinGate').style.display==='flex'){$('pinGate').style.display='none';e.preventDefault();}else if($('catalogScreen').style.display!=='none'){showPage('home');e.preventDefault();}else if(!introDone)finishIntro();}else if(e.key==='Enter'&&!introDone){finishIntro();}});
+
+const neonPhrases=[
+ "ЕЩЁ ОДНУ СЕРИЮ!","КОТ ОДОБРИЛ!","ПОП-КОРН ГДЕ?!","РАБОТА ПОДОЖДЁТ!",
+ "ТЫ ЕЩЁ НЕ СПИШЬ?!","ПУЛЬТ ПРОПАЛ!","СЮЖЕТ КРУЧЕ ЖИЗНИ","ТИШЕ! ИДЁТ КИНО!",
+ "Я ТУТ НА ПЯТЬ МИНУТ","НЕ ТРОГАЙ ПОПКОРН","ДИВАН МОЙ БОСС","СПОКОЙНО, Я СМОТРЮ",
+ "КИНО ЛЕЧИТ СКУКУ","СОСЕДИ ТОЖЕ СМОТРЯТ","ГДЕ МОИ ТИТРЫ?!","МЫШОНOК В ЗАЛЕ",
+ "ЗАВТРА РАНО? НЕ СЛЫШАЛ","СНАЧАЛА ФИЛЬМ","ПЕРЕРЫВ НА ПОПКОРН","ЭКРАН ВСЁ ВИДИТ",
+ "НЕ БУДИ ЗРИТЕЛЯ","СМЕХ БЕЗ БИЛЕТА","ПЯТЬ МИНУТ ДО ФИНАЛА","ФИЛЬМ САМ СЕБЯ НЕ ПОСМОТРИТ",
+ "КТО ВЫКЛЮЧИЛ СВЕТ?","КИНО И ТОЧКА","СЮЖЕТ ЗАКРУЧЕН","ПОП-КОРН — МОЯ СЛАБОСТЬ",
+ "ДИВАН В РЕЖИМЕ КИНО","НЕ СПОЙЛЕРИ!","СЕАНС ДЛЯ СВОИХ","УЛЫБНИСЬ, ИДЁТ ЗАПИСЬ",
+ "ПУЛЬТ — ГЛАВНЫЙ","СОН ОТМЕНЯЕТСЯ","ЕЩЁ ЧУТЬ-ЧУТЬ","СМОТРИ И НЕ МОРГАЙ"
+];
+const neonColors=[
+ ["#52eaff","#b8f8ff","#0879bb"],["#ff63c8","#ffd3f0","#a51b77"],
+ ["#a879ff","#e5d5ff","#5524a8"],["#55f0c7","#d2fff2","#087e70"],
+ ["#ffc85d","#fff0bd","#9b5a13"],["#ff647b","#ffd4da","#a51d3a"]
+];
+function buildNeonWall(){
+ const wall=$("neonWall");if(!wall||wall.dataset.ready)return;wall.dataset.ready="1";
+ const positions=[
+ [2,5,20,-8],[38,3,18,5],[70,8,24,-7],[12,18,16,7],[48,17,22,-5],[78,25,18,8],
+ [3,35,23,6],[30,31,18,-9],[59,35,25,5],[82,43,16,-7],[8,52,19,-5],[39,49,23,8],
+ [68,55,19,-8],[1,68,18,7],[24,65,25,-5],[52,68,17,8],[78,72,20,-6],[12,83,23,5],
+ [43,85,19,-8],[70,88,24,6],[19,9,13,9],[56,7,13,-9],[88,15,11,7],[4,25,12,-6],
+ [27,42,12,8],[48,28,12,-7],[73,37,13,6],[91,57,11,-8],[31,77,13,7],[59,80,12,-5],
+ [87,88,12,8],[5,92,13,-6],[36,92,12,7],[63,94,13,-8],[91,3,12,6],[2,47,12,-7]
+ ];
+ positions.forEach((p,i)=>{
+  const el=document.createElement("span");el.className="neonTag";el.textContent=neonPhrases[i];el.dataset.text=neonPhrases[i];
+  el.style.left=p[0]+"%";el.style.top=p[1]+"%";el.style.fontSize="clamp(12px,"+p[2]+"vw,42px)";
+  el.style.setProperty("--rot",p[3]+"deg");el.style.setProperty("--scale",i%4===0?"1.05":".94");
+  const color=neonColors[i%neonColors.length];el.style.setProperty("--neon",color[0]);el.style.setProperty("--neon-hi",color[1]);el.style.setProperty("--neon-low",color[2]);
+  el.style.setProperty("--speed",(3.4+(i%7)*.73)+"s");el.style.setProperty("--delay",(-i*.61)+"s");
+  wall.appendChild(el);
+ });
+}
+function playPanelPrism(){
+ const panel=document.querySelector(".hero");if(!panel)return;
+ panel.classList.remove("neon-boot");void panel.offsetWidth;panel.classList.add("neon-boot");
+ setTimeout(()=>panel.classList.remove("neon-boot"),3600);
+}
+
+buildNeonWall();
 startSplashSequence();
 </script>
 </body>
