@@ -15,8 +15,8 @@ button{color:inherit;cursor:pointer}
 #intro{position:absolute;inset:0;background:#050506;display:flex;align-items:center;justify-content:center;z-index:50;overflow:hidden}
 .introStage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none}
 .introStage.active{opacity:1}
-#studio .silhouette{position:absolute;left:50%;top:51%;width:220px;height:320px;transform:translate(-50%,-50%);animation:hammerHit 2.5s ease-in-out forwards}
-@keyframes hammerHit{0%{transform:translate(-50%,-50%) scale(.8);opacity:0}20%{opacity:1}48%{transform:translate(-50%,-50%) scale(1)}72%{transform:translate(-50%,-50%) scale(1.05) rotate(-4deg)}85%{transform:translate(-50%,-50%) scale(1.13) rotate(7deg)}100%{transform:translate(-50%,-50%) scale(1.18);opacity:0}}
+#studio .silhouette{position:absolute;left:50%;top:47%;width:min(46vw,390px);height:min(76vh,500px);transform:translate(-50%,-50%);filter:drop-shadow(0 0 9px #d6ae61aa) drop-shadow(0 0 26px #d6ae6155);animation:hammerHit 2.8s cubic-bezier(.2,.75,.2,1) forwards}
+@keyframes hammerHit{0%{transform:translate(-50%,-50%) scale(.72) translateY(34px);opacity:0}14%{opacity:1}34%{transform:translate(-50%,-50%) scale(1) translateY(0)}57%{transform:translate(-50%,-50%) scale(1.02) rotate(-5deg)}76%{transform:translate(-50%,-50%) scale(1.13) rotate(8deg)}100%{transform:translate(-50%,-50%) scale(1.2) rotate(2deg);opacity:1}}20%{opacity:1}48%{transform:translate(-50%,-50%) scale(1)}72%{transform:translate(-50%,-50%) scale(1.05) rotate(-4deg)}85%{transform:translate(-50%,-50%) scale(1.13) rotate(7deg)}100%{transform:translate(-50%,-50%) scale(1.18);opacity:0}}
 #studio .crack{position:absolute;width:min(78vw,920px);height:min(78vh,680px);opacity:0;transform:scale(.55);animation:crackIn .75s 1.55s ease-out forwards}
 @keyframes crackIn{0%{opacity:0;transform:scale(.55)}25%{opacity:1}100%{opacity:.8;transform:scale(1)}}
 #studio .studioTitle{position:absolute;bottom:14%;left:0;right:0;text-align:center;font-family:Georgia,serif;font-size:clamp(24px,4vw,54px);letter-spacing:.09em;color:#f0d28f;text-shadow:0 1px 1px #fff2,0 4px 18px #d2a34b77;opacity:0;animation:titleIn 1.1s 2.2s ease-out forwards}
@@ -96,7 +96,7 @@ button{color:inherit;cursor:pointer}
 <div id="intro">
   <section id="studio" class="introStage active">
     <svg class="silhouette" viewBox="0 0 220 320" aria-hidden="true">
-      <g fill="#020203" stroke="#020203" stroke-linejoin="round">
+      <g fill="#211912" stroke="#d6ae61" stroke-width="2.4" stroke-linejoin="round">
         <path d="M64 91Q59 53 96 43Q137 39 151 75L151 88L64 91Z"/>
         <path d="M54 83Q96 64 164 79L174 88Q116 99 50 93Z"/>
         <path d="M97 94L137 94L141 146L156 174L168 308L43 308L60 177L85 143Z"/>
