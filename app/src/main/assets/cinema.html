@@ -164,6 +164,11 @@ button{color:inherit;cursor:pointer}
 @media(max-width:700px){.neonTag{opacity:.45;letter-spacing:-.07em;text-shadow:0 1px 0 #fff9,0 3px 0 #111,0 0 7px var(--neon),0 0 18px var(--neon)}}
 @media(prefers-reduced-motion:reduce){.neonTag,.neonTag:after,.hero.neon-boot,.hero.neon-boot:before{animation:none!important}}
 
+
+.catalogEmpty{grid-column:1/-1;width:100%;min-height:132px;padding:22px;border:1px solid #d6ae6140;border-radius:14px;background:linear-gradient(135deg,#17171acc,#101014cc);display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:10px}
+.catalogEmpty strong{font:700 16px Georgia,serif;color:#f3d99a}
+.catalogEmpty span{font-size:13px;line-height:1.5;color:#bdb5a8}
+.catalogEmpty .goldButton{margin-top:2px}
 </style>
 </head>
 <body>
@@ -323,7 +328,21 @@ function licenseLabel(item){
 }
 function makeCard(item){const card=document.createElement('button');card.className='card';card.type='button';card.innerHTML='<img class="poster" loading="lazy" src="'+imageUrl(item)+'" alt=""><span class="cardTitle">'+escapeHtml(item.title||item.identifier)+'</span><span class="cardYear">'+escapeHtml(item.year||'Год не указан')+' · '+licenseLabel(item)+'</span>';card.addEventListener('click',()=>openDetail(item));return card;}
 function drawItems(target,items){target.innerHTML='';items.forEach(item=>target.appendChild(makeCard(item)));}
-function updateCatalog(){drawItems($('homeCards'),archiveItems.slice(0,8));drawItems($('catalogGrid'),archiveItems);$('catalogCount').textContent=archiveItems.length+' материалов';const fav=getFavorites();const selected=archiveItems.filter(x=>fav.includes(x.identifier));drawItems($('favoriteGrid'),selected);$('favoriteEmpty').style.display=selected.length?'none':'block';}
+function drawCatalogEmpty(target,message){
+ target.innerHTML='';
+ const panel=document.createElement('div');panel.className='catalogEmpty';
+ const heading=document.createElement('strong');heading.textContent='Каталог фильмов';
+ const detail=document.createElement('span');detail.textContent=message||'Подключаем источники открытого кино. Если список не загрузился, повтори запрос.';
+ const retry=document.createElement('button');retry.type='button';retry.className='goldButton';retry.textContent='Повторить поиск';
+ retry.addEventListener('click',()=>{const query=$('searchInput')?.value||'';$('status').textContent='Повторно загружаю каталог…';if(window.AndroidCinema)AndroidCinema.searchArchive(query);});
+ panel.append(heading,detail,retry);target.appendChild(panel);
+}
+function updateCatalog(message=''){
+ if(archiveItems.length){drawItems($('homeCards'),archiveItems.slice(0,8));drawItems($('catalogGrid'),archiveItems);}
+ else{drawCatalogEmpty($('homeCards'),message);drawCatalogEmpty($('catalogGrid'),message);}
+ $('catalogCount').textContent=archiveItems.length?archiveItems.length+' материалов':'Каталог обновляется';
+ const fav=getFavorites();const selected=archiveItems.filter(x=>fav.includes(x.identifier));drawItems($('favoriteGrid'),selected);$('favoriteEmpty').style.display=selected.length?'none':'block';
+}
 const adultCategoryNames={all:"Все источники",general:"Общее",trans:"Транс",hentai:"Хентай",jav:"JAV",rule34:"Rule 34",fetish:"Фетиш",live:"Трансляции",creator:"Авторы",type_archive:"Архивы",type_live:"Live-эфиры",type_resolver:"Каталоги ссылок",type_tube:"Видеосайты"};
 async function ensureAdultSources(){
  if(adultCatalogLoaded){renderAdultSources();return;}
@@ -370,7 +389,7 @@ function renderAdultSources(){
  $("adultCount").textContent=enabled+" доступно · "+filtered.length+" в текущем списке";
 }
 $("adultSearchInput").addEventListener("input",renderAdultSources);
-window.onArchiveResults=(json,error)=>{try{archiveItems=Array.isArray(json)?json:JSON.parse(json||'[]');}catch(_){archiveItems=[];}updateCatalog();$('status').textContent=error||('Найдено: '+archiveItems.length);if(error)showToast(error);else if(!archiveItems.length)showToast('В открытой коллекции пока нет совпадений');};
+window.onArchiveResults=(json,error)=>{try{archiveItems=Array.isArray(json)?json:JSON.parse(json||'[]');}catch(_){archiveItems=[];}updateCatalog(error||'');$('status').textContent=error||('Найдено: '+archiveItems.length);if(error)showToast(error);else if(!archiveItems.length)showToast('Каталог не вернул подходящих фильмов');};
 function openSearch(query){$('searchInput').value=query||'';showPage('catalog');$('searchInput').focus();if(query)AndroidCinema.searchArchive(query);}
 function openDetail(item){selectedItem=item;$('detailTitle').textContent=item.title||item.identifier;$('detailDescription').textContent=(item.description||'Описание не предоставлено архивом.').replace(/<[^>]*>/g,' ').slice(0,580);$('detailMeta').textContent=[item.year,item.creator,item.runtime?item.runtime+' мин.':null].filter(Boolean).join(' · ');$('detailLicense').textContent='Лицензия: '+licenseLabel(item)+' · источник: Internet Archive';$('favButton').textContent=getFavorites().includes(item.identifier)?'★ В избранном':'☆ В избранное';$('detail').style.display='flex';$('playButton').focus();}
 function closeDetail(){ $('detail').style.display='none';selectedItem=null;}
