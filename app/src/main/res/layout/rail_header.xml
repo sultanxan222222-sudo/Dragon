@@ -1,17 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:padding="1dp"
-    android:visibility="gone"
+    android:layout_width="match_parent"
+    android:layout_height="88dp"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:paddingTop="12dp"
+    android:paddingBottom="8dp"
+    android:visibility="visible"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+        <TextView
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/sultan_emblem"
+            android:fontFamily="serif"
+            android:gravity="center"
+            android:text="S"
+            android:textColor="#F3D99A"
+            android:textSize="23sp"
+            android:textStyle="bold|italic" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:letterSpacing="0.12"
+            android:text="SULTAN"
+            android:textColor="#D6AE61"
+            android:textSize="8sp"
+            android:textStyle="bold" />
+
         <ImageView
             android:id="@+id/nav_header_notification"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            app:itemIconTint="@color/item_select_color"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginTop="7dp"
             android:focusable="true"
             android:nextFocusRight="@id/home_preview_info_btt"
             android:src="@drawable/notifications_icon_selector"
