@@ -179,17 +179,17 @@ class MainActivity : Activity() {
     }
 
     private fun buildArchiveQuery(searchText: String): String {
-        val publicDomain = "licenseurl:\"https://creativecommons.org/publicdomain/mark/1.0/\""
-        val cc0 = "licenseurl:\"https://creativecommons.org/publicdomain/zero/1.0/\""
+        val publicDomain = "(licenseurl:\"http://creativecommons.org/publicdomain/mark/1.0/\" OR licenseurl:\"https://creativecommons.org/publicdomain/mark/1.0/\")"
+        val cc0 = "(licenseurl:\"http://creativecommons.org/publicdomain/zero/1.0/\" OR licenseurl:\"https://creativecommons.org/publicdomain/zero/1.0/\")"
         val base = "mediatype:movies AND ($publicDomain OR $cc0)"
         val clean = searchText.trim().take(80)
         if (clean.isEmpty()) return base
-        val safe = clean.replace(Regex("([+\\-&|!(){}\[\]^\"~*?:\\\\])")) { "\\\\${it.value}" }
+        val safe = clean.filter { it.isLetterOrDigit() || it.isWhitespace() || it == '-' }
         return "$base AND title:(\"$safe\")"
     }
 
     private fun isApprovedLicense(value: String): Boolean {
-        val license = value.trim().trimEnd('/').lowercase()
+        val license = value.trim().trimEnd('/').lowercase().replace("http://", "https://")
         return license == "https://creativecommons.org/publicdomain/mark/1.0" ||
             license == "https://creativecommons.org/publicdomain/zero/1.0"
     }
