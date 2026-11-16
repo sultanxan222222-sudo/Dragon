@@ -1376,6 +1376,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
                     setKey(REPOSITORIES_KEY, updatedRepos)
                 }
 
+                // The provider list is intentionally kept small and focused on films and series.
                 try {
                     // Remove the starter archive provider; the home page will use the film providers below.
                     PluginManager.getPluginsOnline()
