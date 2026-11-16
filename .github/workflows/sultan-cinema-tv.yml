@@ -33,7 +33,7 @@ jobs:
           import pathlib
           import re
           html = pathlib.Path("app/src/main/assets/cinema.html").read_text(encoding="utf-8")
-          scripts = re.findall(r"<script(?:\\s[^>]*)?>(.*?)</script>", html, flags=re.I | re.S)
+          scripts = re.findall(r"<script(?:\s[^>]*)?>(.*?)</script>", html, flags=re.I | re.S)
           if not scripts:
               raise SystemExit("No inline JavaScript found in cinema.html")
           out = pathlib.Path("/tmp/sultan-cinema-js")
