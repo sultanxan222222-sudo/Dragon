@@ -231,7 +231,7 @@ function licenseLabel(item){return /zero\/1\.0/i.test(item.licenseurl||'')?'CC0 
 function makeCard(item){const card=document.createElement('button');card.className='card';card.type='button';card.innerHTML='<img class="poster" loading="lazy" src="'+imageUrl(item)+'" alt=""><span class="cardTitle">'+escapeHtml(item.title||item.identifier)+'</span><span class="cardYear">'+escapeHtml(item.year||'Год не указан')+' · '+licenseLabel(item)+'</span>';card.addEventListener('click',()=>openDetail(item));return card;}
 function drawItems(target,items){target.innerHTML='';items.forEach(item=>target.appendChild(makeCard(item)));}
 function updateCatalog(){drawItems($('homeCards'),archiveItems.slice(0,8));drawItems($('catalogGrid'),archiveItems);$('catalogCount').textContent=archiveItems.length+' материалов';const fav=getFavorites();const selected=archiveItems.filter(x=>fav.includes(x.identifier));drawItems($('favoriteGrid'),selected);$('favoriteEmpty').style.display=selected.length?'none':'block';}
-const adultCategoryNames={all:"Все источники",general:"Общее",trans:"Транс",hentai:"Хентай",jav:"JAV",rule34:"Rule 34",fetish:"Фетиш",live:"Трансляции",creator:"Авторы"};
+const adultCategoryNames={all:"Все источники",general:"Общее",trans:"Транс",hentai:"Хентай",jav:"JAV",rule34:"Rule 34",fetish:"Фетиш",live:"Трансляции",creator:"Авторы",type_archive:"Архивы",type_live:"Live-эфиры",type_resolver:"Каталоги ссылок",type_tube:"Видеосайты"};
 async function ensureAdultSources(){
  if(adultCatalogLoaded){renderAdultSources();return;}
  try{
@@ -259,7 +259,7 @@ function renderAdultSources(){
  const host=$("adultProviderGrid");if(!host)return;
  const query=($("adultSearchInput")?.value||"").trim().toLowerCase();
  const filtered=adultSources.filter(item=>{
-  const categoryOk=activeAdultCategory==="all"||(item.categories||[]).includes(activeAdultCategory);
+  const categoryOk=activeAdultCategory==="all"||(item.categories||[]).includes(activeAdultCategory.startsWith("type_")?"type:"+activeAdultCategory.slice(5):activeAdultCategory);
   const text=[item.name,item.id,item.url||"",...(item.categoryLabels||[])].join(" ").toLowerCase();
   return categoryOk&&(!query||text.includes(query));
  });
@@ -269,7 +269,7 @@ function renderAdultSources(){
   const card=document.createElement("button");card.type="button";card.className="adultCard"+(item.enabled?"":" disabled");card.disabled=!item.enabled;
   const domain=item.url?(()=>{try{return new URL(item.url).hostname}catch(_){return item.url}})():"Адрес не подтверждён";
   const cats=(item.categoryLabels||[]).slice(0,2).join(" · ");
-  card.innerHTML='<span class="adultCardName">'+escapeHtml(item.name)+'</span><span class="adultCardMeta">'+escapeHtml(domain)+(cats?" · "+escapeHtml(cats):"")+(item.enabled?"":" · Отключён")+'</span>';
+  card.innerHTML='<span class="adultCardName">'+escapeHtml(item.name)+'</span><span class="adultCardMeta">'+escapeHtml(domain)+(cats?" · "+escapeHtml(cats):"")+(item.enabled?"":" · "+(item.reason||"Отключён"))+'</span>';
   if(item.enabled)card.addEventListener("click",()=>AndroidCinema.openAdultProvider(item.id));
   host.appendChild(card);
  });
