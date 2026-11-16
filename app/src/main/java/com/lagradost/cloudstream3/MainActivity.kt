@@ -1377,6 +1377,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
                 }
 
                 // The provider list is intentionally kept small and focused on films and series.
+                // The Sultan skin is shared by the phone and Android TV layouts.
                 try {
                     // Remove the starter archive provider; the home page will use the film providers below.
                     PluginManager.getPluginsOnline()
