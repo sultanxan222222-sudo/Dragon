@@ -26,6 +26,24 @@ jobs:
       - name: Checkout isolated cinema branch
         uses: actions/checkout@v4
 
+      - name: Validate embedded cinema JavaScript and source catalog JSON
+        run: |
+          python3 - <<'PY'
+          import json
+          import pathlib
+          import re
+          html = pathlib.Path("app/src/main/assets/cinema.html").read_text(encoding="utf-8")
+          scripts = re.findall(r"<script(?:\\s[^>]*)?>(.*?)</script>", html, flags=re.I | re.S)
+          if not scripts:
+              raise SystemExit("No inline JavaScript found in cinema.html")
+          out = pathlib.Path("/tmp/sultan-cinema-js")
+          out.mkdir(exist_ok=True)
+          for index, script in enumerate(scripts):
+              (out / f"script-{index}.js").write_text(script, encoding="utf-8")
+          json.loads(pathlib.Path("app/src/main/assets/adult_sources.json").read_text(encoding="utf-8"))
+          PY
+          for script in /tmp/sultan-cinema-js/*.js; do node --check "$script"; done
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
