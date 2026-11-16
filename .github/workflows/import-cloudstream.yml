@@ -110,7 +110,7 @@ jobs:
                 }
 
                 ioSafe {
-"""
+          """
           new_block = """            ioSafe {
                 ioSafe {
                     // Register the official provider repository on first launch.
@@ -156,7 +156,7 @@ jobs:
                         logError(error)
                     }
 
-"""
+          """
           if old_block not in source:
               raise SystemExit("Could not locate the upstream startup provider-loading block")
           source = source.replace(old_block, new_block, 1)
@@ -169,7 +169,7 @@ jobs:
                     )
                 }
 
-"""
+          """
           add = """                ioSafe {
                     PluginManager.___DO_NOT_CALL_FROM_A_PLUGIN_loadAllLocalPlugins(
                         this@MainActivity,
@@ -186,7 +186,7 @@ jobs:
                     mainPluginsLoadedEvent.invoke(false)
                 }
 
-"""
+          """
           if anchor not in source:
               raise SystemExit("Could not locate the upstream local-provider loading block")
           source = source.replace(anchor, add, 1)
@@ -194,23 +194,23 @@ jobs:
 
           notice = """# Sultan Cinema — source and license notice
 
-This branch is a modified fork of **CloudStream v4.9.1** from
-https://github.com/recloudstream/cloudstream
+          This branch is a modified fork of **CloudStream v4.9.1** from
+          https://github.com/recloudstream/cloudstream
 
-CloudStream is distributed under **GNU General Public License v3.0 (GPL-3.0)**.
-The original LICENSE file, upstream source notices, and license headers are retained.
-This fork changes the installed application label/package identifier and adds
-first-run registration of the official CloudStream extensions repository plus
-automatic installation of its Internet Archive provider.
+          CloudStream is distributed under **GNU General Public License v3.0 (GPL-3.0)**.
+          The original LICENSE file, upstream source notices, and license headers are retained.
+          This fork changes the installed application label/package identifier and adds
+          first-run registration of the official CloudStream extensions repository plus
+          automatic installation of its Internet Archive provider.
 
-The official provider repository is:
-https://github.com/recloudstream/extensions
+          The official provider repository is:
+          https://github.com/recloudstream/extensions
 
-This application is a player, not a streaming host or content provider.
-Availability depends on each source's own catalogue, regional access and rights.
-The upstream CloudStream project and its contributors retain their respective
-copyrights and trademarks.
-"""
+          This application is a player, not a streaming host or content provider.
+          Availability depends on each source's own catalogue, regional access and rights.
+          The upstream CloudStream project and its contributors retain their respective
+          copyrights and trademarks.
+          """
           Path("SULTAN-CINEMA-SOURCE-NOTICE.md").write_text(notice, encoding="utf-8")
           PY
 
