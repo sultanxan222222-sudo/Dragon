@@ -185,6 +185,7 @@ class MainActivity : Activity() {
         val clean = searchText.trim().take(80)
         if (clean.isEmpty()) return base
         val safe = clean.filter { it.isLetterOrDigit() || it.isWhitespace() || it == '-' }
+        if (safe.isBlank()) return base
         return "$base AND title:(\"$safe\")"
     }
 
