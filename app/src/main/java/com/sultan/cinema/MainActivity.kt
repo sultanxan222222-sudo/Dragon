@@ -28,6 +28,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
 
 class MainActivity : Activity() {
     private lateinit var webView: WebView
@@ -42,7 +43,11 @@ class MainActivity : Activity() {
             "Локальная страница не ответила. Проверь целостность установки и попробуй перезапустить загрузку."
         )
     }
-    private val io = Executors.newFixedThreadPool(2)
+    private val io = Executors.newFixedThreadPool(3)
+    private val catalogSearchGeneration = AtomicInteger(0)
+    private val catalogPreferences by lazy {
+        getSharedPreferences("sultan-cinema-catalog", MODE_PRIVATE)
+    }
     private val adultProviderUrls: Map<String, String> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         try {
             val root = JSONObject(assets.open("adult_sources.json").bufferedReader(Charsets.UTF_8).use { it.readText() })
@@ -247,26 +252,178 @@ class MainActivity : Activity() {
     private inner class CinemaBridge {
         @JavascriptInterface
         fun searchArchive(searchText: String) {
+            val cleanSearch = searchText.trim().take(80)
+            val generation = catalogSearchGeneration.incrementAndGet()
             io.execute {
-                try {
-                    val encodedQuery = URLEncoder.encode(buildArchiveQuery(searchText), "UTF-8")
-                    val fields = listOf("identifier", "title", "year", "licenseurl", "description", "creator", "runtime")
-                        .joinToString("") { "&fl%5B%5D=" + URLEncoder.encode(it, "UTF-8") }
-                    val address = "https://archive.org/advancedsearch.php?q=$encodedQuery$fields&rows=100&page=1&output=json&sort%5B%5D=downloads+desc"
-                    val root = JSONObject(readUrl(address))
-                    val docs = root.optJSONObject("response")?.optJSONArray("docs") ?: JSONArray()
-                    val approved = JSONArray()
-                    for (i in 0 until docs.length()) {
-                        val item = docs.optJSONObject(i) ?: continue
-                        val license = item.optString("licenseurl")
-                        if (!isApprovedLicense(license)) continue
-                        approved.put(item)
+                // First paint the last successful catalogue immediately. A slow or unavailable
+                // upstream search must never make the home screen look permanently empty.
+                if (cleanSearch.isEmpty()) {
+                    val cached = readCachedCatalog()
+                    if (cached.length() > 0 && generation == catalogSearchGeneration.get()) {
+                        postResults(cached.toString(), "Показываю сохранённый каталог и обновляю список…")
                     }
-                    postResults(approved.toString())
-                } catch (error: Exception) {
-                    Log.e("SultanCinema", "Archive search failed", error)
-                    postResults("[]", "Каталог временно недоступен. Проверь подключение к интернету.")
                 }
+
+                try {
+                    val approved = searchArchiveCatalog(cleanSearch)
+                    if (generation != catalogSearchGeneration.get()) return@execute
+
+                    if (approved.length() > 0) {
+                        if (cleanSearch.isEmpty()) saveCachedCatalog(approved)
+                        postResults(approved.toString())
+                    } else {
+                        val cached = if (cleanSearch.isEmpty()) readCachedCatalog() else JSONArray()
+                        if (cached.length() > 0) {
+                            postResults(cached.toString(), "Новый список пока недоступен. Показываю сохранённый каталог.")
+                        } else {
+                            postResults("[]", "Источник пока не вернул фильмы с подтверждённой открытой лицензией. Нажми «Повторить поиск».")
+                        }
+                    }
+                } catch (error: Exception) {
+                    Log.e("SultanCinema", "All Archive catalog endpoints failed", error)
+                    if (generation != catalogSearchGeneration.get()) return@execute
+                    val cached = if (cleanSearch.isEmpty()) readCachedCatalog() else JSONArray()
+                    if (cached.length() > 0) {
+                        postResults(cached.toString(), "Не удалось обновить каталог. Показана последняя сохранённая подборка.")
+                    } else {
+                        postResults("[]", "Не удалось подключиться к каталогу. Проверь интернет и нажми «Повторить поиск».")
+                    }
+                }
+            }
+        }
+
+        private fun searchArchiveCatalog(searchText: String): JSONArray {
+            val query = buildArchiveQuery(searchText)
+            var lastError: Exception? = null
+
+            // Current cursor-based Search API first; classic Advanced Search is the fallback.
+            try {
+                val results = searchWithScrapeApi(query)
+                if (results.length() > 0) return results
+            } catch (error: Exception) {
+                lastError = error
+                Log.w("SultanCinema", "Scrape API failed; trying Advanced Search", error)
+            }
+
+            try {
+                val results = searchWithAdvancedApi(query)
+                if (results.length() > 0) return results
+            } catch (error: Exception) {
+                lastError = error
+                Log.w("SultanCinema", "Advanced Search failed; widening catalog search", error)
+            }
+
+            // Some IA index partitions reject license wildcards. Search movies broadly as a
+            // last discovery pass, but still admit only explicitly approved licenses locally.
+            val broadQuery = buildMovieOnlyQuery(searchText)
+            try {
+                val results = searchWithScrapeApi(broadQuery)
+                if (results.length() > 0) return results
+            } catch (error: Exception) {
+                lastError = error
+                Log.w("SultanCinema", "Broad scrape search failed", error)
+            }
+            try {
+                val results = searchWithAdvancedApi(broadQuery)
+                if (results.length() > 0) return results
+            } catch (error: Exception) {
+                lastError = error
+                Log.w("SultanCinema", "Broad Advanced Search failed", error)
+            }
+
+            if (lastError != null) throw IllegalStateException("Все способы поиска каталога завершились ошибкой", lastError)
+            return JSONArray()
+        }
+
+        private fun searchWithScrapeApi(query: String): JSONArray {
+            val found = LinkedHashMap<String, JSONObject>()
+            var cursor: String? = null
+            var page = 0
+            do {
+                val fields = "identifier,title,year,licenseurl,description,creator,runtime"
+                val address = buildString {
+                    append("https://archive.org/services/search/v1/scrape?fields=")
+                    append(URLEncoder.encode(fields, "UTF-8"))
+                    append("&q=")
+                    append(URLEncoder.encode(query, "UTF-8"))
+                    append("&size=100")
+                    if (!cursor.isNullOrBlank()) {
+                        append("&cursor=")
+                        append(URLEncoder.encode(cursor, "UTF-8"))
+                    }
+                }
+                val root = JSONObject(readUrl(address))
+                val items = root.optJSONArray("items")
+                    ?: throw IllegalStateException(root.optString("error", "Search API вернул неожиданный ответ"))
+                addApprovedItems(items, found)
+                cursor = root.optString("cursor").takeIf { it.isNotBlank() && it != "null" }
+                page++
+            } while (!cursor.isNullOrBlank() && page < 4 && found.size < 60)
+
+            return JSONArray().apply { found.values.forEach { put(it) } }
+        }
+
+        private fun searchWithAdvancedApi(query: String): JSONArray {
+            val found = LinkedHashMap<String, JSONObject>()
+            val fields = listOf("identifier", "title", "year", "licenseurl", "description", "creator", "runtime")
+                .joinToString("") { "&fl%5B%5D=" + URLEncoder.encode(it, "UTF-8") }
+            for (page in 1..6) {
+                val address = "https://archive.org/advancedsearch.php?q=" +
+                    URLEncoder.encode(query, "UTF-8") +
+                    fields + "&rows=100&page=$page&output=json&sort%5B%5D=downloads+desc"
+                val root = JSONObject(readUrl(address))
+                val response = root.optJSONObject("response")
+                    ?: throw IllegalStateException(root.optString("error", "Advanced Search вернул неожиданный ответ"))
+                val docs = response.optJSONArray("docs") ?: JSONArray()
+                addApprovedItems(docs, found)
+                if (docs.length() < 100 || found.size >= 60) break
+                val total = response.optInt("numFound", 0)
+                if (total <= page * 100) break
+            }
+            return JSONArray().apply { found.values.forEach { put(it) } }
+        }
+
+        private fun addApprovedItems(items: JSONArray, target: LinkedHashMap<String, JSONObject>) {
+            for (i in 0 until items.length()) {
+                val item = items.optJSONObject(i) ?: continue
+                val identifier = item.optString("identifier")
+                if (!ArchiveLicensePolicy.isSafeIdentifier(identifier)) continue
+                if (!itemHasApprovedLicense(item)) continue
+                target.putIfAbsent(identifier, item)
+            }
+        }
+
+        private fun itemHasApprovedLicense(item: JSONObject): Boolean {
+            val value = item.opt("licenseurl")
+            return when (value) {
+                is JSONArray -> (0 until value.length()).any { isApprovedLicense(value.optString(it)) }
+                else -> isApprovedLicense(value?.toString().orEmpty())
+            }
+        }
+
+        private fun readCachedCatalog(): JSONArray {
+            return try {
+                val raw = catalogPreferences.getString("approved_items", null) ?: return JSONArray()
+                val stored = JSONArray(raw)
+                val valid = JSONArray()
+                for (i in 0 until stored.length()) {
+                    val item = stored.optJSONObject(i) ?: continue
+                    if (ArchiveLicensePolicy.isSafeIdentifier(item.optString("identifier")) && itemHasApprovedLicense(item)) {
+                        valid.put(item)
+                    }
+                }
+                valid
+            } catch (error: Exception) {
+                Log.w("SultanCinema", "Could not read cached catalog", error)
+                JSONArray()
+            }
+        }
+
+        private fun saveCachedCatalog(items: JSONArray) {
+            try {
+                catalogPreferences.edit().putString("approved_items", items.toString()).apply()
+            } catch (error: Exception) {
+                Log.w("SultanCinema", "Could not save catalog cache", error)
             }
         }
 
@@ -346,36 +503,56 @@ class MainActivity : Activity() {
     }
 
     private fun buildArchiveQuery(searchText: String): String {
-        val publicDomain = "(licenseurl:\"http://creativecommons.org/publicdomain/mark/1.0/\" OR licenseurl:\"https://creativecommons.org/publicdomain/mark/1.0/\")"
-        val cc0 = "(licenseurl:\"http://creativecommons.org/publicdomain/zero/1.0/\" OR licenseurl:\"https://creativecommons.org/publicdomain/zero/1.0/\")"
-        val base = "mediatype:movies AND ${ArchiveLicensePolicy.searchClause()}"
+        val base = buildMovieOnlyQuery(searchText)
+        return "$base AND ${ArchiveLicensePolicy.searchClause()}"
+    }
+
+    private fun buildMovieOnlyQuery(searchText: String): String {
+        val base = "mediatype:movies"
         val clean = searchText.trim().take(80)
         if (clean.isEmpty()) return base
         val safe = clean.filter { it.isLetterOrDigit() || it.isWhitespace() || it == '-' }
         if (safe.isBlank()) return base
-        return "$base AND title:(\"$safe\")"
+        return "$base AND title:\"$safe\""
     }
 
     private fun isApprovedLicense(value: String): Boolean =
         ArchiveLicensePolicy.isApproved(value)
 
     private fun readUrl(address: String): String {
-        val connection = (URL(address).openConnection() as HttpURLConnection).apply {
-            requestMethod = "GET"
-            connectTimeout = 12000
-            readTimeout = 18000
-            setRequestProperty("User-Agent", "SultanCinema/0.1 (Android TV)")
-            setRequestProperty("Accept", "application/json")
+        var lastError: Exception? = null
+        for (attempt in 0..2) {
+            val connection = (URL(address).openConnection() as HttpURLConnection).apply {
+                requestMethod = "GET"
+                connectTimeout = 15000
+                readTimeout = 20000
+                instanceFollowRedirects = true
+                useCaches = false
+                setRequestProperty("User-Agent", "SultanCinema/0.2 AndroidTV")
+                setRequestProperty("Accept", "application/json")
+            }
+            try {
+                val code = connection.responseCode
+                val stream = if (code in 200..299) connection.inputStream else connection.errorStream
+                val body = stream?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }.orEmpty()
+                if (code in 200..299) return body
+                val error = IllegalStateException("Источник вернул HTTP $code: ${body.take(240)}")
+                lastError = error
+                if (code !in 429..599 || attempt == 2) throw error
+            } catch (error: Exception) {
+                lastError = error
+                if (attempt == 2) throw error
+            } finally {
+                connection.disconnect()
+            }
+            try {
+                Thread.sleep(450L * (1L shl attempt))
+            } catch (interrupted: InterruptedException) {
+                Thread.currentThread().interrupt()
+                throw IllegalStateException("Поиск каталога отменён", interrupted)
+            }
         }
-        return try {
-            val code = connection.responseCode
-            val stream = if (code in 200..299) connection.inputStream else connection.errorStream
-            val body = stream.bufferedReader(Charsets.UTF_8).use { it.readText() }
-            if (code !in 200..299) throw IllegalStateException("Источник вернул HTTP $code")
-            body
-        } finally {
-            connection.disconnect()
-        }
+        throw lastError ?: IllegalStateException("Источник не ответил")
     }
 
     private fun postResults(json: String, error: String? = null) {
