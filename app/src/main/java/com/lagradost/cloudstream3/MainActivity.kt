@@ -1362,73 +1362,76 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
             }
         } else if (lastError == null) {
             ioSafe {
-                DataStoreHelper.currentHomePage?.let { homeApi ->
-                    mainPluginsLoadedEvent.invoke(loadSinglePlugin(this@MainActivity, homeApi))
-                } ?: run {
-                    mainPluginsLoadedEvent.invoke(false)
+                // Remove the placeholder Archive source added by the first prototype build.
+                val previousPublicRepoUrl = "https://raw.githubusercontent.com/recloudstream/extensions/master/repo.json"
+                val sultanCinemaRepo = RepositoryData(
+                    "Кинотеатр Султана — фильмы и сериалы",
+                    "https://raw.githubusercontent.com/sultanxan222222-sudo/Dragon/sultan-cloudstream/cinema-providers/repo.json"
+                )
+                val savedRepos = getKey<Array<RepositoryData>>(REPOSITORIES_KEY) ?: emptyArray()
+                val cleanedRepos = savedRepos.filterNot { it.url == previousPublicRepoUrl }
+                val updatedRepos = if (cleanedRepos.any { it.url == sultanCinemaRepo.url }) {
+                    cleanedRepos
+                } else {
+                    cleanedRepos + sultanCinemaRepo
+                }
+                if (updatedRepos.size != savedRepos.size || updatedRepos.none { it.url == sultanCinemaRepo.url }) {
+                    setKey(REPOSITORIES_KEY, updatedRepos)
                 }
 
-                ioSafe {
-                    // Add the official provider repository to the extension manager.
-                    val sultanArchiveRepo = RepositoryData(
-                        "CloudStream public providers",
-                        "https://raw.githubusercontent.com/recloudstream/extensions/master/repo.json"
-                    )
-                    val savedRepos = getKey<Array<RepositoryData>>(REPOSITORIES_KEY) ?: emptyArray()
-                    if (savedRepos.none { it.url == sultanArchiveRepo.url }) {
-                        setKey(REPOSITORIES_KEY, savedRepos + sultanArchiveRepo)
-                    }
+                try {
+                    // Remove the starter archive provider; the home page will use the film providers below.
+                    PluginManager.getPluginsOnline()
+                        .filter { it.internalName.equals("InternetArchiveProvider", true) }
+                        .forEach { plugin -> PluginManager.deletePlugin(java.io.File(plugin.filePath)) }
 
-                    // Install the official Internet Archive plugin, validating its published hash.
-                    try {
-                        val archiveAlreadyInstalled = PluginManager.getPluginsOnline().any { it.internalName.equals("InternetArchiveProvider", true) }
-                        if (!archiveAlreadyInstalled) {
-                            val archivePlugin = RepositoryManager.getRepoPlugins(sultanArchiveRepo)?.firstOrNull {
-                                it.plugin.internalName.equals("InternetArchiveProvider", true) && it.plugin.status > 0
-                            }
-                            if (archivePlugin != null) {
-                                val installed = PluginManager.downloadPlugin(
-                                    this@MainActivity,
-                                    archivePlugin.plugin.url,
-                                    archivePlugin.plugin.fileHash,
-                                    archivePlugin.plugin.internalName,
-                                    sultanArchiveRepo.url,
-                                    true
-                                )
-                                if (!installed) Log.w("SultanCinema", "Could not install the Internet Archive provider")
-                            }
+                    val curatedNames = listOf(
+                        "HDrezkaProvider",
+                        "OK",
+                        "CineStream",
+                        "UakinoProvider",
+                        "KinoTronProvider"
+                    )
+                    val remoteProviders = RepositoryManager.getRepoPlugins(sultanCinemaRepo).orEmpty()
+                    for (providerName in curatedNames) {
+                        val alreadyInstalled = PluginManager.getPluginsOnline().any {
+                            it.internalName.equals(providerName, true)
                         }
-                    } catch (error: Throwable) {
-                        logError(error)
-                    }
-                    if (PluginManager.getPluginsOnline().any { it.internalName.equals("InternetArchiveProvider", true) } && DataStoreHelper.currentHomePage == null) {
-                        DataStoreHelper.currentHomePage = "Internet Archive"
-                    }
-                    if (settingsManager.getBoolean(
-                            getString(R.string.auto_update_plugins_key),
+                        if (alreadyInstalled) continue
+
+                        val provider = remoteProviders.firstOrNull {
+                            it.plugin.internalName.equals(providerName, true) && it.plugin.status > 0
+                        }
+                        if (provider == null) {
+                            Log.w("SultanCinema", "Provider is not available in the current catalogue: $providerName")
+                            continue
+                        }
+                        val installed = PluginManager.downloadPlugin(
+                            this@MainActivity,
+                            provider.plugin.url,
+                            provider.plugin.fileHash,
+                            provider.plugin.internalName,
+                            sultanCinemaRepo.url,
                             true
                         )
-                    ) {
-                        PluginManager.___DO_NOT_CALL_FROM_A_PLUGIN_updateAllOnlinePluginsAndLoadThem(
-                            this@MainActivity
-                        )
-                    } else {
-                        ___DO_NOT_CALL_FROM_A_PLUGIN_loadAllOnlinePlugins(this@MainActivity)
+                        if (!installed) {
+                            Log.w("SultanCinema", "Could not install provider: $providerName")
+                        }
                     }
+                } catch (error: Throwable) {
+                    logError(error)
+                }
 
-                    //Automatically download not existing plugins, using mode specified.
-                    /*val autoDownloadPlugin = AutoDownloadMode.getEnum(
-                        settingsManager.getInt(
-                            getString(R.string.auto_download_plugins_key),
-                            0
-                        )
-                    ) ?: AutoDownloadMode.Disable
-                    if (autoDownloadPlugin != AutoDownloadMode.Disable) {
-                        PluginManager.___DO_NOT_CALL_FROM_A_PLUGIN_downloadNotExistingPluginsAndLoad(
-                            this@MainActivity,
-                            autoDownloadPlugin
-                        )
-                    }*/
+                if (settingsManager.getBoolean(
+                        getString(R.string.auto_update_plugins_key),
+                        true
+                    )
+                ) {
+                    PluginManager.___DO_NOT_CALL_FROM_A_PLUGIN_updateAllOnlinePluginsAndLoadThem(
+                        this@MainActivity
+                    )
+                } else {
+                    ___DO_NOT_CALL_FROM_A_PLUGIN_loadAllOnlinePlugins(this@MainActivity)
                 }
 
                 ioSafe {
@@ -1438,11 +1441,18 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
                     )
                 }
 
-                DataStoreHelper.currentHomePage?.let { homeApi ->
-                    mainPluginsLoadedEvent.invoke(loadSinglePlugin(this@MainActivity, homeApi))
-                } ?: run {
-                    mainPluginsLoadedEvent.invoke(false)
+                // Prefer the Russian-language HDrezka source as the first home catalogue.
+                val hdrezkaHome = apis.firstOrNull { it.name.contains("HDrezka", ignoreCase = true) }?.name
+                if (DataStoreHelper.currentHomePage.isNullOrBlank() ||
+                    DataStoreHelper.currentHomePage.equals("Internet Archive", ignoreCase = true)
+                ) {
+                    if (hdrezkaHome != null) DataStoreHelper.currentHomePage = hdrezkaHome
                 }
+
+                val homeLoaded = DataStoreHelper.currentHomePage?.let { homeApi ->
+                    loadSinglePlugin(this@MainActivity, homeApi)
+                } ?: false
+                mainPluginsLoadedEvent.invoke(homeLoaded)
 
 // Add your channel creation here
 

@@ -106,7 +106,7 @@ android {
         applicationId = "com.sultan.cinema"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 80
+        versionCode = 81
         versionName = libs.versions.versionName.get()
 
         manifestPlaceholders["target_sdk_version"] = libs.versions.targetSdk.get()

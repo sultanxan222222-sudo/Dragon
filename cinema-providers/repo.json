@@ -1,0 +1,9 @@
+{
+  "iconUrl": null,
+  "name": "Кинотеатр Султана — фильмы и сериалы",
+  "description": "Подборка кино-источников для фильмов, сериалов, аниме и мультфильмов.",
+  "manifestVersion": 1,
+  "pluginLists": [
+    "https://raw.githubusercontent.com/sultanxan222222-sudo/Dragon/sultan-cloudstream/cinema-providers/plugins.json"
+  ]
+}

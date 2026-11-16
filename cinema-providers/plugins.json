@@ -1,0 +1,115 @@
+[
+  {
+    "iconUrl": "https://www.google.com/s2/favicons?domain=rezka.ag&sz=%size%",
+    "fileHash": "sha256-c041bc3c5f50ef029261885831258ef09f75cabc09f54ae3fbd251a86e082e32",
+    "apiVersion": 1,
+    "repositoryUrl": "https://github.com/admknight/CloudstreamExtensions",
+    "fileSize": 59357,
+    "status": 1,
+    "language": "ru",
+    "authors": [
+      "Adam Knight (Maintainer)"
+    ],
+    "tvTypes": [
+      "AsianDrama",
+      "Anime",
+      "TvSeries",
+      "Movie"
+    ],
+    "version": 35,
+    "internalName": "HDrezkaProvider",
+    "url": "https://raw.githubusercontent.com/NivinCNC/CNCVerse-Cloud-Stream-Extension/builds/HDrezkaProvider.cs3",
+    "name": "[Movies] HDrezkaProvider"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Kraptor123/Cs-Karma/1037ea80656effaf59a4d8df7e926dfe89cc5240/OK.cs3",
+    "status": 1,
+    "version": 9,
+    "name": "[Movies] OK",
+    "internalName": "OK",
+    "authors": [
+      "Adam Knight (Maintainer)"
+    ],
+    "description": "OKRU Videos.",
+    "fileSize": 68008,
+    "repositoryUrl": "https://github.com/admknight/CloudstreamExtensions",
+    "language": "ru",
+    "tvTypes": [
+      "Movie",
+      "TvSeries"
+    ],
+    "iconUrl": "https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://ok.ru/video/c12842395&size=128",
+    "apiVersion": 1,
+    "fileHash": "sha256-91b4686bd7c505b7a97ad3676add3c4c43114d166ba8caabebceaaeef9f81bcd"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/SaurabhKaperwan/CSX/builds/CineStream.cs3",
+    "status": 1,
+    "version": 487,
+    "name": "[Movies] CineStream",
+    "internalName": "CineStream",
+    "authors": [
+      "Adam Knight (Maintainer)"
+    ],
+    "description": "One stop solution for Movies, Series, Anime, AsianDrama and Torrents",
+    "fileSize": 695013,
+    "repositoryUrl": "https://github.com/admknight/CloudstreamExtensions",
+    "language": "en",
+    "tvTypes": [
+      "TvSeries",
+      "Movie",
+      "AsianDrama",
+      "Anime",
+      "Torrent"
+    ],
+    "iconUrl": "https://github.com/SaurabhKaperwan/CSX/raw/refs/heads/master/CineStream/icon.png",
+    "apiVersion": 1,
+    "fileHash": "sha256-30dc643628702d6b2fe139339e59996783c95a0c1d41efe0a31872ae4d10908b"
+  },
+  {
+    "iconUrl": "https://www.google.com/s2/favicons?domain=uakino.club&sz=%size%",
+    "fileHash": "sha256-bed2490e90a24b564ac19efd457e1d107bd7806343cd74f9f98348acaa65c13c",
+    "apiVersion": 1,
+    "repositoryUrl": "https://github.com/admknight/CloudstreamExtensions",
+    "fileSize": 47325,
+    "status": 1,
+    "language": "uk",
+    "authors": [
+      "Adam Knight (Maintainer)"
+    ],
+    "tvTypes": [
+      "Anime",
+      "TvSeries",
+      "Movie",
+      "AsianDrama"
+    ],
+    "version": 32,
+    "internalName": "UakinoProvider",
+    "description": "Дивіться фільми та серіали онлайн в HD якості. У нас можна дивитися кіно онлайн безкоштовно, у високій якості та з якісним українським дубляжем.",
+    "url": "https://raw.githubusercontent.com/CakesTwix/cloudstream-extensions-uk/builds/UakinoProvider.cs3",
+    "name": "[Movies] UakinoProvider"
+  },
+  {
+    "iconUrl": "https://www.google.com/s2/favicons?domain=kinotron.top&sz=%size%",
+    "fileHash": "sha256-3a099e9ae79f040f6594a6a693f988d5e3131761c76a6685f0a4bad2c7512ab2",
+    "apiVersion": 1,
+    "repositoryUrl": "https://github.com/admknight/CloudstreamExtensions",
+    "fileSize": 22204,
+    "status": 1,
+    "language": "uk",
+    "authors": [
+      "Adam Knight (Maintainer)"
+    ],
+    "tvTypes": [
+      "Cartoon",
+      "TvSeries",
+      "Movie",
+      "Anime"
+    ],
+    "version": 17,
+    "internalName": "KinoTronProvider",
+    "description": "Твій KinoTron, де фільми завжди українською.",
+    "url": "https://raw.githubusercontent.com/CakesTwix/cloudstream-extensions-uk/builds/KinoTronProvider.cs3",
+    "name": "[Movies] KinoTronProvider"
+  }
+]
