@@ -89,6 +89,24 @@ button{color:inherit;cursor:pointer}
 .ageLine{display:flex;gap:9px;align-items:center;color:#c7bba7;font-size:12px;margin-top:15px}
 #toast{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);background:#251d1c;border:1px solid #d6ae6166;border-radius:20px;padding:10px 17px;color:#ecd7ab;font-size:12px;z-index:40;opacity:0;transition:opacity .2s;pointer-events:none}
 #toast.show{opacity:1}
+
+#adultScreen{display:none;flex:1;min-height:0;overflow:hidden;flex-direction:column}
+.adultNotice{font-size:11px;line-height:1.5;color:#bdaf98;border:1px solid #d6ae6130;background:#161317;border-radius:8px;padding:10px 13px;margin:0 0 12px}
+.adultToolbar{display:flex;gap:12px;align-items:center;margin:3px 0 11px}
+.adultToolbar .search{max-width:none}
+.adultCategories{display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;padding:2px 2px 10px;scrollbar-width:none}
+.adultCategories::-webkit-scrollbar{display:none}
+.adultChip{flex:0 0 auto;border:1px solid #d6ae6138;background:#19171a;color:#c9bda8;border-radius:18px;padding:8px 13px;font-size:11px}
+.adultChip.active,.adultChip:focus{outline:2px solid #f0d391;outline-offset:1px;background:#3a2b1c;color:#ffe7b2}
+.adultGrid{display:grid;grid-template-columns:repeat(5,minmax(125px,1fr));gap:10px;overflow-y:auto;min-height:0;flex:1;padding:3px 4px 18px;scrollbar-width:thin;scrollbar-color:#8d6c38 #151519}
+.adultCard{min-width:0;min-height:86px;text-align:left;border:1px solid #d6ae6138;background:linear-gradient(145deg,#1c181a,#111216);border-radius:8px;padding:12px;display:flex;flex-direction:column;justify-content:space-between;gap:9px;transition:background .2s,border .2s,box-shadow .2s}
+.adultCard:focus{outline:2px solid #f0d391;outline-offset:1px;border-color:#f0d391;box-shadow:0 0 14px #d6ae6144}
+.adultCard.disabled{opacity:.38;cursor:default;border-style:dashed}
+.adultCardName{font:500 14px Georgia,serif;color:#f2dfb9;line-height:1.2}
+.adultCardMeta{font-size:10px;color:#a99b84;line-height:1.35;overflow-wrap:anywhere}
+.adultEmpty{padding:22px 5px;color:#a99a85;font-size:13px}
+@media(max-width:900px){.adultGrid{grid-template-columns:repeat(3,minmax(110px,1fr))}}
+
 @media(max-width:900px){#main{grid-template-columns:170px 1fr}.sidebar{padding:24px 12px}.content{padding:25px 22px}.catalogGrid{grid-template-columns:repeat(4,minmax(100px,1fr))}.hero{height:220px}.heroMark{right:4%;transform:scale(.8)}}
 </style>
 </head>
@@ -186,7 +204,13 @@ button{color:inherit;cursor:pointer}
         <div id="catalogGrid" class="catalogGrid"></div>
       </section>
       <section id="favoritesScreen"><div class="sectionHead"><h2>Избранное</h2><span>Сохранено на этом устройстве</span></div><div id="favoriteGrid" class="catalogGrid"></div><div id="favoriteEmpty">Пока ничего не добавлено.</div></section>
-      <section id="adultScreen" style="display:none;flex:1;min-height:0"><div class="sectionHead"><h2>Закрытая коллекция 18+</h2><span>Доступ подтверждён</span></div><div class="hero" style="height:auto;min-height:210px"><div class="heroCopy" style="max-width:78%"><div class="eyebrow">ПРИВАТНЫЙ РАЗДЕЛ</div><h1>Коллекция ещё не подключена</h1><p>Этот раздел пока закрыт для просмотра: сюда будут добавляться только материалы от законных поставщиков, с проверенными правами распространения и возрастной маркировкой. Сейчас видео здесь нет.</p></div></div></section>
+      <section id="adultScreen">
+        <div class="sectionHead" style="margin-top:4px"><h2>Закрытый каталог 18+</h2><span id="adultCount">Загружаю список источников…</span></div>
+        <div class="adultNotice">Здесь собраны внешние сайты из каталогов AdultHideout и Hedon Haven. Открытие выполняется на сайте-источнике. Каталог не скачивает ролики и не извлекает прямые видеопотоки; права и возрастные ограничения проверяются у самого поставщика.</div>
+        <div class="adultToolbar"><input id="adultSearchInput" class="search" type="search" placeholder="Найти сайт по названию…" autocomplete="off"></div>
+        <div id="adultCategories" class="adultCategories"></div>
+        <div id="adultProviderGrid" class="adultGrid"><div class="adultEmpty">Подключаю справочник источников…</div></div>
+      </section>
     </main>
   </div>
   <div id="detail"><div class="dialog"><div class="eyebrow">КАРТОЧКА КОЛЛЕКЦИИ</div><h2 id="detailTitle"></h2><p id="detailDescription"></p><p id="detailMeta"></p><p id="detailLicense" class="licenseNote"></p><div class="dialogActions"><button id="playButton" class="goldButton">Смотреть</button><button id="favButton" class="secondary">☆ В избранное</button><button id="sourceButton" class="secondary">Источник</button><button id="closeDetail" class="secondary">Назад</button></div></div></div>
@@ -196,6 +220,7 @@ button{color:inherit;cursor:pointer}
 <script>
 const $=id=>document.getElementById(id);
 let archiveItems=[],selectedItem=null,pin='',unlockedAdult=false,audioCtx=null,introDone=false,toastTimer=null;
+let adultSources=[],activeAdultCategory="all",adultCatalogLoaded=false;
 const FAVORITES_KEY='sultan-cinema-favorites-v1';
 function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function showToast(text){const t=$('toast');t.textContent=text;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2300);}
@@ -206,11 +231,57 @@ function licenseLabel(item){return /zero\/1\.0/i.test(item.licenseurl||'')?'CC0 
 function makeCard(item){const card=document.createElement('button');card.className='card';card.type='button';card.innerHTML='<img class="poster" loading="lazy" src="'+imageUrl(item)+'" alt=""><span class="cardTitle">'+escapeHtml(item.title||item.identifier)+'</span><span class="cardYear">'+escapeHtml(item.year||'Год не указан')+' · '+licenseLabel(item)+'</span>';card.addEventListener('click',()=>openDetail(item));return card;}
 function drawItems(target,items){target.innerHTML='';items.forEach(item=>target.appendChild(makeCard(item)));}
 function updateCatalog(){drawItems($('homeCards'),archiveItems.slice(0,8));drawItems($('catalogGrid'),archiveItems);$('catalogCount').textContent=archiveItems.length+' материалов';const fav=getFavorites();const selected=archiveItems.filter(x=>fav.includes(x.identifier));drawItems($('favoriteGrid'),selected);$('favoriteEmpty').style.display=selected.length?'none':'block';}
+const adultCategoryNames={all:"Все источники",general:"Общее",trans:"Транс",hentai:"Хентай",jav:"JAV",rule34:"Rule 34",fetish:"Фетиш",live:"Трансляции",creator:"Авторы"};
+async function ensureAdultSources(){
+ if(adultCatalogLoaded){renderAdultSources();return;}
+ try{
+  const response=await fetch("adult_sources.json",{cache:"no-store"});
+  if(!response.ok)throw new Error("HTTP "+response.status);
+  const data=await response.json();
+  adultSources=Array.isArray(data.sources)?data.sources:[];
+  adultCatalogLoaded=true;
+  renderAdultCategories();
+  renderAdultSources();
+ }catch(error){
+  $("adultCount").textContent="Не удалось загрузить каталог";
+  $("adultProviderGrid").innerHTML='<div class="adultEmpty">Справочник не загрузился. Закрой и открой раздел ещё раз.</div>';
+ }
+}
+function renderAdultCategories(){
+ const host=$("adultCategories");host.innerHTML="";
+ Object.entries(adultCategoryNames).forEach(([id,label])=>{
+  const b=document.createElement("button");b.type="button";b.className="adultChip"+(activeAdultCategory===id?" active":"");b.textContent=label;
+  b.addEventListener("click",()=>{activeAdultCategory=id;renderAdultCategories();renderAdultSources();});
+  host.appendChild(b);
+ });
+}
+function renderAdultSources(){
+ const host=$("adultProviderGrid");if(!host)return;
+ const query=($("adultSearchInput")?.value||"").trim().toLowerCase();
+ const filtered=adultSources.filter(item=>{
+  const categoryOk=activeAdultCategory==="all"||(item.categories||[]).includes(activeAdultCategory);
+  const text=[item.name,item.id,item.url||"",...(item.categoryLabels||[])].join(" ").toLowerCase();
+  return categoryOk&&(!query||text.includes(query));
+ });
+ host.innerHTML="";
+ if(!filtered.length){host.innerHTML='<div class="adultEmpty">По этому запросу источников нет.</div>';return;}
+ filtered.forEach(item=>{
+  const card=document.createElement("button");card.type="button";card.className="adultCard"+(item.enabled?"":" disabled");card.disabled=!item.enabled;
+  const domain=item.url?(()=>{try{return new URL(item.url).hostname}catch(_){return item.url}})():"Адрес не подтверждён";
+  const cats=(item.categoryLabels||[]).slice(0,2).join(" · ");
+  card.innerHTML='<span class="adultCardName">'+escapeHtml(item.name)+'</span><span class="adultCardMeta">'+escapeHtml(domain)+(cats?" · "+escapeHtml(cats):"")+(item.enabled?"":" · Отключён")+'</span>';
+  if(item.enabled)card.addEventListener("click",()=>AndroidCinema.openAdultProvider(item.id));
+  host.appendChild(card);
+ });
+ const enabled=filtered.filter(x=>x.enabled).length;
+ $("adultCount").textContent=enabled+" доступно · "+filtered.length+" в текущем списке";
+}
+$("adultSearchInput").addEventListener("input",renderAdultSources);
 window.onArchiveResults=(json,error)=>{try{archiveItems=Array.isArray(json)?json:JSON.parse(json||'[]');}catch(_){archiveItems=[];}updateCatalog();$('status').textContent=error||('Найдено: '+archiveItems.length);if(error)showToast(error);else if(!archiveItems.length)showToast('В открытой коллекции пока нет совпадений');};
 function openSearch(query){$('searchInput').value=query||'';showPage('catalog');$('searchInput').focus();if(query)AndroidCinema.searchArchive(query);}
 function openDetail(item){selectedItem=item;$('detailTitle').textContent=item.title||item.identifier;$('detailDescription').textContent=(item.description||'Описание не предоставлено архивом.').replace(/<[^>]*>/g,' ').slice(0,580);$('detailMeta').textContent=[item.year,item.creator,item.runtime?item.runtime+' мин.':null].filter(Boolean).join(' · ');$('detailLicense').textContent='Лицензия: '+licenseLabel(item)+' · источник: Internet Archive';$('favButton').textContent=getFavorites().includes(item.identifier)?'★ В избранном':'☆ В избранное';$('detail').style.display='flex';$('playButton').focus();}
 function closeDetail(){ $('detail').style.display='none';selectedItem=null;}
-function showPage(page){document.querySelectorAll('.nav').forEach(b=>{b.classList.toggle('active',b.dataset.page===page);});$('homeScreen').style.display=page==='home'?'block':'none';$('catalogScreen').style.display=page==='catalog'?'flex':'none';$('favoritesScreen').style.display=page==='favorites'?'block':'none';$('adultScreen').style.display=page==='adult'&&unlockedAdult?'block':'none';if(page==='search'){showPage('catalog');$('searchInput').focus();return;}if(page==='adult'){if(unlockedAdult){$('adultScreen').style.display='block';}else openPinGate();return;}}
+function showPage(page){document.querySelectorAll('.nav').forEach(b=>{b.classList.toggle('active',b.dataset.page===page);});$('homeScreen').style.display=page==='home'?'block':'none';$('catalogScreen').style.display=page==='catalog'?'flex':'none';$('favoritesScreen').style.display=page==='favorites'?'block':'none';$('adultScreen').style.display=page==='adult'&&unlockedAdult?'block':'none';if(page==='search'){showPage('catalog');$('searchInput').focus();return;}if(page==='adult'){if(unlockedAdult){$('adultScreen').style.display='flex';ensureAdultSources();}else openPinGate();return;}}
 function openPinGate(){pin='';$('pinDots').textContent='○ ○ ○';$('ageConfirm').checked=false;$('pinGate').style.display='flex';buildPinGrid();$('pinCancel').focus();}
 function buildPinGrid(){const grid=$('pinGrid');grid.innerHTML='';['1','2','3','4','5','6','7','8','9','⌫','0','С'].forEach(k=>{const b=document.createElement('button');b.className='pinKey';b.textContent=k;b.addEventListener('click',()=>{if(k==='⌫')pin=pin.slice(0,-1);else if(k==='С')pin='';else if(pin.length<3)pin+=k;$('pinDots').textContent=pin.padEnd(3,'○').split('').join(' ');});grid.appendChild(b);});}
 function finishIntro(){if(introDone)return;introDone=true;$('intro').style.display='none';$('app').style.display='block';$('main').classList.add('ready');$('main').querySelector('.nav').focus();if(window.AndroidCinema)AndroidCinema.searchArchive('');}
@@ -222,7 +293,7 @@ $('skip').addEventListener('click',()=>finishIntro());$('heroBrowse').addEventLi
 $('playButton').addEventListener('click',()=>{if(selectedItem)AndroidCinema.openArchiveItem(selectedItem.identifier,selectedItem.title||selectedItem.identifier);});
 $('favButton').addEventListener('click',()=>{if(!selectedItem)return;let ids=getFavorites();if(ids.includes(selectedItem.identifier))ids=ids.filter(x=>x!==selectedItem.identifier);else ids.push(selectedItem.identifier);setFavorites(ids);$('favButton').textContent=ids.includes(selectedItem.identifier)?'★ В избранном':'☆ В избранное';updateCatalog();});
 $('sourceButton').addEventListener('click',()=>{if(selectedItem)AndroidCinema.openExternalSource('https://archive.org/details/'+encodeURIComponent(selectedItem.identifier));});$('closeDetail').addEventListener('click',closeDetail);
-$('pinCancel').addEventListener('click',()=>{$('pinGate').style.display='none';showPage('home');});$('pinEnter').addEventListener('click',()=>{if(pin==='123'&&$('ageConfirm').checked){unlockedAdult=true;$('pinGate').style.display='none';showPage('adult');showToast('Раздел открыт на время этого запуска');}else showToast('Проверь код и подтверждение возраста');});
+$('pinCancel').addEventListener('click',()=>{$('pinGate').style.display='none';showPage('home');});$('pinEnter').addEventListener('click',()=>{if(pin==='123'&&$('ageConfirm').checked){unlockedAdult=true;$('pinGate').style.display='none';showPage('adult');ensureAdultSources();showToast('Раздел открыт на время этого запуска');}else showToast('Проверь код и подтверждение возраста');});
 document.querySelectorAll('.nav').forEach(b=>{b.addEventListener('click',()=>showPage(b.dataset.page));b.addEventListener('focus',()=>playComicYelp());});
 let secretTapCount=0,secretTapTimer=null;$('brandSecret').addEventListener('click',()=>{secretTapCount++;clearTimeout(secretTapTimer);secretTapTimer=setTimeout(()=>secretTapCount=0,2500);if(secretTapCount>=7){secretTapCount=0;openPinGate();}});
 document.addEventListener('keydown',e=>{unlockAudio();if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)){const current=document.activeElement;const visible=[...document.querySelectorAll('button:not([disabled]),input:not([disabled])')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden');const cr=current.getBoundingClientRect();const cx=cr.left+cr.width/2,cy=cr.top+cr.height/2;const dir=e.key;const candidates=visible.filter(el=>el!==current).map(el=>{const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,dx=x-cx,dy=y-cy;const primary=dir==='ArrowRight'?dx:dir==='ArrowLeft'?-dx:dir==='ArrowDown'?dy:-dy;const secondary=dir==='ArrowRight'||dir==='ArrowLeft'?Math.abs(dy):Math.abs(dx);return {el,primary,score:primary+secondary*2.1};}).filter(v=>v.primary>2).sort((a,b)=>a.score-b.score);if(candidates.length){candidates[0].el.focus();e.preventDefault();}}if(e.key==='Escape'||e.key==='Backspace'){if($('detail').style.display==='flex'){closeDetail();e.preventDefault();}else if($('pinGate').style.display==='flex'){$('pinGate').style.display='none';e.preventDefault();}else if($('catalogScreen').style.display!=='none'){showPage('home');e.preventDefault();}else if(!introDone)finishIntro();}else if(e.key==='Enter'&&!introDone){finishIntro();}});
