@@ -462,24 +462,14 @@ class MainActivity : Activity() {
                         throw IllegalStateException("У этой записи не подтверждена свободная лицензия")
                     }
 
-                    data class ArchiveVideo(
-                        val rank: Long,
-                        val fileName: String,
-                        val identity: String,
-                        val displayTitle: String
-                    )
-
                     val files = record.optJSONArray("files") ?: JSONArray()
                     val playableExtensions = setOf("mp4", "m4v", "mov", "mkv", "webm", "ogv", "ogg", "avi")
-                    val candidates = ArrayList<ArchiveVideo>()
+                    val candidates = ArrayList<Triple<Long, String, String>>()
                     for (i in 0 until files.length()) {
                         val file = files.optJSONObject(i) ?: continue
                         val name = file.optString("name")
                         if (name.isBlank() || name.startsWith("__ia_thumb")) continue
                         if (file.optString("private").equals("true", true)) continue
-                        if (name.contains("sample", true) || name.contains("thumbnail", true) ||
-                            name.contains("trailer", true) || name.contains("preview", true)) continue
-
                         val extension = name.substringAfterLast('.', "").lowercase()
                         val format = file.optString("format")
                         val supportedFormat = format.contains("MPEG", true) ||
@@ -491,54 +481,26 @@ class MainActivity : Activity() {
                             format.contains("QuickTime", true) ||
                             format.contains("AVI", true)
                         if (extension !in playableExtensions && !supportedFormat) continue
-
-                        // Archive lists alternate encodings as separate files. Use the
-                        // original filename when supplied, otherwise normalize common
-                        // resolution/bitrate suffixes so they collapse into one episode.
-                        val original = file.optString("original").takeIf { it.isNotBlank() } ?: name
-                        val identity = original.substringAfterLast('/').substringBeforeLast('.')
-                            .replace(Regex("(?i)([_ .-]?512kb)$"), "")
-                            .replace(Regex("(?i)([_ .-]?(2160|1440|1080|720|480|360)p)$"), "")
-                            .replace(Regex("[._-]+"), " ")
-                            .trim()
-                            .lowercase()
-                            .ifBlank { name.substringAfterLast('/').substringBeforeLast('.').lowercase() }
+                        if (name.contains("sample", true) || name.contains("thumbnail", true)) continue
 
                         val height = file.optString("height").toLongOrNull() ?: 0L
                         val width = file.optString("width").toLongOrNull() ?: 0L
                         val size = file.optString("size").toLongOrNull()?.coerceAtMost(4_000_000_000L) ?: 0L
                         val rank = (height.coerceAtMost(4320L) * 1_000_000L) +
                             (width.coerceAtMost(7680L) * 100L) + (size / 10_000L)
-                        val label = file.optString("title").takeIf { it.isNotBlank() }
-                            ?: name.substringAfterLast('/').substringBeforeLast('.')
-                                .replace('_', ' ').replace('-', ' ').trim()
-                        candidates.add(ArchiveVideo(rank, name, identity, label))
+                        candidates.add(Triple(rank, name, format))
                     }
 
-                    // Keep one highest-quality file per distinct original video:
-                    // one original = one movie; several originals = a series/playlist.
-                    val episodes = candidates
-                        .groupBy { it.identity }
-                        .values
-                        .mapNotNull { versions -> versions.maxByOrNull { it.rank } }
-                        .sortedWith(
-                            compareBy<ArchiveVideo> {
-                                val match = Regex("(?i)s(\\d+)e(\\d+)").find(it.displayTitle)
-                                if (match != null) {
-                                    (match.groupValues[1].toLongOrNull() ?: 0L) * 10000L +
-                                        (match.groupValues[2].toLongOrNull() ?: 0L)
-                                } else {
-                                    val episode = Regex("(?i)(?:episode|ep)[ ._-]*(\\d+)").find(it.displayTitle)
-                                    if (episode != null) 1_000_000L + (episode.groupValues[1].toLongOrNull() ?: 0L)
-                                    else Long.MAX_VALUE
-                                }
-                            }.thenBy { it.displayTitle.lowercase() }
-                        )
-
-                    if (episodes.isEmpty()) {
+                    val selected = candidates
+                        .sortedByDescending { it.first }
+                        .distinctBy { it.second }
+                        .take(6)
+                    if (selected.isEmpty()) {
                         throw IllegalStateException("В этой записи не найден видеофайл поддерживаемого формата")
                     }
 
+                    // Archive metadata provides the actual storage host and directory.
+                    // These direct links avoid unnecessary redirect hops through /download/.
                     val hostCandidates = listOf(record.optString("d1"), record.optString("d2"))
                         .map { it.trim().removePrefix("https://").removePrefix("http://").substringBefore('/') }
                         .filter { it.matches(Regex("[A-Za-z0-9.-]{1,180}")) && it.endsWith(".archive.org", true) }
@@ -548,38 +510,22 @@ class MainActivity : Activity() {
                         .trimEnd('/')
 
                     val videoUrls = ArrayList<String>()
-                    val episodeTitles = ArrayList<String>()
-                    episodes.forEach { episode ->
-                        val encodedPath = episode.fileName.split('/').joinToString("/") { Uri.encode(it) }
-                        val host = hostCandidates.firstOrNull()
-                        val primary = if (host != null) {
-                            "https://$host$archiveDir/$encodedPath"
-                        } else {
-                            "https://archive.org/download/$identifier/$encodedPath"
+                    selected.forEach { (_, fileName, _) ->
+                        val encodedPath = fileName.split('/').joinToString("/") { Uri.encode(it) }
+                        hostCandidates.forEach { host ->
+                            videoUrls.add("https://$host$archiveDir/$encodedPath")
                         }
-                        videoUrls.add(primary)
-                        episodeTitles.add(episode.displayTitle)
+                        videoUrls.add("https://archive.org/download/$identifier/$encodedPath")
                     }
-                    val safeUrls = ArrayList(videoUrls.distinct())
-                    val safeTitles = if (episodes.size > 1) episodeTitles else arrayListOf(title)
+                    val safeUrls = ArrayList(videoUrls.distinct().take(18))
                     val intent = Intent(this@MainActivity, PlayerActivity::class.java).apply {
                         putStringArrayListExtra(PlayerActivity.EXTRA_URLS, safeUrls)
-                        putStringArrayListExtra(PlayerActivity.EXTRA_TITLES, safeTitles)
                         putExtra(PlayerActivity.EXTRA_URL, safeUrls.first())
                         putExtra(PlayerActivity.EXTRA_TITLE, title)
                         putExtra(PlayerActivity.EXTRA_SOURCE, "Internet Archive")
                         putExtra(PlayerActivity.EXTRA_LICENSE, license)
                     }
-                    runOnUiThread {
-                        if (safeUrls.size > 1) {
-                            Toast.makeText(
-                                this@MainActivity,
-                                "Найдено эпизодов: ${safeUrls.size}",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                        startActivity(intent)
-                    }
+                    runOnUiThread { startActivity(intent) }
                 } catch (error: Exception) {
                     Log.e("SultanCinema", "Unable to open Archive item", error)
                     runOnUiThread {
