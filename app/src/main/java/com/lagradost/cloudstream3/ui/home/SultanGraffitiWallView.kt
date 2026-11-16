@@ -37,44 +37,52 @@ class SultanGraffitiWallView @JvmOverloads constructor(
         strokeJoin = Paint.Join.ROUND
     }
 
-    // x/y are the original wall's percentage positions; the third value controls font size.
+    private data class GraffitiTag(
+        val text: String,
+        val leftPercent: Float,
+        val topPercent: Float,
+        val sizeFactor: Float,
+        val angle: Float
+    )
+
+    // Original Sultan wall positions, using explicit fields for strict Kotlin builds.
     private val graffiti = listOf(
-        arrayOf("ЕЩЁ ОДНУ СЕРИЮ!", 2f, 5f, 20f, -8f),
-        arrayOf("КОТ ОДОБРИЛ!", 38f, 3f, 18f, 5f),
-        arrayOf("ПОП-КОРН ГДЕ?!", 70f, 8f, 24f, -7f),
-        arrayOf("РАБОТА ПОДОЖДЁТ!", 12f, 18f, 16f, 7f),
-        arrayOf("ТЫ ЕЩЁ НЕ СПИШЬ?!", 48f, 17f, 22f, -5f),
-        arrayOf("ПУЛЬТ ПРОПАЛ!", 78f, 25f, 18f, 8f),
-        arrayOf("СЮЖЕТ КРУЧЕ ЖИЗНИ", 3f, 35f, 23f, 6f),
-        arrayOf("ТИШЕ! ИДЁТ КИНО!", 30f, 31f, 18f, -9f),
-        arrayOf("Я ТУТ НА ПЯТЬ МИНУТ", 59f, 35f, 25f, 5f),
-        arrayOf("НЕ ТРОГАЙ ПОПКОРН", 82f, 43f, 16f, -7f),
-        arrayOf("ДИВАН МОЙ БОСС", 8f, 52f, 19f, -5f),
-        arrayOf("СПОКОЙНО, Я СМОТРЮ", 39f, 49f, 23f, 8f),
-        arrayOf("КИНО ЛЕЧИТ СКУКУ", 68f, 55f, 19f, -8f),
-        arrayOf("СОСЕДИ ТОЖЕ СМОТРЯТ", 1f, 68f, 18f, 7f),
-        arrayOf("ГДЕ МОИ ТИТРЫ?!", 24f, 65f, 25f, -5f),
-        arrayOf("МЫШОНОК В ЗАЛЕ", 52f, 68f, 17f, 8f),
-        arrayOf("ЗАВТРА РАНО? НЕ СЛЫШАЛ", 78f, 72f, 20f, -6f),
-        arrayOf("СНАЧАЛА ФИЛЬМ", 12f, 83f, 23f, 5f),
-        arrayOf("ПЕРЕРЫВ НА ПОПКОРН", 43f, 85f, 19f, -8f),
-        arrayOf("ЭКРАН ВСЁ ВИДИТ", 70f, 88f, 24f, 6f),
-        arrayOf("НЕ БУДИ ЗРИТЕЛЯ", 19f, 9f, 13f, 9f),
-        arrayOf("СМЕХ БЕЗ БИЛЕТА", 56f, 7f, 13f, -9f),
-        arrayOf("ПЯТЬ МИНУТ ДО ФИНАЛА", 88f, 15f, 11f, 7f),
-        arrayOf("ФИЛЬМ САМ СЕБЯ НЕ ПОСМОТРИТ", 4f, 25f, 12f, -6f),
-        arrayOf("КТО ВЫКЛЮЧИЛ СВЕТ?", 27f, 42f, 12f, 8f),
-        arrayOf("КИНО И ТОЧКА", 48f, 28f, 12f, -7f),
-        arrayOf("СЮЖЕТ ЗАКРУЧЕН", 73f, 37f, 13f, 6f),
-        arrayOf("ПОП-КОРН — МОЯ СЛАБОСТЬ", 91f, 57f, 11f, -8f),
-        arrayOf("ДИВАН В РЕЖИМЕ КИНО", 31f, 77f, 13f, 7f),
-        arrayOf("НЕ СПОЙЛЕРИ!", 59f, 80f, 12f, -5f),
-        arrayOf("СЕАНС ДЛЯ СВОИХ", 87f, 88f, 11f, 8f),
-        arrayOf("УЛЫБНИСЬ, ИДЁТ ЗАПИСЬ", 5f, 92f, 13f, -6f),
-        arrayOf("ПУЛЬТ — ГЛАВНЫЙ", 36f, 92f, 12f, 7f),
-        arrayOf("СОН ОТМЕНЯЕТСЯ", 63f, 94f, 13f, -8f),
-        arrayOf("ЕЩЁ ЧУТЬ-ЧУТЬ", 91f, 3f, 12f, 6f),
-        arrayOf("СМОТРИ И НЕ МОРГАЙ", 2f, 47f, 12f, -7f)
+        GraffitiTag("ЕЩЁ ОДНУ СЕРИЮ!", 2f, 5f, 20f, -8f),
+        GraffitiTag("КОТ ОДОБРИЛ!", 38f, 3f, 18f, 5f),
+        GraffitiTag("ПОП-КОРН ГДЕ?!", 70f, 8f, 24f, -7f),
+        GraffitiTag("РАБОТА ПОДОЖДЁТ!", 12f, 18f, 16f, 7f),
+        GraffitiTag("ТЫ ЕЩЁ НЕ СПИШЬ?!", 48f, 17f, 22f, -5f),
+        GraffitiTag("ПУЛЬТ ПРОПАЛ!", 78f, 25f, 18f, 8f),
+        GraffitiTag("СЮЖЕТ КРУЧЕ ЖИЗНИ", 3f, 35f, 23f, 6f),
+        GraffitiTag("ТИШЕ! ИДЁТ КИНО!", 30f, 31f, 18f, -9f),
+        GraffitiTag("Я ТУТ НА ПЯТЬ МИНУТ", 59f, 35f, 25f, 5f),
+        GraffitiTag("НЕ ТРОГАЙ ПОПКОРН", 82f, 43f, 16f, -7f),
+        GraffitiTag("ДИВАН МОЙ БОСС", 8f, 52f, 19f, -5f),
+        GraffitiTag("СПОКОЙНО, Я СМОТРЮ", 39f, 49f, 23f, 8f),
+        GraffitiTag("КИНО ЛЕЧИТ СКУКУ", 68f, 55f, 19f, -8f),
+        GraffitiTag("СОСЕДИ ТОЖЕ СМОТРЯТ", 1f, 68f, 18f, 7f),
+        GraffitiTag("ГДЕ МОИ ТИТРЫ?!", 24f, 65f, 25f, -5f),
+        GraffitiTag("МЫШОНОК В ЗАЛЕ", 52f, 68f, 17f, 8f),
+        GraffitiTag("ЗАВТРА РАНО? НЕ СЛЫШАЛ", 78f, 72f, 20f, -6f),
+        GraffitiTag("СНАЧАЛА ФИЛЬМ", 12f, 83f, 23f, 5f),
+        GraffitiTag("ПЕРЕРЫВ НА ПОПКОРН", 43f, 85f, 19f, -8f),
+        GraffitiTag("ЭКРАН ВСЁ ВИДИТ", 70f, 88f, 24f, 6f),
+        GraffitiTag("НЕ БУДИ ЗРИТЕЛЯ", 19f, 9f, 13f, 9f),
+        GraffitiTag("СМЕХ БЕЗ БИЛЕТА", 56f, 7f, 13f, -9f),
+        GraffitiTag("ПЯТЬ МИНУТ ДО ФИНАЛА", 88f, 15f, 11f, 7f),
+        GraffitiTag("ФИЛЬМ САМ СЕБЯ НЕ ПОСМОТРИТ", 4f, 25f, 12f, -6f),
+        GraffitiTag("КТО ВЫКЛЮЧИЛ СВЕТ?", 27f, 42f, 12f, 8f),
+        GraffitiTag("КИНО И ТОЧКА", 48f, 28f, 12f, -7f),
+        GraffitiTag("СЮЖЕТ ЗАКРУЧЕН", 73f, 37f, 13f, 6f),
+        GraffitiTag("ПОП-КОРН — МОЯ СЛАБОСТЬ", 91f, 57f, 11f, -8f),
+        GraffitiTag("ДИВАН В РЕЖИМЕ КИНО", 31f, 77f, 13f, 7f),
+        GraffitiTag("НЕ СПОЙЛЕРИ!", 59f, 80f, 12f, -5f),
+        GraffitiTag("СЕАНС ДЛЯ СВОИХ", 87f, 88f, 11f, 8f),
+        GraffitiTag("УЛЫБНИСЬ, ИДЁТ ЗАПИСЬ", 5f, 92f, 13f, -6f),
+        GraffitiTag("ПУЛЬТ — ГЛАВНЫЙ", 36f, 92f, 12f, 7f),
+        GraffitiTag("СОН ОТМЕНЯЕТСЯ", 63f, 94f, 13f, -8f),
+        GraffitiTag("ЕЩЁ ЧУТЬ-ЧУТЬ", 91f, 3f, 12f, 6f),
+        GraffitiTag("СМОТРИ И НЕ МОРГАЙ", 2f, 47f, 12f, -7f)
     )
 
     private val neonPalette = intArrayOf(
@@ -134,11 +142,11 @@ class SultanGraffitiWallView @JvmOverloads constructor(
         canvas.drawCircle(w * 0.89f, h * 0.18f, min(w, h) * 0.155f, linePaint)
 
         graffiti.forEachIndexed { index, item ->
-            val phrase = item[0] as String
-            val leftPercent = item[1] as Float
-            val topPercent = item[2] as Float
-            val sizeFactor = item[3] as Float
-            val angle = item[4] as Float
+            val phrase = item.text
+            val leftPercent = item.leftPercent
+            val topPercent = item.topPercent
+            val sizeFactor = item.sizeFactor
+            val angle = item.angle
             val textSize = (sizeFactor * 0.28f * w / 100f).coerceIn(dp(9f), dp(34f))
 
             textPaint.textSize = textSize
