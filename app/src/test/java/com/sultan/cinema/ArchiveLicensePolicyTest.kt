@@ -32,7 +32,7 @@ class ArchiveLicensePolicyTest {
     }
 
     @Test fun usesBroadCreativeCommonsDiscoveryQuery() {
-        assertEquals("licenseurl:http*creativecommons.org*", ArchiveLicensePolicy.searchClause())
+        assertEquals("(licenseurl:http*by* OR licenseurl:http*publicdomain/mark* OR licenseurl:http*publicdomain/zero*)", ArchiveLicensePolicy.searchClause())
     }
 
     @Test fun onlyAllowsSafeArchiveIdentifiers() {
