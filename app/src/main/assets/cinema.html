@@ -120,22 +120,7 @@ button{color:inherit;cursor:pointer}
  text-shadow:0 1px 0 #fff9,0 3px 0 var(--neon-low),0 0 7px var(--neon),0 0 16px var(--neon);
  opacity:.62;transform:rotate(var(--rot)) scale(var(--scale));position:absolute;
 }
-.neonTag:before{content:attr(data-text);position:absolute;inset:0;z-index:-1;
- color:var(--neon-low);-webkit-text-fill-color:var(--neon-low);
- -webkit-text-stroke:3px color-mix(in srgb,var(--neon-low),black 24%);
- transform:translate(3px,5px);filter:blur(.25px);opacity:.9}
-
-.neonTag:after{content:attr(data-text);position:absolute;inset:0;z-index:1;pointer-events:none;
- color:transparent;-webkit-text-fill-color:transparent;
- background:linear-gradient(112deg,transparent 0%,#ffffff00 31%,#ffffffd9 39%,#eafcff88 43%,transparent 49%,transparent 72%,#ffffff66 77%,transparent 83%);
- background-size:230% 100%;background-position:-145% 0;
- background-clip:text;-webkit-background-clip:text;-webkit-text-stroke:.45px #ffffffa8;
- mix-blend-mode:screen;animation:glassGlint 8.8s ease-in-out var(--glint-delay) infinite;}
-@keyframes glassGlint{0%,58%{background-position:-145% 0;opacity:.05}74%{opacity:.95}100%{background-position:145% 0;opacity:.18}}
-
-@keyframes tagPulse{0%{opacity:.18;filter:brightness(.65) drop-shadow(0 5px 3px #000b)}
- 48%{opacity:.95;filter:brightness(1.25) drop-shadow(0 0 15px var(--neon))}
- 100%{opacity:.38;filter:brightness(.82) drop-shadow(0 0 7px var(--neon))}}
+.neonTag:before,.neonTag:after{display:none!important;content:none!important}
 #main{z-index:2}
 #grain{z-index:1}
 .sidebar{background:linear-gradient(90deg,#09090bf2 0,#101014e8 82%,#101014dd)}
@@ -155,26 +140,26 @@ button{color:inherit;cursor:pointer}
  25%{opacity:1;background:radial-gradient(ellipse,#ff4cae88,transparent 68%)}
  55%{opacity:.9;background:radial-gradient(ellipse,#4deaff88,transparent 68%)}
  80%{opacity:.75;background:radial-gradient(ellipse,#d76bff77,transparent 68%)}100%{opacity:.4}}
-/* Android WebView performance profile: avoid compositing-heavy glass and dozens of animated layers. */
+/* Static neon-glass profile for Android WebView: preserve the graffiti wall without
+   dozens of filters, animated pseudo-elements, or repeated layer compositing. */
 @media(max-width:900px){
- #neonWall{opacity:.72}
- .neonTag:nth-child(n+13){display:none}
- .neonTag{animation:none!important;text-shadow:0 1px 0 #fff9,0 2px 0 #111,0 0 6px var(--neon),0 0 12px var(--neon)}
- .neonTag:before{transform:translate(1px,2px);-webkit-text-stroke:1px var(--neon-low)}
+ #neonWall{opacity:.84;isolation:auto}
+ .neonTag:nth-child(n+25){display:none}
+ .neonTag{animation:none!important;filter:none!important;opacity:.72;text-shadow:0 1px 0 #fff9,0 2px 0 #111,0 0 5px var(--neon)}
+ .neonTag:before,.neonTag:after{display:none!important;content:none!important}
  .nav{animation:none!important;transition:none}
  .hero,.card,.dialog,.sidebar,.content,#detail,#pinGate{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
- .hero.neon-boot{animation:none!important;filter:none!important;box-shadow:0 18px 35px #0008}
- .hero.neon-boot:before{animation:none!important}
+ .hero.neon-boot,.hero.neon-boot:before{animation:none!important;filter:none!important}
 }
 @media(max-width:520px){
- .neonTag:nth-child(n+7){display:none}
+ .neonTag:nth-child(n+15){display:none}
  .catalogGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
  .card{min-width:0;width:auto;flex-basis:calc(50% - 8px)}
  .poster{height:150px;object-fit:cover}
 }
 .poster{aspect-ratio:4/3;contain:paint;background:#211b1b}
-.card{contain:layout paint;content-visibility:auto;contain-intrinsic-size:150px 210px}
-@media(prefers-reduced-motion:reduce){.neonTag,.nav,.hero.neon-boot,.hero.neon-boot:before{animation:none!important}}
+.card{contain:layout paint;contain-intrinsic-size:150px 210px}
+@media(prefers-reduced-motion:reduce){.neonTag,.nav,.hero.neon-boot,.hero.neon-boot:before{animation:none!important}}@media(prefers-reduced-motion:reduce){.neonTag,.nav,.hero.neon-boot,.hero.neon-boot:before{animation:none!important}}
 @media(prefers-reduced-motion:reduce){.neonTag,.neonTag:after,.hero.neon-boot,.hero.neon-boot:before{animation:none!important}}
 
 
@@ -327,6 +312,7 @@ const $=id=>document.getElementById(id);
 let archiveItems=[],selectedItem=null,pin='',unlockedAdult=false,audioCtx=null,introDone=false,toastTimer=null;
 let adultSources=[],activeAdultCategory="all",adultCatalogLoaded=false;
 const FAVORITES_KEY='sultan-cinema-favorites-v1';
+const cardRenderGeneration=new WeakMap();
 function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function showToast(text){const t=$('toast');t.textContent=text;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2300);}
 function getFavorites(){try{return JSON.parse(localStorage.getItem(FAVORITES_KEY)||'[]');}catch(_){return [];}}
@@ -340,7 +326,23 @@ function licenseLabel(item){
  return m?"CC "+m[1].toUpperCase()+" "+m[2]:"Creative Commons";
 }
 function makeCard(item){const card=document.createElement('button');card.className='card';card.type='button';const poster=document.createElement('img');poster.className='poster';poster.loading='lazy';poster.decoding='async';poster.alt='';poster.src=imageUrl(item);poster.onerror=()=>{poster.onerror=null;poster.removeAttribute('src');poster.classList.add('posterMissing');};const title=document.createElement('span');title.className='cardTitle';title.textContent=item.title||item.identifier;const meta=document.createElement('span');meta.className='cardYear';meta.textContent=(item.year||'Год не указан')+' · '+licenseLabel(item);card.append(poster,title,meta);card.addEventListener('click',()=>openDetail(item));return card;}
-function drawItems(target,items){target.replaceChildren();let index=0;const batch=()=>{const fragment=document.createDocumentFragment();const end=Math.min(index+8,items.length);for(;index<end;index++)fragment.appendChild(makeCard(items[index]));target.appendChild(fragment);if(index<items.length)requestAnimationFrame(batch);};requestAnimationFrame(batch);}
+function drawItems(target,items){
+ if(!target)return;
+ const generation=(cardRenderGeneration.get(target)||0)+1;
+ cardRenderGeneration.set(target,generation);
+ target.replaceChildren();
+ const limited=Array.isArray(items)?items.slice(0,60):[];
+ let index=0;
+ const batch=()=>{
+  if(cardRenderGeneration.get(target)!==generation)return;
+  const fragment=document.createDocumentFragment();
+  const end=Math.min(index+6,limited.length);
+  for(;index<end;index++)fragment.appendChild(makeCard(limited[index]));
+  target.appendChild(fragment);
+  if(index<limited.length)requestAnimationFrame(batch);
+ };
+ batch();
+}
 function drawCatalogEmpty(target,message){
  target.innerHTML='';
  const panel=document.createElement('div');panel.className='catalogEmpty';
@@ -409,7 +411,7 @@ function closeDetail(){ $('detail').style.display='none';selectedItem=null;}
 function showPage(page){document.querySelectorAll('.nav').forEach(b=>{b.classList.toggle('active',b.dataset.page===page);});$('homeScreen').style.display=page==='home'?'block':'none';$('catalogScreen').style.display=page==='catalog'?'flex':'none';$('favoritesScreen').style.display=page==='favorites'?'block':'none';$('adultScreen').style.display=page==='adult'&&unlockedAdult?'block':'none';if(page==='search'){showPage('catalog');$('searchInput').focus();return;}if(page==='adult'){if(unlockedAdult){$('adultScreen').style.display='flex';ensureAdultSources();}else openPinGate();return;}}
 function openPinGate(){pin='';$('pinDots').textContent='○ ○ ○';$('ageConfirm').checked=false;$('pinGate').style.display='flex';buildPinGrid();$('pinCancel').focus();}
 function buildPinGrid(){const grid=$('pinGrid');grid.innerHTML='';['1','2','3','4','5','6','7','8','9','⌫','0','С'].forEach(k=>{const b=document.createElement('button');b.className='pinKey';b.textContent=k;b.addEventListener('click',()=>{if(k==='⌫')pin=pin.slice(0,-1);else if(k==='С')pin='';else if(pin.length<3)pin+=k;$('pinDots').textContent=pin.padEnd(3,'○').split('').join(' ');});grid.appendChild(b);});}
-function finishIntro(){if(introDone)return;introDone=true;window.__sultanBooted=true;$('intro').style.display='none';$('app').style.display='block';$('main').classList.add('ready');playPanelPrism();$('main').querySelector('.nav').focus();if(window.AndroidCinema)AndroidCinema.searchArchive('');}
+function finishIntro(){if(introDone)return;introDone=true;window.__sultanBooted=true;$('intro').style.display='none';$('app').style.display='block';$('main').classList.add('ready');$('main').querySelector('.nav').focus();if(window.AndroidCinema)AndroidCinema.searchArchive('');}
 function unlockAudio(){if(!audioCtx){try{audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(_){return;}}if(audioCtx.state==='suspended')audioCtx.resume();}
 function noiseBurst(duration,volume){if(!audioCtx)return;const size=Math.max(1,Math.floor(audioCtx.sampleRate*duration));const buffer=audioCtx.createBuffer(1,size,audioCtx.sampleRate);const data=buffer.getChannelData(0);for(let i=0;i<size;i++)data[i]=(Math.random()*2-1)*(1-i/size);const src=audioCtx.createBufferSource();src.buffer=buffer;const gain=audioCtx.createGain();gain.gain.setValueAtTime(volume,audioCtx.currentTime);gain.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);src.connect(gain).connect(audioCtx.destination);src.start();}
 function playSmash(){unlockAudio();if(!audioCtx)return;const now=audioCtx.currentTime;const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();osc.type='sine';osc.frequency.setValueAtTime(105,now);osc.frequency.exponentialRampToValueAtTime(34,now+.36);gain.gain.setValueAtTime(.8,now);gain.gain.exponentialRampToValueAtTime(.001,now+.5);osc.connect(gain).connect(audioCtx.destination);osc.start(now);osc.stop(now+.52);noiseBurst(.28,.23);}function playComicYelp(){if(!audioCtx||audioCtx.state!=='running')return;const now=audioCtx.currentTime;const osc=audioCtx.createOscillator(),gain=audioCtx.createGain(),filter=audioCtx.createBiquadFilter();osc.type='triangle';osc.frequency.setValueAtTime(620+Math.random()*120,now);osc.frequency.exponentialRampToValueAtTime(210+Math.random()*60,now+.26);osc.frequency.linearRampToValueAtTime(360+Math.random()*80,now+.43);filter.type='lowpass';filter.frequency.value=1500;gain.gain.setValueAtTime(.0001,now);gain.gain.linearRampToValueAtTime(.17,now+.05);gain.gain.exponentialRampToValueAtTime(.0001,now+.48);osc.connect(filter).connect(gain).connect(audioCtx.destination);osc.start(now);osc.stop(now+.5);}

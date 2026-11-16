@@ -27,8 +27,19 @@ class PlayerActivity : Activity() {
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
             )
 
-        val url = intent.getStringExtra(EXTRA_URL)
-        if (url.isNullOrBlank() || !url.startsWith("https://archive.org/")) {
+        val requestedUrls = intent.getStringArrayListExtra(EXTRA_URLS).orEmpty()
+        val urls = (requestedUrls + listOfNotNull(intent.getStringExtra(EXTRA_URL)))
+            .filter { value ->
+                runCatching {
+                    val uri = android.net.Uri.parse(value)
+                    uri.scheme == "https" && (
+                        uri.host.equals("archive.org", true) ||
+                            uri.host?.endsWith(".archive.org", true) == true
+                        )
+                }.getOrDefault(false)
+            }
+            .distinct()
+        if (urls.isEmpty()) {
             finish()
             return
         }
@@ -52,8 +63,9 @@ class PlayerActivity : Activity() {
         val httpFactory = DefaultHttpDataSource.Factory()
             .setUserAgent("SultanCinema/0.1 AndroidTV")
             .setConnectTimeoutMs(15000)
-            .setReadTimeoutMs(30000)
+            .setReadTimeoutMs(18000)
             .setAllowCrossProtocolRedirects(true)
+            .setDefaultRequestProperties(mapOf("Referer" to "https://archive.org/"))
         val dataSourceFactory = DefaultDataSource.Factory(this, httpFactory)
         val mediaSourceFactory = DefaultMediaSourceFactory(dataSourceFactory)
 
@@ -65,17 +77,30 @@ class PlayerActivity : Activity() {
                 exo.addListener(object : Player.Listener {
                     override fun onPlayerError(error: PlaybackException) {
                         android.util.Log.e("SultanCinemaPlayer", "Playback failed: ${error.errorCodeName}", error)
+                        if (exo.hasNextMediaItem()) {
+                            exo.seekToNextMediaItem()
+                            exo.prepare()
+                            exo.playWhenReady = true
+                        } else {
+                            android.widget.Toast.makeText(
+                                this@PlayerActivity,
+                                "Не удалось воспроизвести этот файл. Проверь соединение или выбери другой фильм.",
+                                android.widget.Toast.LENGTH_LONG
+                            ).show()
+                        }
                     }
                 })
                 val metadata = MediaMetadata.Builder()
                     .setTitle(intent.getStringExtra(EXTRA_TITLE) ?: "Видео")
                     .setSubtitle(intent.getStringExtra(EXTRA_SOURCE) ?: "Internet Archive")
                     .build()
-                val item = MediaItem.Builder()
-                    .setUri(url)
-                    .setMediaMetadata(metadata)
-                    .build()
-                exo.setMediaItem(item)
+                val mediaItems = urls.map { url ->
+                    MediaItem.Builder()
+                        .setUri(url)
+                        .setMediaMetadata(metadata)
+                        .build()
+                }
+                exo.setMediaItems(mediaItems)
                 exo.prepare()
                 exo.playWhenReady = true
             }
@@ -98,5 +123,6 @@ class PlayerActivity : Activity() {
         const val EXTRA_TITLE = "cinema_title"
         const val EXTRA_SOURCE = "cinema_source"
         const val EXTRA_LICENSE = "cinema_license"
+        const val EXTRA_URLS = "cinema_urls"
     }
 }
