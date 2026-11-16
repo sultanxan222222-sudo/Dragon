@@ -126,7 +126,7 @@ class MainActivity : Activity() {
                     val encodedQuery = URLEncoder.encode(buildArchiveQuery(searchText), "UTF-8")
                     val fields = listOf("identifier", "title", "year", "licenseurl", "description", "creator", "runtime")
                         .joinToString("") { "&fl%5B%5D=" + URLEncoder.encode(it, "UTF-8") }
-                    val address = "https://archive.org/advancedsearch.php?q=$encodedQuery$fields&rows=48&page=1&output=json&sort%5B%5D=downloads+desc"
+                    val address = "https://archive.org/advancedsearch.php?q=$encodedQuery$fields&rows=100&page=1&output=json&sort%5B%5D=downloads+desc"
                     val root = JSONObject(readUrl(address))
                     val docs = root.optJSONObject("response")?.optJSONArray("docs") ?: JSONArray()
                     val approved = JSONArray()
