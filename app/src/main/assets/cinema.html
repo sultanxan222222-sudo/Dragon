@@ -227,7 +227,13 @@ function showToast(text){const t=$('toast');t.textContent=text;t.classList.add('
 function getFavorites(){try{return JSON.parse(localStorage.getItem(FAVORITES_KEY)||'[]');}catch(_){return [];}}
 function setFavorites(ids){localStorage.setItem(FAVORITES_KEY,JSON.stringify(ids));}
 function imageUrl(item){return 'https://archive.org/services/img/'+encodeURIComponent(item.identifier||'');}
-function licenseLabel(item){return /zero\/1\.0/i.test(item.licenseurl||'')?'CC0 1.0':'Public Domain Mark 1.0';}
+function licenseLabel(item){
+ const u=String(item.licenseurl||"").replace(/^http:/i,"https:").replace(/\/$/,"").toLowerCase();
+ if(u.endsWith("/publicdomain/zero/1.0"))return "CC0 1.0";
+ if(u.endsWith("/publicdomain/mark/1.0"))return "Public Domain Mark 1.0";
+ const m=u.match(/\/licenses\/(by(?:-sa|-nd|-nc|-nc-sa|-nc-nd)?)\/(1\.0|2\.0|2\.5|3\.0|4\.0)$/);
+ return m?"CC "+m[1].toUpperCase()+" "+m[2]:"Creative Commons";
+}
 function makeCard(item){const card=document.createElement('button');card.className='card';card.type='button';card.innerHTML='<img class="poster" loading="lazy" src="'+imageUrl(item)+'" alt=""><span class="cardTitle">'+escapeHtml(item.title||item.identifier)+'</span><span class="cardYear">'+escapeHtml(item.year||'Год не указан')+' · '+licenseLabel(item)+'</span>';card.addEventListener('click',()=>openDetail(item));return card;}
 function drawItems(target,items){target.innerHTML='';items.forEach(item=>target.appendChild(makeCard(item)));}
 function updateCatalog(){drawItems($('homeCards'),archiveItems.slice(0,8));drawItems($('catalogGrid'),archiveItems);$('catalogCount').textContent=archiveItems.length+' материалов';const fav=getFavorites();const selected=archiveItems.filter(x=>fav.includes(x.identifier));drawItems($('favoriteGrid'),selected);$('favoriteEmpty').style.display=selected.length?'none':'block';}
