@@ -90,11 +90,15 @@ class PlayerActivity : Activity() {
                         }
                     }
                 })
-                val metadata = MediaMetadata.Builder()
-                    .setTitle(intent.getStringExtra(EXTRA_TITLE) ?: "Видео")
-                    .setSubtitle(intent.getStringExtra(EXTRA_SOURCE) ?: "Internet Archive")
-                    .build()
-                val mediaItems = urls.map { url ->
+                val fallbackTitles = intent.getStringArrayListExtra(EXTRA_TITLES).orEmpty()
+                val mediaItems = urls.mapIndexed { index, url ->
+                    val metadata = MediaMetadata.Builder()
+                        .setTitle(fallbackTitles.getOrNull(index) ?: intent.getStringExtra(EXTRA_TITLE) ?: "Видео")
+                        .setSubtitle(
+                            if (urls.size > 1) "Эпизод ${index + 1} · Internet Archive"
+                            else intent.getStringExtra(EXTRA_SOURCE) ?: "Internet Archive"
+                        )
+                        .build()
                     MediaItem.Builder()
                         .setUri(url)
                         .setMediaMetadata(metadata)
@@ -124,5 +128,6 @@ class PlayerActivity : Activity() {
         const val EXTRA_SOURCE = "cinema_source"
         const val EXTRA_LICENSE = "cinema_license"
         const val EXTRA_URLS = "cinema_urls"
+        const val EXTRA_TITLES = "cinema_episode_titles"
     }
 }
