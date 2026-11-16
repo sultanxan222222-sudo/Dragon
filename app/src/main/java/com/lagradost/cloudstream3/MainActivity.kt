@@ -1371,8 +1371,8 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
                 ioSafe {
                     // Add the official provider repository to the extension manager.
                     val sultanArchiveRepo = RepositoryData(
-                        name = "CloudStream public providers",
-                        url = "https://raw.githubusercontent.com/recloudstream/extensions/master/repo.json"
+                        "CloudStream public providers",
+                        "https://raw.githubusercontent.com/recloudstream/extensions/master/repo.json"
                     )
                     val savedRepos = getKey<Array<RepositoryData>>(REPOSITORIES_KEY) ?: emptyArray()
                     if (savedRepos.none { it.url == sultanArchiveRepo.url }) {
