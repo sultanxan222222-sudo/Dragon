@@ -3,8 +3,8 @@
   "description": "Directory of external 18+ source websites. No video files, stream URLs, scrapers or playback resolvers are included.",
   "counts": {
     "registered": 303,
-    "active": 297,
-    "disabled": 6
+    "active": 287,
+    "disabled": 16
   },
   "categoryNames": {
     "general": "Общее",
@@ -731,8 +731,8 @@
       "origins": [
         "AdultHideout"
       ],
-      "enabled": true,
-      "reason": null
+      "enabled": false,
+      "reason": "В AdultHideout этот сайт оставлен только для ручного включения пользователем."
     },
     {
       "id": "cumdrinkingclips",
@@ -1649,8 +1649,8 @@
       "origins": [
         "AdultHideout"
       ],
-      "enabled": true,
-      "reason": null
+      "enabled": false,
+      "reason": "AdultHideout помечает источник как временно недоступный по умолчанию."
     },
     {
       "id": "hentaimoon",
@@ -1768,8 +1768,8 @@
       "origins": [
         "AdultHideout"
       ],
-      "enabled": true,
-      "reason": null
+      "enabled": false,
+      "reason": "AdultHideout помечает источник как временно недоступный по умолчанию."
     },
     {
       "id": "hqpornero",
@@ -2551,8 +2551,8 @@
       "origins": [
         "AdultHideout"
       ],
-      "enabled": true,
-      "reason": null
+      "enabled": false,
+      "reason": "AdultHideout помечает источник как временно недоступный по умолчанию."
     },
     {
       "id": "pervertium",
@@ -3383,8 +3383,8 @@
       "origins": [
         "AdultHideout"
       ],
-      "enabled": true,
-      "reason": null
+      "enabled": false,
+      "reason": "AdultHideout помечает источник как временно недоступный по умолчанию."
     },
     {
       "id": "retroporngallery",
@@ -3470,8 +3470,8 @@
       "origins": [
         "AdultHideout"
       ],
-      "enabled": true,
-      "reason": null
+      "enabled": false,
+      "reason": "AdultHideout помечает источник как временно недоступный по умолчанию."
     },
     {
       "id": "sextb",
@@ -3780,8 +3780,8 @@
       "origins": [
         "AdultHideout"
       ],
-      "enabled": true,
-      "reason": null
+      "enabled": false,
+      "reason": "AdultHideout помечает источник как временно недоступный по умолчанию из-за сетевых ограничений сайта."
     },
     {
       "id": "sxyprn",
@@ -4155,8 +4155,8 @@
       "origins": [
         "AdultHideout"
       ],
-      "enabled": true,
-      "reason": null
+      "enabled": false,
+      "reason": "AdultHideout помечает источник как временно недоступный по умолчанию из-за сетевых ограничений сайта."
     },
     {
       "id": "vintageworldp",
@@ -4173,8 +4173,8 @@
       "origins": [
         "AdultHideout"
       ],
-      "enabled": true,
-      "reason": null
+      "enabled": false,
+      "reason": "AdultHideout помечает источник как временно недоступный по умолчанию."
     },
     {
       "id": "viralxxxporn",
@@ -4352,8 +4352,8 @@
       "origins": [
         "AdultHideout"
       ],
-      "enabled": true,
-      "reason": null
+      "enabled": false,
+      "reason": "AdultHideout помечает источник как временно недоступный по умолчанию."
     },
     {
       "id": "x24video",
