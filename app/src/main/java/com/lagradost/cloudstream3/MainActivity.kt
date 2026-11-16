@@ -1369,13 +1369,10 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
                     "https://raw.githubusercontent.com/sultanxan222222-sudo/Dragon/sultan-cloudstream/cinema-providers/repo.json"
                 )
                 val savedRepos = getKey<Array<RepositoryData>>(REPOSITORIES_KEY) ?: emptyArray()
-                val cleanedRepos = savedRepos.filterNot { it.url == previousPublicRepoUrl }
-                val updatedRepos = if (cleanedRepos.any { it.url == sultanCinemaRepo.url }) {
-                    cleanedRepos
-                } else {
-                    cleanedRepos + sultanCinemaRepo
-                }
-                if (updatedRepos.size != savedRepos.size || updatedRepos.none { it.url == sultanCinemaRepo.url }) {
+                val updatedRepos = savedRepos
+                    .filterNot { it.url == previousPublicRepoUrl || it.url == sultanCinemaRepo.url } +
+                    sultanCinemaRepo
+                if (updatedRepos.map { it.url } != savedRepos.map { it.url }) {
                     setKey(REPOSITORIES_KEY, updatedRepos)
                 }
 
