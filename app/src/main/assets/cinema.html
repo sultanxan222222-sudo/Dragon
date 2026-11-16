@@ -114,17 +114,11 @@ button{color:inherit;cursor:pointer}
  background:radial-gradient(ellipse at 50% 45%,#10132155,transparent 72%);}
 .neonTag{position:absolute;display:block;white-space:nowrap;pointer-events:none;user-select:none;
  font-family:Impact,"Arial Black",system-ui,sans-serif;font-weight:1000;font-style:italic;
- letter-spacing:-.055em;line-height:.9;text-transform:uppercase;
- color:transparent;-webkit-text-fill-color:transparent;
+ letter-spacing:-.055em;line-height:.9;text-transform:uppercase;color:transparent;-webkit-text-fill-color:transparent;
  background:linear-gradient(155deg,#fff 0%,var(--neon-hi) 13%,var(--neon) 39%,#fff 48%,var(--neon) 62%,var(--neon-low) 100%);
- background-clip:text;-webkit-background-clip:text;
- -webkit-text-stroke:1.25px color-mix(in srgb,var(--neon-hi),white 28%);
- paint-order:stroke fill;
- text-shadow:0 1px 0 #fff9,0 3px 0 color-mix(in srgb,var(--neon-low),black 25%),
- 0 5px 0 color-mix(in srgb,var(--neon-low),black 48%),0 0 5px var(--neon-hi),
- 0 0 13px var(--neon),0 0 27px var(--neon),0 0 48px color-mix(in srgb,var(--neon),transparent 22%);
- filter:drop-shadow(0 9px 5px #000b);opacity:.7;transform:rotate(var(--rot)) scale(var(--scale));position:absolute;
- animation:tagPulse var(--speed) ease-in-out var(--delay) infinite alternate;
+ background-clip:text;-webkit-background-clip:text;-webkit-text-stroke:1px var(--neon-hi);paint-order:stroke fill;
+ text-shadow:0 1px 0 #fff9,0 3px 0 var(--neon-low),0 0 7px var(--neon),0 0 16px var(--neon);
+ opacity:.62;transform:rotate(var(--rot)) scale(var(--scale));position:absolute;
 }
 .neonTag:before{content:attr(data-text);position:absolute;inset:0;z-index:-1;
  color:var(--neon-low);-webkit-text-fill-color:var(--neon-low);
@@ -144,12 +138,12 @@ button{color:inherit;cursor:pointer}
  100%{opacity:.38;filter:brightness(.82) drop-shadow(0 0 7px var(--neon))}}
 #main{z-index:2}
 #grain{z-index:1}
-.sidebar{background:linear-gradient(90deg,#09090bc9 0,#101014a8 82%,#10101488);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
-.content{background:linear-gradient(110deg,#090a0d38,transparent 55%);backdrop-filter:blur(1.5px)}
-.hero{background:linear-gradient(105deg,#171014b8 0,#281b1bb0 48%,#50301f9c 100%);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-.card{background:#151519bb;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
-.dialog{background:linear-gradient(145deg,#211b1bd9,#111216df);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
-#detail,#pinGate{background:#030304b9;backdrop-filter:blur(7px)}
+.sidebar{background:linear-gradient(90deg,#09090bf2 0,#101014e8 82%,#101014dd)}
+.content{background:linear-gradient(110deg,#090a0d66,transparent 55%)}
+.hero{background:linear-gradient(105deg,#171014ed 0,#281b1be8 48%,#50301fdf 100%)}
+.card{background:#151519ed}
+.dialog{background:linear-gradient(145deg,#211b1bf5,#111216f7)}
+#detail,#pinGate{background:#030304ed}
 .hero.neon-boot{animation:panelPrism 3.4s ease-in-out both}
 .hero.neon-boot:before{animation:prismSweep 3.4s ease-in-out both}
 @keyframes panelPrism{0%{box-shadow:0 18px 50px #0008,0 0 0 #fff0;filter:saturate(.8)}
@@ -161,7 +155,26 @@ button{color:inherit;cursor:pointer}
  25%{opacity:1;background:radial-gradient(ellipse,#ff4cae88,transparent 68%)}
  55%{opacity:.9;background:radial-gradient(ellipse,#4deaff88,transparent 68%)}
  80%{opacity:.75;background:radial-gradient(ellipse,#d76bff77,transparent 68%)}100%{opacity:.4}}
-@media(max-width:700px){.neonTag{opacity:.45;letter-spacing:-.07em;text-shadow:0 1px 0 #fff9,0 3px 0 #111,0 0 7px var(--neon),0 0 18px var(--neon)}}
+/* Android WebView performance profile: avoid compositing-heavy glass and dozens of animated layers. */
+@media(max-width:900px){
+ #neonWall{opacity:.72}
+ .neonTag:nth-child(n+13){display:none}
+ .neonTag{animation:none!important;text-shadow:0 1px 0 #fff9,0 2px 0 #111,0 0 6px var(--neon),0 0 12px var(--neon)}
+ .neonTag:before{transform:translate(1px,2px);-webkit-text-stroke:1px var(--neon-low)}
+ .nav{animation:none!important;transition:none}
+ .hero,.card,.dialog,.sidebar,.content,#detail,#pinGate{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+ .hero.neon-boot{animation:none!important;filter:none!important;box-shadow:0 18px 35px #0008}
+ .hero.neon-boot:before{animation:none!important}
+}
+@media(max-width:520px){
+ .neonTag:nth-child(n+7){display:none}
+ .catalogGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .card{min-width:0;width:auto;flex-basis:calc(50% - 8px)}
+ .poster{height:150px;object-fit:cover}
+}
+.poster{aspect-ratio:4/3;contain:paint;background:#211b1b}
+.card{contain:layout paint;content-visibility:auto;contain-intrinsic-size:150px 210px}
+@media(prefers-reduced-motion:reduce){.neonTag,.nav,.hero.neon-boot,.hero.neon-boot:before{animation:none!important}}
 @media(prefers-reduced-motion:reduce){.neonTag,.neonTag:after,.hero.neon-boot,.hero.neon-boot:before{animation:none!important}}
 
 
@@ -326,8 +339,8 @@ function licenseLabel(item){
  const m=u.match(/\/licenses\/(by(?:-sa|-nd|-nc|-nc-sa|-nc-nd)?)\/(1\.0|2\.0|2\.5|3\.0|4\.0)$/);
  return m?"CC "+m[1].toUpperCase()+" "+m[2]:"Creative Commons";
 }
-function makeCard(item){const card=document.createElement('button');card.className='card';card.type='button';card.innerHTML='<img class="poster" loading="lazy" src="'+imageUrl(item)+'" alt=""><span class="cardTitle">'+escapeHtml(item.title||item.identifier)+'</span><span class="cardYear">'+escapeHtml(item.year||'Год не указан')+' · '+licenseLabel(item)+'</span>';card.addEventListener('click',()=>openDetail(item));return card;}
-function drawItems(target,items){target.innerHTML='';items.forEach(item=>target.appendChild(makeCard(item)));}
+function makeCard(item){const card=document.createElement('button');card.className='card';card.type='button';const poster=document.createElement('img');poster.className='poster';poster.loading='lazy';poster.decoding='async';poster.alt='';poster.src=imageUrl(item);poster.onerror=()=>{poster.onerror=null;poster.removeAttribute('src');poster.classList.add('posterMissing');};const title=document.createElement('span');title.className='cardTitle';title.textContent=item.title||item.identifier;const meta=document.createElement('span');meta.className='cardYear';meta.textContent=(item.year||'Год не указан')+' · '+licenseLabel(item);card.append(poster,title,meta);card.addEventListener('click',()=>openDetail(item));return card;}
+function drawItems(target,items){target.replaceChildren();let index=0;const batch=()=>{const fragment=document.createDocumentFragment();const end=Math.min(index+8,items.length);for(;index<end;index++)fragment.appendChild(makeCard(items[index]));target.appendChild(fragment);if(index<items.length)requestAnimationFrame(batch);};requestAnimationFrame(batch);}
 function drawCatalogEmpty(target,message){
  target.innerHTML='';
  const panel=document.createElement('div');panel.className='catalogEmpty';
