@@ -24,6 +24,28 @@ import java.util.concurrent.Executors
 class MainActivity : Activity() {
     private lateinit var webView: WebView
     private val io = Executors.newFixedThreadPool(2)
+    private val adultProviderUrls: Map<String, String> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
+        try {
+            val root = JSONObject(assets.open("adult_sources.json").bufferedReader(Charsets.UTF_8).use { it.readText() })
+            val rows = root.optJSONArray("sources") ?: JSONArray()
+            val result = mutableMapOf<String, String>()
+            for (i in 0 until rows.length()) {
+                val item = rows.optJSONObject(i) ?: continue
+                if (!item.optBoolean("enabled", false)) continue
+                val id = item.optString("id")
+                val raw = item.optString("url")
+                if (!id.matches(Regex("[a-z0-9_-]{1,60}"))) continue
+                val uri = Uri.parse(raw)
+                if (uri.scheme == "https" && !uri.host.isNullOrBlank() && uri.userInfo == null) {
+                    result[id] = uri.toString()
+                }
+            }
+            result
+        } catch (error: Exception) {
+            Log.e("SultanCinema", "Could not load adult provider directory", error)
+            emptyMap()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -174,6 +196,25 @@ class MainActivity : Activity() {
             runOnUiThread {
                 try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
                 catch (_: Exception) { Toast.makeText(this@MainActivity, "Не удалось открыть источник", Toast.LENGTH_SHORT).show() }
+            }
+        }
+
+        @JavascriptInterface
+        fun openAdultProvider(providerId: String) {
+            if (!providerId.matches(Regex("[a-z0-9_-]{1,60}"))) return
+            val address = adultProviderUrls[providerId]
+            if (address == null) {
+                runOnUiThread {
+                    Toast.makeText(this@MainActivity, "Этот источник отключён: адрес или права не подтверждены", Toast.LENGTH_LONG).show()
+                }
+                return
+            }
+            runOnUiThread {
+                try {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(address)))
+                } catch (_: Exception) {
+                    Toast.makeText(this@MainActivity, "На устройстве не найден браузер для открытия сайта", Toast.LENGTH_LONG).show()
+                }
             }
         }
     }
