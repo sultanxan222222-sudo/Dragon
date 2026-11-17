@@ -41,6 +41,13 @@ jobs:
           out.mkdir(exist_ok=True)
           for index, script in enumerate(scripts):
               (out / f"script-{index}.js").write_text(script, encoding="utf-8")
+          required_phrases = ["ЖИЗНЬ УДАЛАСЬ!", "ПЯТНИЦА! ТЫ ПРЕКРАСНА!", "БУДЕМ КРАСИВЫМИ!", "ДАВАЙ ЗА ЖИЗНЬ!", "НЕ ПАРЬСЯ!", "ХОРОШЕГО НАСТРОЕНИЯ!", "УЛЫБНИСЬ!", "ВСЁ БУДЕТ ОК!"]
+          for phrase in required_phrases:
+              if phrase not in html:
+                  raise SystemExit(f"Missing neon wall phrase: {phrase}")
+          for marker in ("archiveItems", "AndroidCinema.searchArchive", "adult_sources.json", "function buildNeonWall"):
+              if marker not in html:
+                  raise SystemExit(f"Missing catalog or neon-wall component: {marker}")
           json.loads(pathlib.Path("app/src/main/assets/adult_sources.json").read_text(encoding="utf-8"))
           PY
           for script in /tmp/sultan-cinema-js/*.js; do node --check "$script"; done
