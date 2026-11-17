@@ -1,4 +1,4 @@
-name: Sultan Cinema TV — build pipeline
+name: Sultan Cinema — universal Android build pipeline
 # Rebuild trigger: verify the current Android TV package after the latest source updates.
 
 on:
@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   build-tv-apk:
-    name: Compile and package Android TV APK
+    name: Compile and package one phone + Android TV APK
     runs-on: ubuntu-latest
     steps:
       - name: Checkout isolated cinema branch
@@ -70,7 +70,38 @@ jobs:
       - name: Compile and run unit-test task
         run: gradle --no-daemon clean testDebugUnitTest assembleDebug
 
-      - name: Verify APK package identity
+      - name: Verify APK package identity and device compatibility
+        run: |
+          set -euo pipefail
+          APK="app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK"
+          BADGING="$("$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK")"
+          grep -F "package: name='com.sultan.cinema' versionCode='4' versionName='0.3.0-Universal'" <<< "$BADGING"
+          grep -F "sdkVersion:'23'" <<< "$BADGING"
+          grep -F "targetSdkVersion:'28'" <<< "$BADGING"
+          grep -F "launchable-activity: name='com.sultan.cinema.MainActivity'" <<< "$BADGING"
+          grep -F "leanback-launchable-activity: name='com.sultan.cinema.MainActivity'" <<< "$BADGING"
+          python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+          root = ET.parse("app/src/main/AndroidManifest.xml").getroot()
+          ns = "{http://schemas.android.com/apk/res/android}"
+          features = {node.get(ns + "name"): node.get(ns + "required", "true")
+                      for node in root.findall("uses-feature")}
+          assert features.get("android.software.leanback") == "false", features
+          assert features.get("android.hardware.touchscreen") == "false", features
+          print("Universal manifest: optional touchscreen + optional Leanback verified")
+          PY
+          sha256sum "$APK" | tee app/build/outputs/apk/debug/SHA256SUMS.txt
+
+      - name: Publish final build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sultan-Cinema-Universal-debug
+          path: |
+            app/build/outputs/apk/debug/app-debug.apk
+            app/build/outputs/apk/debug/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
         run: |
           set -euo pipefail
           APK="app/build/outputs/apk/debug/app-debug.apk"
