@@ -109,54 +109,134 @@ button{color:inherit;cursor:pointer}
 
 @media(max-width:900px){#main{grid-template-columns:170px 1fr}.sidebar{padding:24px 12px}.content{padding:25px 22px}.catalogGrid{grid-template-columns:repeat(4,minmax(100px,1fr))}.hero{height:220px}.heroMark{right:4%;transform:scale(.8)}}
 
-/* Sultan Neon Graffiti Glass wall */
-#neonWall{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;isolation:isolate;
- background:radial-gradient(ellipse at 50% 45%,#10132155,transparent 72%);}
-.neonTag{position:absolute;display:block;white-space:nowrap;pointer-events:none;user-select:none;
- font-family:Impact,"Arial Black",system-ui,sans-serif;font-weight:1000;font-style:italic;
- letter-spacing:-.055em;line-height:.9;text-transform:uppercase;color:transparent;-webkit-text-fill-color:transparent;
- background:linear-gradient(155deg,#fff 0%,var(--neon-hi) 13%,var(--neon) 39%,#fff 48%,var(--neon) 62%,var(--neon-low) 100%);
- background-clip:text;-webkit-background-clip:text;-webkit-text-stroke:1px var(--neon-hi);paint-order:stroke fill;
- text-shadow:0 1px 0 #fff9,0 3px 0 var(--neon-low),0 0 7px var(--neon),0 0 16px var(--neon);
- opacity:.62;transform:rotate(var(--rot)) scale(var(--scale));position:absolute;
+/* Neon Glass Graffiti Wall: brick texture + eight independent glass-tube signs. */
+#neonWall{
+ position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;isolation:isolate;
+ background-color:#080910;
+ background-image:
+  radial-gradient(ellipse at 16% 12%,#0869c52b,transparent 28%),
+  radial-gradient(ellipse at 78% 20%,#d2249624,transparent 30%),
+  radial-gradient(ellipse at 47% 84%,#13bca31e,transparent 34%),
+  linear-gradient(0deg,transparent 0 47px,#05060b 48px 52px),
+  linear-gradient(90deg,transparent 0 94px,#05060b 95px 99px),
+  linear-gradient(90deg,transparent 0 94px,#05060b 95px 99px),
+  linear-gradient(145deg,#1a1b25,#090a11 58%,#17111d);
+ background-size:auto,auto,auto,100% 52px,188px 104px,188px 104px,cover;
+ background-position:center,center,center,0 0,0 0,47px 26px,center;
 }
-.neonTag:before,.neonTag:after{display:none!important;content:none!important}
+#neonWall:before{
+ content:"";position:absolute;inset:0;pointer-events:none;
+ background:linear-gradient(180deg,#0008,transparent 20%,transparent 78%,#000a),
+  radial-gradient(ellipse at center,transparent 35%,#0008 100%);
+}
+.neonTag{
+ position:absolute;display:block;box-sizing:border-box;white-space:normal;
+ text-wrap:balance;text-align:center;pointer-events:none;user-select:none;
+ font-family:Impact,"Arial Black","Arial",sans-serif;font-weight:1000;font-style:italic;
+ letter-spacing:-.045em;line-height:.92;text-transform:uppercase;
+ color:var(--neon);-webkit-text-fill-color:transparent;
+ background:linear-gradient(155deg,#fff 0%,var(--neon-hi) 15%,var(--neon) 42%,#fff 51%,var(--neon) 66%,var(--neon-low) 100%);
+ background-clip:text;-webkit-background-clip:text;
+ -webkit-text-stroke:1.25px var(--neon-hi);paint-order:stroke fill;
+ text-shadow:0 1px 1px #fff,0 0 2px var(--neon-hi),0 0 6px var(--neon),
+  0 0 13px var(--neon),0 0 25px var(--neon-low);
+ opacity:.96;transform:rotate(var(--rot)) scale(var(--scale));
+ transform-origin:center center;
+}
+.neonDoodle{
+ position:absolute;display:block;line-height:1;pointer-events:none;user-select:none;
+ color:var(--neon);font-family:"Segoe UI Symbol","Arial Unicode MS",sans-serif;
+ font-weight:900;text-shadow:0 0 2px #fff,0 0 6px var(--neon),0 0 15px var(--neon),0 0 28px var(--neon-low);
+ transform:translate(-50%,-50%) rotate(var(--rot));
+}
+@keyframes neonStartFlicker{
+ 0%,1%{opacity:.05}1.6%{opacity:.82}2.1%{opacity:.18}3%{opacity:1}
+ 3.4%,18%{opacity:.96}18.3%{opacity:.42}18.8%{opacity:1}
+ 42%,42.4%{opacity:.88}42.7%{opacity:.08}43.4%{opacity:1}
+ 76%,76.3%{opacity:.93}76.7%{opacity:.12}77.4%{opacity:.98}
+ 100%{opacity:.96}
+}
+@keyframes neonSoftFlicker{
+ 0%,19%,20%,57%,58%,100%{opacity:.94}
+ 19.4%{opacity:.66}20.4%{opacity:1}
+ 57.3%{opacity:.48}58.4%{opacity:.97}
+ 83.1%{opacity:.7}83.6%{opacity:.96}
+}
+@keyframes neonPowerCut{
+ 0%,26%,27%,100%{opacity:.94}
+ 26.4%{opacity:.12}26.9%{opacity:.76}27.4%{opacity:1}
+ 63.2%{opacity:.86}63.5%{opacity:.03}64.2%{opacity:.98}
+ 88%{opacity:.72}88.5%{opacity:1}
+}
+@keyframes neonDoodleFlicker{
+ 0%,100%{opacity:.94}13%{opacity:.5}13.6%{opacity:1}
+ 54%{opacity:.18}54.8%{opacity:.96}79%{opacity:.68}79.5%{opacity:1}
+}
 #main{z-index:2}
 #grain{z-index:1}
-.sidebar{background:linear-gradient(90deg,#09090bf2 0,#101014e8 82%,#101014dd)}
-.content{background:linear-gradient(110deg,#090a0d66,transparent 55%)}
-.hero{background:linear-gradient(105deg,#171014ed 0,#281b1be8 48%,#50301fdf 100%)}
+.sidebar{background:linear-gradient(90deg,#09090bf0 0,#101014e0 82%,#101014ce)}
+.content{background:linear-gradient(110deg,#090a0d40,transparent 62%)}
+.hero{background:linear-gradient(105deg,#171014e8 0,#281b1bdc 48%,#50301fce 100%)}
 .card{background:#151519ed}
 .dialog{background:linear-gradient(145deg,#211b1bf5,#111216f7)}
 #detail,#pinGate{background:#030304ed}
 .hero.neon-boot{animation:panelPrism 3.4s ease-in-out both}
 .hero.neon-boot:before{animation:prismSweep 3.4s ease-in-out both}
-@keyframes panelPrism{0%{box-shadow:0 18px 50px #0008,0 0 0 #fff0;filter:saturate(.8)}
- 18%{box-shadow:0 0 22px #ff4c9d88,0 0 55px #4bdcff77,0 18px 50px #0008;filter:saturate(2)}
- 38%{box-shadow:0 0 28px #a66bff99,0 0 70px #42f2c477,0 18px 50px #0008;filter:saturate(2.2)}
- 62%{box-shadow:0 0 24px #ffd45c88,0 0 60px #ff5c7d77,0 18px 50px #0008;filter:saturate(1.9)}
- 100%{box-shadow:0 18px 50px #0008,0 0 22px #6bdcff22;filter:saturate(1.1)}}
-@keyframes prismSweep{0%{opacity:0;transform:translateX(-30%) rotate(-12deg)}
+@keyframes panelPrism{
+ 0%{box-shadow:0 18px 50px #0008,0 0 0 #fff0}
+ 18%{box-shadow:0 0 22px #ff4c9d88,0 0 55px #4bdcff77,0 18px 50px #0008}
+ 38%{box-shadow:0 0 28px #a66bff99,0 0 70px #42f2c477,0 18px 50px #0008}
+ 62%{box-shadow:0 0 24px #ffd45c88,0 0 60px #ff5c7d77,0 18px 50px #0008}
+ 100%{box-shadow:0 18px 50px #0008,0 0 22px #6bdcff22}
+}
+@keyframes prismSweep{
+ 0%{opacity:0;transform:translateX(-30%) rotate(-12deg)}
  25%{opacity:1;background:radial-gradient(ellipse,#ff4cae88,transparent 68%)}
  55%{opacity:.9;background:radial-gradient(ellipse,#4deaff88,transparent 68%)}
- 80%{opacity:.75;background:radial-gradient(ellipse,#d76bff77,transparent 68%)}100%{opacity:.4}}
-/* Static neon-glass profile for Android WebView: preserve the graffiti wall without
-   dozens of filters, animated pseudo-elements, or repeated layer compositing. */
+ 80%{opacity:.75;background:radial-gradient(ellipse,#d76bff77,transparent 68%)}
+ 100%{opacity:.4}
+}
+/* Phone and TV use the same package; only the layout adapts to available width. */
 @media(max-width:900px){
- #neonWall{opacity:.84;isolation:auto}
- .neonTag:nth-child(n+25){display:none}
- .neonTag{animation:none!important;filter:none!important;opacity:.72;text-shadow:0 1px 0 #fff9,0 2px 0 #111,0 0 5px var(--neon)}
- .neonTag:before,.neonTag:after{display:none!important;content:none!important}
- .nav{animation:none!important;transition:none}
+ #neonWall{opacity:.88;isolation:auto}
+ .neonTag{letter-spacing:-.05em;-webkit-text-stroke:1px var(--neon-hi)}
  .hero,.card,.dialog,.sidebar,.content,#detail,#pinGate{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
- .hero.neon-boot,.hero.neon-boot:before{animation:none!important;filter:none!important}
 }
-@media(max-width:520px){
- .neonTag:nth-child(n+15){display:none}
- .catalogGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
- .card{min-width:0;width:auto;flex-basis:calc(50% - 8px)}
- .poster{height:150px;object-fit:cover}
+@media(max-width:600px){
+ #main{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto}
+ .sidebar{grid-column:1;grid-row:2;flex-direction:row;align-items:center;gap:5px;overflow-x:auto;
+  padding:8px 7px;border-right:0;border-top:1px solid #d6ae6138}
+ .brand,.sidebarFooter{display:none}
+ .nav{flex:1 0 auto;width:auto;min-width:0;padding:10px 7px;font-size:11px;text-align:center;white-space:nowrap}
+ .content{grid-column:1;grid-row:1;padding:15px 12px 10px;overflow:auto}
+ .topline{margin-bottom:12px;gap:8px}
+ .eyebrow{letter-spacing:.15em}
+ .status{font-size:10px;text-align:right}
+ .hero{height:auto;min-height:220px;padding:19px 16px}
+ .heroCopy{max-width:78%}
+ .hero h1{font-size:clamp(23px,5.5vw,32px)}
+ .hero p{font-size:12px}
+ .heroMark{width:104px;height:104px;right:2%;top:28%}
+ .heroMark:before{font-size:70px}
+ .sectionHead{margin:16px 0 9px}
+ .sectionHead h2{font-size:17px}
+ .catalogGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .adultGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .adultToolbar{gap:7px}
+ .dialog{width:94vw;padding:19px}
+ .dialog h2{font-size:23px}
 }
+@media(max-width:380px){
+ .nav{font-size:10px;padding:9px 5px}
+ .nav:nth-of-type(5){display:none}
+ .cardTitle{font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){
+ .neonTag,.neonDoodle,.nav,.hero.neon-boot,.hero.neon-boot:before{animation:none!important}
+ .neonTag,.neonDoodle{opacity:.92}
+}
+#neonWall.paused .neonTag,#neonWall.paused .neonDoodle{animation-play-state:paused!important}
+
 .poster{aspect-ratio:4/3;contain:paint;background:#211b1b}
 .card{contain:layout paint;contain-intrinsic-size:150px 210px}
 @media(prefers-reduced-motion:reduce){.neonTag,.nav,.hero.neon-boot,.hero.neon-boot:before{animation:none!important}}@media(prefers-reduced-motion:reduce){.neonTag,.nav,.hero.neon-boot,.hero.neon-boot:before{animation:none!important}}
@@ -457,38 +537,64 @@ let secretTapCount=0,secretTapTimer=null;$('brandSecret').addEventListener('clic
 document.addEventListener('keydown',e=>{unlockAudio();if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)){const current=document.activeElement;const visible=[...document.querySelectorAll('button:not([disabled]),input:not([disabled])')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden');const cr=current.getBoundingClientRect();const cx=cr.left+cr.width/2,cy=cr.top+cr.height/2;const dir=e.key;const candidates=visible.filter(el=>el!==current).map(el=>{const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,dx=x-cx,dy=y-cy;const primary=dir==='ArrowRight'?dx:dir==='ArrowLeft'?-dx:dir==='ArrowDown'?dy:-dy;const secondary=dir==='ArrowRight'||dir==='ArrowLeft'?Math.abs(dy):Math.abs(dx);return {el,primary,score:primary+secondary*2.1};}).filter(v=>v.primary>2).sort((a,b)=>a.score-b.score);if(candidates.length){candidates[0].el.focus();e.preventDefault();}}if(e.key==='Escape'||e.key==='Backspace'){if($('detail').style.display==='flex'){closeDetail();e.preventDefault();}else if($('pinGate').style.display==='flex'){$('pinGate').style.display='none';e.preventDefault();}else if($('catalogScreen').style.display!=='none'){showPage('home');e.preventDefault();}else if(!introDone)finishIntro();}else if(e.key==='Enter'&&!introDone){finishIntro();}});
 
 const neonPhrases=[
- "ЕЩЁ ОДНУ СЕРИЮ!","КОТ ОДОБРИЛ!","ПОП-КОРН ГДЕ?!","РАБОТА ПОДОЖДЁТ!",
- "ТЫ ЕЩЁ НЕ СПИШЬ?!","ПУЛЬТ ПРОПАЛ!","СЮЖЕТ КРУЧЕ ЖИЗНИ","ТИШЕ! ИДЁТ КИНО!",
- "Я ТУТ НА ПЯТЬ МИНУТ","НЕ ТРОГАЙ ПОПКОРН","ДИВАН МОЙ БОСС","СПОКОЙНО, Я СМОТРЮ",
- "КИНО ЛЕЧИТ СКУКУ","СОСЕДИ ТОЖЕ СМОТРЯТ","ГДЕ МОИ ТИТРЫ?!","МЫШОНОК В ЗАЛЕ",
- "ЗАВТРА РАНО? НЕ СЛЫШАЛ","СНАЧАЛА ФИЛЬМ","ПЕРЕРЫВ НА ПОПКОРН","ЭКРАН ВСЁ ВИДИТ",
- "НЕ БУДИ ЗРИТЕЛЯ","СМЕХ БЕЗ БИЛЕТА","ПЯТЬ МИНУТ ДО ФИНАЛА","ФИЛЬМ САМ СЕБЯ НЕ ПОСМОТРИТ",
- "КТО ВЫКЛЮЧИЛ СВЕТ?","КИНО И ТОЧКА","СЮЖЕТ ЗАКРУЧЕН","ПОП-КОРН — МОЯ СЛАБОСТЬ",
- "ДИВАН В РЕЖИМЕ КИНО","НЕ СПОЙЛЕРИ!","СЕАНС ДЛЯ СВОИХ","УЛЫБНИСЬ, ИДЁТ ЗАПИСЬ",
- "ПУЛЬТ — ГЛАВНЫЙ","СОН ОТМЕНЯЕТСЯ","ЕЩЁ ЧУТЬ-ЧУТЬ","СМОТРИ И НЕ МОРГАЙ"
+ "ЖИЗНЬ УДАЛАСЬ!","ПЯТНИЦА! ТЫ ПРЕКРАСНА!","БУДЕМ КРАСИВЫМИ!",
+ "ДАВАЙ ЗА ЖИЗНЬ!","НЕ ПАРЬСЯ!","ХОРОШЕГО НАСТРОЕНИЯ!",
+ "УЛЫБНИСЬ!","ВСЁ БУДЕТ ОК!"
 ];
 const neonColors=[
- ["#52eaff","#b8f8ff","#0879bb"],["#ff63c8","#ffd3f0","#a51b77"],
- ["#a879ff","#e5d5ff","#5524a8"],["#55f0c7","#d2fff2","#087e70"],
- ["#ffc85d","#fff0bd","#9b5a13"],["#ff647b","#ffd4da","#a51d3a"]
+ ["#28cfff","#d8faff","#0756ab"],["#ff43bb","#ffe0f5","#9d145f"],
+ ["#ffbd35","#fff3bc","#a65b08"],["#26c8ff","#dffaff","#0755a7"],
+ ["#d65cff","#f6d9ff","#64208f"],["#5dff42","#e5ffdb","#237b0c"],
+ ["#64ffbd","#e3fff4","#08764f"],["#ff4c85","#ffe2ed","#9c123f"]
 ];
 function buildNeonWall(){
  const wall=$("neonWall");if(!wall||wall.dataset.ready)return;wall.dataset.ready="1";
  const positions=[
- [2,5,20,-8],[38,3,18,5],[70,8,24,-7],[12,18,16,7],[48,17,22,-5],[78,25,18,8],
- [3,35,23,6],[30,31,18,-9],[59,35,25,5],[82,43,16,-7],[8,52,19,-5],[39,49,23,8],
- [68,55,19,-8],[1,68,18,7],[24,65,25,-5],[52,68,17,8],[78,72,20,-6],[12,83,23,5],
- [43,85,19,-8],[70,88,24,6],[19,9,13,9],[56,7,13,-9],[88,15,11,7],[4,25,12,-6],
- [27,42,12,8],[48,28,12,-7],[73,37,13,6],[91,57,11,-8],[31,77,13,7],[59,80,12,-5],
- [87,88,12,8],[5,92,13,-6],[36,92,12,7],[63,94,13,-8],[91,3,12,6],[2,47,12,-7]
+  [3,7,25,-7,2.65],[36,5,29,5,2.15],[69,23,27,-6,2.15],[3,40,26,6,2.45],
+  [40,48,19,-7,3.3],[70,59,28,6,2.05],[17,80,24,-6,3.1],[70,84,25,5,2.7]
  ];
- positions.forEach((p,i)=>{
-  const el=document.createElement("span");el.className="neonTag";el.textContent=neonPhrases[i];el.dataset.text=neonPhrases[i];
-  el.style.left=p[0]+"%";el.style.top=p[1]+"%";el.style.fontSize="clamp(10px,"+(p[2]*.28)+"vw,34px)";
-  el.style.setProperty("--rot",p[3]+"deg");el.style.setProperty("--scale",i%4===0?"1.05":".94");
-  const color=neonColors[i%neonColors.length];el.style.setProperty("--neon",color[0]);el.style.setProperty("--neon-hi",color[1]);el.style.setProperty("--neon-low",color[2]);
-  el.style.setProperty("--speed",(3.4+(i%7)*.73)+"s");el.style.setProperty("--delay",(-i*.61)+"s");el.style.setProperty("--glint-delay",(-i*.83)+"s");
+ neonPhrases.forEach((phrase,i)=>{
+  const p=positions[i],el=document.createElement("span");
+  el.className="neonTag";el.textContent=phrase;el.setAttribute("aria-hidden","true");
+  el.style.left=p[0]+"%";el.style.top=p[1]+"%";el.style.width=p[2]+"%";
+  el.style.fontSize="clamp(14px,"+p[4]+"vw,46px)";
+  el.style.setProperty("--rot",p[3]+"deg");el.style.setProperty("--scale",i%3===0?"1.04":".98");
+  const c=neonColors[i];el.style.setProperty("--neon",c[0]);el.style.setProperty("--neon-hi",c[1]);el.style.setProperty("--neon-low",c[2]);
+  if(i!==0&&i!==4){
+   const cycle=8+Math.random()*8;
+   el.style.animationName=i%3===0?"neonStartFlicker":(i%3===1?"neonSoftFlicker":"neonPowerCut");
+   el.style.animationDuration=cycle.toFixed(2)+"s";
+   el.style.animationDelay=(-Math.random()*cycle).toFixed(2)+"s";
+   el.style.animationTimingFunction="steps(1,end)";
+   el.style.animationIterationCount="infinite";
+  }
   wall.appendChild(el);
+ });
+ const doodles=[
+  ["♛",30,10,"#ffc84c","#fff2b3",64,-8],
+  ["✦",62,12,"#46dfff","#d6f8ff",42,9],
+  ["😎",91,13,"#ffcb44","#fff0a8",58,6],
+  ["♡",35,73,"#ff4bc4","#ffd8f4",58,-8],
+  ["💋",35,58,"#ff4e7b","#ffd5e1",54,8],
+  ["👍",92,78,"#ffb53d","#ffedaf",58,-7],
+  ["★",58,91,"#38d9ff","#d7faff",38,6]
+ ];
+ doodles.forEach((d,i)=>{
+  const el=document.createElement("span");el.className="neonDoodle";el.textContent=d[0];
+  el.setAttribute("aria-hidden","true");el.style.left=d[1]+"%";el.style.top=d[2]+"%";
+  el.style.setProperty("--neon",d[3]);el.style.setProperty("--neon-hi",d[4]);
+  el.style.setProperty("--neon-low",d[3]);el.style.fontSize="clamp(25px,"+(d[5]/10)+"vw,76px)";
+  el.style.setProperty("--rot",d[6]+"deg");
+  const cycle=6+Math.random()*7;
+  el.style.animationName="neonDoodleFlicker";
+  el.style.animationDuration=cycle.toFixed(2)+"s";
+  el.style.animationDelay=(-Math.random()*cycle).toFixed(2)+"s";
+  el.style.animationTimingFunction="steps(1,end)";
+  el.style.animationIterationCount="infinite";
+  wall.appendChild(el);
+ });
+ document.addEventListener("visibilitychange",()=>{
+  wall.classList.toggle("paused",document.hidden);
  });
 }
 function playPanelPrism(){
