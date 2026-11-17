@@ -11,8 +11,8 @@ android {
         applicationId = "com.sultan.cinema"
         minSdk = 23
         targetSdk = 28
-        versionCode = 3
-        versionName = "0.2.1-TV"
+        versionCode = 4
+        versionName = "0.3.0-Universal"
     }
 
     compileOptions {
