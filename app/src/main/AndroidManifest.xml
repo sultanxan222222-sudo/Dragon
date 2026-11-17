@@ -31,8 +31,10 @@
             android:name=".MainActivity"
             android:exported="true"
             android:screenOrientation="sensor"
-            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize"
-            android:hardwareAccelerated="true">
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout|smallestScreenSize"
+            android:hardwareAccelerated="true"
+            android:resizeableActivity="true"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
