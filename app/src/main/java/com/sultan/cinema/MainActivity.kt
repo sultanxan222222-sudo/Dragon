@@ -235,13 +235,17 @@ class MainActivity : Activity() {
     }
 
     private fun enterImmersiveMode() {
+        // Keep the TV experience edge-to-edge, but preserve normal system bars on phones.
+        val isTelevision = packageManager.hasSystemFeature("android.software.leanback")
         @Suppress("DEPRECATION")
-        window.decorView.systemUiVisibility = (
+        window.decorView.systemUiVisibility = if (isTelevision) {
             View.SYSTEM_UI_FLAG_FULLSCREEN or
                 View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-            )
+        } else {
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+        }
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
